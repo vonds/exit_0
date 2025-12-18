@@ -1,0 +1,4 @@
+# Boss Battle 18
+# This boss tests your mastery of Challenges 171 to 180.
+# You'll need to demonstrate everything you've learned so far.
+# Complete all subtasks below in a single Bash script.

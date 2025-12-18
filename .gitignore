@@ -1,0 +1,9 @@
+cat > .gitignore << 'EOF'
+.DS_Store
+*.log
+*.tmp
+.env
+.env.*
+data/*.json
+data/.lab_completions.json
+EOF

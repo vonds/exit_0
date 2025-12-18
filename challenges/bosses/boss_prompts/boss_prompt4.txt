@@ -1,0 +1,4 @@
+# Boss Battle 4
+# This boss tests your mastery of Challenges 31 to 40.
+# You'll need to demonstrate everything you've learned so far.
+# Complete all subtasks below in a single Bash script.
