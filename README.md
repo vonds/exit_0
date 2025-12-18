@@ -8,18 +8,21 @@ The core idea behind exit_0 is simple: Linux mastery is earned through consisten
 
 exit_0 runs entirely in the terminal and is intended for use on Unix-like systems such as Linux or macOS. After cloning the repository or extracting the project directory, begin by navigating into the root of the project.
 
-cd exit_0
+```cd exit_0```
 
 Before running the application for the first time, ensure the scripts are executable. If needed, you can update permissions with:
 
-chmod +x *.sh
-chmod +x scripts/*.sh labs/*.sh
+```chmod +x *.sh```
+```chmod +x scripts/*.sh labs/*.sh```
 
 
 The primary entry point into the application is the welcome menu, which initializes the environment and provides access to all available functionality. To start the game, run:
 
-./welcome_menu.sh
+```exit_0/scripts/welcome_menu.sh```
 
+To start the game from the project root, run:
+
+```./scripts/welcome_menu.sh```
 
 Once launched, you’ll be presented with an interactive terminal menu. Navigation is handled using simple numeric selections and standard input. From the welcome menu, you can enter the labs interface, review progress and stats, or explore other available options.
 
