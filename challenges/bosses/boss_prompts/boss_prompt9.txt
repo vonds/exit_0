@@ -1,4 +1,0 @@
-# Boss Battle 9
-# This boss tests your mastery of Challenges 81 to 90.
-# You'll need to demonstrate everything you've learned so far.
-# Complete all subtasks below in a single Bash script.

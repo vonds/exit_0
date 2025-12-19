@@ -1,4 +1,0 @@
-# Boss Battle 20
-# This boss tests your mastery of Challenges 191 to 200.
-# You'll need to demonstrate everything you've learned so far.
-# Complete all subtasks below in a single Bash script.

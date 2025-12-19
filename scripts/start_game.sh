@@ -9,7 +9,7 @@ source "$SCRIPT_DIR/stats.sh" > /dev/null 2>&1 || true
 source "$SCRIPT_DIR/xp.sh" > /dev/null 2>&1 || true
 source "$SCRIPT_DIR/../assets/prompts.sh" > /dev/null 2>&1 || true
 
-# LPIC module (with fallback message later if unavailable)
+# Linux module (with fallback message later if unavailable)
 if ! source "$SCRIPT_DIR/lpic_practice_exam.sh" > /dev/null 2>&1; then
     LPIC_AVAILABLE=0
 else
@@ -174,8 +174,8 @@ main_menu() {
         center_menu "1) Start Full Challenge Run"
         center_menu "2) Run a Specific Challenge"
         center_menu "3) Practice a Challenge"
-        center_menu "4) LPIC Practice Exam"
-        center_menu "5) Sysadmin Lab Mode"
+        center_menu "4) Linux Practice Exam"
+        center_menu "5) Linux Lab Mode"
         center_menu "6) Study Stats "
         center_menu "7) Exit"
         echo
@@ -210,7 +210,7 @@ main_menu() {
                 if [[ "$LPIC_AVAILABLE" -eq 1 ]]; then
                     choose_exam
                 else
-                    print_error "   LPIC Practice Exam module failed to load."
+                    print_error "   Linux Practice Exam module failed to load."
                     read -p "   Press Enter to return to menu..."
                 fi
                 ;;
@@ -219,7 +219,7 @@ main_menu() {
                     source "$SCRIPT_DIR/labs_menu.sh"
                     main_lab_menu
                 else
-                    print_error "   Sysadmin Lab module not found."
+                    print_error "   Linux Lab module not found."
                     read -p "   Press Enter to return to menu..."
                 fi
                 ;;

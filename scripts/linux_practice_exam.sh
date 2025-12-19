@@ -100,7 +100,7 @@ choose_exam() {
   echo
   echo
   echo
-  print_banner "LPIC Practice Menu"
+  print_banner "Linux Practice Menu"
   echo
 
   center_menu "1) System Architecture A"
@@ -657,7 +657,7 @@ word_wrap_and_center() {
 run_exam() {
   local EXAM_TITLE="$1"
   clear
-  center_text "LPIC Practice Exam: $EXAM_TITLE"
+  center_text "Linux Practice Exam: $EXAM_TITLE"
   echo
 
   # Validate that the question file exists and has content

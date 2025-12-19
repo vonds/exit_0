@@ -23,10 +23,10 @@ main_lab_menu() {
     center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
     center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
     echo; echo
-    print_banner "Sysadmin Lab Mode - LPIC-1"
+    print_banner "Sysadmin Lab Mode - Linux"
     echo
   else
-    echo "Sysadmin Lab Mode - LPIC-1"
+    echo "Sysadmin Lab Mode - Linux"
     echo
   fi
 
