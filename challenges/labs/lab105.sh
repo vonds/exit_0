@@ -48,7 +48,39 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  DHCP server package installed."
+    echo "  Last metadata expiration check: 0:01:44 ago on Fri 19 Dec 2025 05:02:11 PM EST."
+    echo "  Dependencies resolved."
+    echo "  ================================================================================"
+    echo "   Package                      Architecture    Version              Repository  Size"
+    echo "  ================================================================================"
+    echo "   Installing:"
+    echo "   dhcp-server                   x86_64          12:4.4.2-19.el9      appstream  1.2 M"
+    echo "   dhcp-common                    noarch         12:4.4.2-19.el9      appstream  158 k"
+    echo "   "
+    echo "  Transaction Summary"
+    echo "  ================================================================================"
+    echo "  Install  2 Packages"
+    echo "  "
+    echo "  Total download size: 1.4 M"
+    echo "  Installed size: 4.8 M"
+    echo "  Downloading Packages:"
+    echo "  (1/2): dhcp-common-4.4.2-19.el9.noarch.rpm                 3.2 MB/s | 158 kB  00:00"
+    echo "  (2/2): dhcp-server-4.4.2-19.el9.x86_64.rpm                 7.1 MB/s | 1.2 MB  00:00"
+    echo "  --------------------------------------------------------------------------------"
+    echo "  Total                                                   9.4 MB/s | 1.4 MB  00:00"
+    echo "  Running transaction check"
+    echo "  Transaction check succeeded."
+    echo "  Running transaction test"
+    echo "  Transaction test succeeded."
+    echo "  Running transaction"
+    echo "    Preparing        :                                                        1/1"
+    echo "    Installing       : dhcp-common-12:4.4.2-19.el9.noarch                    1/2"
+    echo "    Installing       : dhcp-server-12:4.4.2-19.el9.x86_64                    2/2"
+    echo "    Verifying        : dhcp-common-12:4.4.2-19.el9.noarch                    1/2"
+    echo "    Verifying        : dhcp-server-12:4.4.2-19.el9.x86_64                    2/2"
+    echo "  "
+    echo "  Installed:"
+    echo "    dhcp-server-12:4.4.2-19.el9.x86_64   dhcp-common-12:4.4.2-19.el9.noarch"
     echo
 
     echo "  Step 2: Edit the main DHCP configuration file."
@@ -59,14 +91,18 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
+    echo "  [editor opened: /etc/dhcp/dhcpd.conf]"
+    echo "  [you added a subnet scope, DNS servers, and default gateway]"
+    echo "  [saved and exited]"
+    echo
     echo "  Example config:"
-    echo 'subnet 192.168.50.0 netmask 255.255.255.0 {'
-    echo '  range 192.168.50.10 192.168.50.100;'
-    echo '  option domain-name-servers 8.8.8.8, 1.1.1.1;'
-    echo '  option routers 192.168.50.1;'
-    echo '  default-lease-time 600;'
-    echo '  max-lease-time 7200;'
-    echo '}'
+    echo "  subnet 192.168.50.0 netmask 255.255.255.0 {"
+    echo "    range 192.168.50.10 192.168.50.100;"
+    echo "    option domain-name-servers 8.8.8.8, 1.1.1.1;"
+    echo "    option routers 192.168.50.1;"
+    echo "    default-lease-time 600;"
+    echo "    max-lease-time 7200;"
+    echo "  }"
     echo
 
     echo "  Step 3: Define the network interface to use."
@@ -77,7 +113,8 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Interface configuration updated."
+    echo "  [updated interface binding]"
+    echo "  [dhcpd will listen on: eth0]"
     echo
 
     echo "  Step 4: Enable and start the DHCP server."
@@ -88,7 +125,7 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  DHCP server started and enabled."
+    echo "  Created symlink /etc/systemd/system/multi-user.target.wants/dhcpd.service → /usr/lib/systemd/system/dhcpd.service."
     echo
 
     echo "  Step 5: Check server status for successful launch."
@@ -99,7 +136,22 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Server status should show active (running)."
+    echo "  ● dhcpd.service - DHCPv4 Server Daemon"
+    echo "     Loaded: loaded (/usr/lib/systemd/system/dhcpd.service; enabled; vendor preset: disabled)"
+    echo "     Active: active (running) since Fri 2025-12-19 17:04:28 EST; 6s ago"
+    echo "       Docs: man:dhcpd(8)"
+    echo "             man:dhcpd.conf(5)"
+    echo "   Main PID: 5312 (dhcpd)"
+    echo "     Status: \"Dispatching packets...\""
+    echo "      Tasks: 1 (limit: 11423)"
+    echo "     Memory: 4.7M"
+    echo "        CPU: 86ms"
+    echo "     CGroup: /system.slice/dhcpd.service"
+    echo "             └─5312 /usr/sbin/dhcpd -4 -q -cf /etc/dhcp/dhcpd.conf -pf /run/dhcpd.pid eth0"
+    echo "  "
+    echo "  Dec 19 17:04:28 rhel-lab dhcpd[5312]: Listening on LPF/eth0/52:54:00:7a:2c:19/192.168.50.0/24"
+    echo "  Dec 19 17:04:28 rhel-lab dhcpd[5312]: Sending on   LPF/eth0/52:54:00:7a:2c:19/192.168.50.0/24"
+    echo "  Dec 19 17:04:28 rhel-lab dhcpd[5312]: Sending on   Socket/fallback/fallback-net"
     echo
 
     echo "  Step 6: Check DHCP leases (once a client has requested one)."
@@ -110,7 +162,28 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Lease file displayed."
+    echo "  # The format is one lease block per client that has requested an address."
+    echo "  lease 192.168.50.10 {"
+    echo "    starts 5 2025/12/19 22:05:01;"
+    echo "    ends 5 2025/12/19 22:15:01;"
+    echo "    tstp 5 2025/12/19 22:15:01;"
+    echo "    cltt 5 2025/12/19 22:05:01;"
+    echo "    binding state active;"
+    echo "    next binding state free;"
+    echo "    rewind binding state free;"
+    echo "    hardware ethernet 3c:52:82:19:aa:0f;"
+    echo "    uid \"\\001<R\\202\\031\\252\\017\";"
+    echo "    client-hostname \"laptop-qa\";"
+    echo "  }"
+    echo
+    echo "  lease 192.168.50.11 {"
+    echo "    starts 5 2025/12/19 22:06:12;"
+    echo "    ends 5 2025/12/19 22:16:12;"
+    echo "    cltt 5 2025/12/19 22:06:12;"
+    echo "    binding state active;"
+    echo "    hardware ethernet 70:ee:50:9c:11:20;"
+    echo "    client-hostname \"printer-ops\";"
+    echo "  }"
     echo
 
     print_success "Lab complete."

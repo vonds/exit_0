@@ -48,7 +48,8 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Directory created and entered."
+    echo "  Directory 'galaxy_lab' created."
+    echo "  roles directory created: galaxy_lab/roles"
     echo
 
     echo "  Step 2: Search for a community role to install (e.g., geerlingguy.nginx)."
@@ -59,7 +60,15 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Search complete — select a relevant role (e.g., geerlingguy.nginx)."
+    echo "  Found 25 roles matching 'nginx'"
+    echo "  "
+    echo "  Name                                 Description"
+    echo "  ----                                 -----------"
+    echo "  geerlingguy.nginx                    Nginx for Linux."
+    echo "  nginxinc.nginx                       Official NGINX role (install/config)."
+    echo "  idealista.nginx_role                 Installs and configures Nginx."
+    echo "  jdauphant.nginx                      Install and configures nginx"
+    echo "  ..."
     echo
 
     echo "  Step 3: Install the role using ansible-galaxy."
@@ -70,7 +79,11 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Role installed under ~/.ansible/roles/"
+    echo "  Starting galaxy role install process"
+    echo "  - downloading role 'nginx', owned by geerlingguy"
+    echo "  - downloading role from https://github.com/geerlingguy/ansible-role-nginx/archive/refs/heads/master.tar.gz"
+    echo "  - extracting geerlingguy.nginx to /home/lab/.ansible/roles/geerlingguy.nginx"
+    echo "  - geerlingguy.nginx (master) was installed successfully"
     echo
 
     echo "  Step 4: Create a playbook to use the downloaded role."
@@ -82,10 +95,10 @@ while true; do
         continue
     }
     echo "  Sample playbook:"
-    echo "- hosts: all"
-    echo "  become: true"
-    echo "  roles:"
-    echo "    - geerlingguy.nginx"
+    echo "  - hosts: all"
+    echo "    become: true"
+    echo "    roles:"
+    echo "      - geerlingguy.nginx"
     echo
 
     echo "  Step 5: Run the playbook (use --syntax-check if needed)."
@@ -96,7 +109,25 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Playbook executed using the role."
+    echo "  PLAY [all] *********************************************************************"
+    echo
+    echo "  TASK [Gathering Facts] *********************************************************"
+    echo "  ok: [target1]"
+    echo
+    echo "  TASK [geerlingguy.nginx : Include OS-specific variables] ************************"
+    echo "  ok: [target1]"
+    echo
+    echo "  TASK [geerlingguy.nginx : Ensure nginx is installed] ****************************"
+    echo "  changed: [target1]"
+    echo
+    echo "  TASK [geerlingguy.nginx : Copy nginx configuration in place.] *******************"
+    echo "  changed: [target1]"
+    echo
+    echo "  TASK [geerlingguy.nginx : Ensure nginx is started and enabled at boot.] *********"
+    echo "  changed: [target1]"
+    echo
+    echo "  PLAY RECAP *********************************************************************"
+    echo "  target1                    : ok=6    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0"
     echo
 
     echo "  Step 6: Create a custom role using the init command."
@@ -107,11 +138,17 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Custom role skeleton created under roles/myrole/"
-    echo
-
-    echo "  Step 7: Optionally edit tasks/main.yml and call your custom role in site.yml."
-    echo "  This allows combining public and internal roles in structured playbooks."
+    echo "  - Role roles/myrole was created successfully"
+    echo "  - Created roles/myrole/tasks/main.yml"
+    echo "  - Created roles/myrole/handlers/main.yml"
+    echo "  - Created roles/myrole/defaults/main.yml"
+    echo "  - Created roles/myrole/vars/main.yml"
+    echo "  - Created roles/myrole/meta/main.yml"
+    echo "  - Created roles/myrole/README.md"
+    echo "  - Created roles/myrole/files/"
+    echo "  - Created roles/myrole/templates/"
+    echo "  - Created roles/myrole/tests/inventory"
+    echo "  - Created roles/myrole/tests/test.yml"
     echo
 
     print_success "Lab complete."

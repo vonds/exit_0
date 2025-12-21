@@ -48,7 +48,45 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  OpenVPN and Easy-RSA installed."
+    echo "  Last metadata expiration check: 0:03:12 ago on Fri 19 Dec 2025 04:10:11 PM EST."
+    echo "  Dependencies resolved."
+    echo "  ================================================================================"
+    echo "   Package                Architecture    Version                 Repository  Size"
+    echo "  ================================================================================"
+    echo "   Installing:"
+    echo "   easy-rsa                noarch          3.1.7-1.el9             epel       49 k"
+    echo "   openvpn                 x86_64          2.6.8-1.el9              appstream  584 k"
+    echo "   "
+    echo "   Installing dependencies:"
+    echo "   lz4-libs                x86_64          1.9.4-2.el9              baseos     62 k"
+    echo "   "
+    echo "  Transaction Summary"
+    echo "  ================================================================================"
+    echo "  Install  3 Packages"
+    echo "  "
+    echo "  Total download size: 695 k"
+    echo "  Installed size: 2.3 M"
+    echo "  Downloading Packages:"
+    echo "  (1/3): openvpn-2.6.8-1.el9.x86_64.rpm                  1.6 MB/s | 584 kB  00:00"
+    echo "  (2/3): easy-rsa-3.1.7-1.el9.noarch.rpm                 1.1 MB/s |  49 kB  00:00"
+    echo "  (3/3): lz4-libs-1.9.4-2.el9.x86_64.rpm                 2.0 MB/s |  62 kB  00:00"
+    echo "  --------------------------------------------------------------------------------"
+    echo "  Total                                                   3.7 MB/s | 695 kB  00:00"
+    echo "  Running transaction check"
+    echo "  Transaction check succeeded."
+    echo "  Running transaction test"
+    echo "  Transaction test succeeded."
+    echo "  Running transaction"
+    echo "    Preparing        :                                                        1/1"
+    echo "    Installing       : lz4-libs-1.9.4-2.el9.x86_64                           1/3"
+    echo "    Installing       : openvpn-2.6.8-1.el9.x86_64                             2/3"
+    echo "    Installing       : easy-rsa-3.1.7-1.el9.noarch                            3/3"
+    echo "    Verifying        : lz4-libs-1.9.4-2.el9.x86_64                           1/3"
+    echo "    Verifying        : openvpn-2.6.8-1.el9.x86_64                             2/3"
+    echo "    Verifying        : easy-rsa-3.1.7-1.el9.noarch                            3/3"
+    echo "  "
+    echo "  Installed:"
+    echo "    easy-rsa-3.1.7-1.el9.noarch  openvpn-2.6.8-1.el9.x86_64  lz4-libs-1.9.4-2.el9.x86_64"
     echo
 
     echo "  Step 2: Set up the PKI (Public Key Infrastructure) directory."
@@ -59,7 +97,9 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Easy-RSA directory created at ~/openvpn-ca."
+    echo "  NOTE: Easy-RSA 'make-cadir' is available on some distros; others ship /usr/share/easy-rsa/ directly."
+    echo "  Created directory: /home/lab/openvpn-ca"
+    echo "  Copied easy-rsa files into: /home/lab/openvpn-ca"
     echo
 
     echo "  Step 3: Build the Certificate Authority (CA)."
@@ -70,7 +110,20 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  CA created. You were prompted to enter a passphrase and CN."
+    echo "  Notice"
+    echo "  ------"
+    echo "  'init-pki' complete; you may now create a CA or requests."
+    echo "  "
+    echo "  Using SSL: openssl OpenSSL 3.0.7 1 Nov 2022"
+    echo "  "
+    echo "  Enter New CA Key Passphrase:"
+    echo "  Re-Enter New CA Key Passphrase:"
+    echo "  "
+    echo "  Common Name (eg: your user, host, or server name) [Easy-RSA CA]: rhel-lab-ca"
+    echo "  "
+    echo "  CA creation complete and you may now import and sign cert requests."
+    echo "  Your new CA certificate file for publishing is at:"
+    echo "    pki/ca.crt"
     echo
 
     echo "  Step 4: Generate server certificate and key."
@@ -81,7 +134,28 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Server certificate signed and ready."
+    echo "  Using SSL: openssl OpenSSL 3.0.7 1 Nov 2022"
+    echo "  Generating a RSA private key"
+    echo "  ........................................................+++++"
+    echo "  ........................................+++++"
+    echo "  writing new private key to 'pki/private/server.key'"
+    echo "  -----"
+    echo "  "
+    echo "  Keypair and certificate request completed. Your files are:"
+    echo "    req: pki/reqs/server.req"
+    echo "    key: pki/private/server.key"
+    echo "  "
+    echo "  Using SSL: openssl OpenSSL 3.0.7 1 Nov 2022"
+    echo "  "
+    echo "  You are about to sign the following certificate request:"
+    echo "    subject=CN = server"
+    echo "  "
+    echo "  Type the word 'yes' to continue, or any other input to abort."
+    echo "    Confirm request details: yes"
+    echo "  "
+    echo "  Enter pass phrase for /home/lab/openvpn-ca/pki/private/ca.key:"
+    echo "  "
+    echo "  Certificate created at: pki/issued/server.crt"
     echo
 
     echo "  Step 5: Generate Diffie-Hellman parameters."
@@ -92,7 +166,12 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  DH parameters generated."
+    echo "  Using SSL: openssl OpenSSL 3.0.7 1 Nov 2022"
+    echo "  Generating DH parameters, 2048 bit long safe prime"
+    echo "  This is going to take a long time"
+    echo "  ..............................................................................+"
+    echo "  ..........................................................+"
+    echo "  DH parameters of size 2048 created at pki/dh.pem"
     echo
 
     echo "  Step 6: Copy certificates and keys to OpenVPN directory."
@@ -103,7 +182,10 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Files copied to /etc/openvpn/"
+    echo "  cp: copy '/home/lab/openvpn-ca/pki/ca.crt' -> '/etc/openvpn/ca.crt'"
+    echo "  cp: copy '/home/lab/openvpn-ca/pki/private/server.key' -> '/etc/openvpn/server.key'"
+    echo "  cp: copy '/home/lab/openvpn-ca/pki/issued/server.crt' -> '/etc/openvpn/server.crt'"
+    echo "  cp: copy '/home/lab/openvpn-ca/pki/dh.pem' -> '/etc/openvpn/dh.pem'"
     echo
 
     echo "  Step 7: Configure the OpenVPN server."
@@ -114,7 +196,9 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Sample server config deployed."
+    echo "  0+1 records in"
+    echo "  0+1 records out"
+    echo "  7556 bytes copied, 0.00231445 s, 3.3 MB/s"
     echo
 
     echo "  Step 8: Start and enable the OpenVPN server."
@@ -125,7 +209,7 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  OpenVPN server started and enabled."
+    echo "  Created symlink /etc/systemd/system/multi-user.target.wants/openvpn@server.service → /usr/lib/systemd/system/openvpn@.service."
     echo
 
     echo "  Step 9: Verify the server status."
@@ -136,7 +220,21 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  You should see active (running) in the output."
+    echo "  ● openvpn@server.service - OpenVPN service for server"
+    echo "     Loaded: loaded (/usr/lib/systemd/system/openvpn@.service; enabled; vendor preset: disabled)"
+    echo "     Active: active (running) since Fri 2025-12-19 16:12:44 EST; 6s ago"
+    echo "       Docs: man:openvpn(8)"
+    echo "   Main PID: 4128 (openvpn)"
+    echo "     Status: \"Initialization Sequence Completed\""
+    echo "      Tasks: 1 (limit: 11423)"
+    echo "     Memory: 3.8M"
+    echo "        CPU: 112ms"
+    echo "     CGroup: /system.slice/system-openvpn\\x2dserver.slice/openvpn@server.service"
+    echo "             └─4128 /usr/sbin/openvpn --config /etc/openvpn/server.conf"
+    echo "  "
+    echo "  Dec 19 16:12:44 rhel-lab openvpn[4128]: WARNING: file '/etc/openvpn/server.key' is group or others accessible"
+    echo "  Dec 19 16:12:44 rhel-lab openvpn[4128]: NOTE: --cipher is not set. OpenVPN 2.5+ uses negotiated ciphers."
+    echo "  Dec 19 16:12:44 rhel-lab openvpn[4128]: Initialization Sequence Completed"
     echo
 
     echo "  Step 10: Generate a client certificate (e.g., client1)."
@@ -147,7 +245,25 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Client certificate generated and signed."
+    echo "  Using SSL: openssl OpenSSL 3.0.7 1 Nov 2022"
+    echo "  Generating a RSA private key"
+    echo "  ...................................................+++++"
+    echo "  .............................+++++"
+    echo "  writing new private key to 'pki/private/client1.key'"
+    echo "  -----"
+    echo "  Keypair and certificate request completed. Your files are:"
+    echo "    req: pki/reqs/client1.req"
+    echo "    key: pki/private/client1.key"
+    echo "  "
+    echo "  You are about to sign the following certificate request:"
+    echo "    subject=CN = client1"
+    echo "  "
+    echo "  Type the word 'yes' to continue, or any other input to abort."
+    echo "    Confirm request details: yes"
+    echo "  "
+    echo "  Enter pass phrase for /home/lab/openvpn-ca/pki/private/ca.key:"
+    echo "  "
+    echo "  Certificate created at: pki/issued/client1.crt"
     echo
 
     print_success "Lab complete."

@@ -49,12 +49,12 @@ while true; do
         continue
     }
     echo "  Script content should include:"
-    echo '#!/usr/bin/env python3'
-    echo 'import json'
-    echo 'print(json.dumps({'
-    echo '  "web": { "hosts": ["web1.local", "web2.local"] },'
-    echo '  "_meta": { "hostvars": {} }'
-    echo '}))'
+    echo '  #!/usr/bin/env python3'
+    echo '  import json'
+    echo '  print(json.dumps({'
+    echo '    "web": { "hosts": ["web1.local", "web2.local"] },'
+    echo '    "_meta": { "hostvars": {} }'
+    echo '  }))'
     echo
 
     echo "  Step 2: Make the inventory script executable."
@@ -65,7 +65,7 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Script is now executable."
+    echo "  chmod: changing permissions of 'dyn_inventory.py': 1000:1000"
     echo
 
     echo "  Step 3: Query the dynamic inventory using ansible-inventory."
@@ -76,7 +76,23 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Output shows your simulated inventory."
+    echo "  {"
+    echo "    \"_meta\": {"
+    echo "      \"hostvars\": {}"
+    echo "    },"
+    echo "    \"all\": {"
+    echo "      \"children\": ["
+    echo "        \"ungrouped\","
+    echo "        \"web\""
+    echo "      ]"
+    echo "    },"
+    echo "    \"web\": {"
+    echo "      \"hosts\": ["
+    echo "        \"web1.local\","
+    echo "        \"web2.local\""
+    echo "      ]"
+    echo "    }"
+    echo "  }"
     echo
 
     echo "  Step 4: Create a playbook to target the dynamic 'web' group."
@@ -88,11 +104,11 @@ while true; do
         continue
     }
     echo "  Sample content:"
-    echo "- hosts: web"
-    echo "  gather_facts: false"
-    echo "  tasks:"
-    echo "    - name: Ping web group hosts"
-    echo "      ping:"
+    echo "  - hosts: web"
+    echo "    gather_facts: false"
+    echo "    tasks:"
+    echo "      - name: Ping web group hosts"
+    echo "        ping:"
     echo
 
     echo "  Step 5: Run the playbook using the dynamic inventory script."
@@ -103,13 +119,23 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Playbook executed using your dynamic inventory."
+    echo "  PLAY [web] *********************************************************************"
     echo
-
-    echo "  Step 6: Optional – Implement plugin-based dynamic inventory (YAML format)."
-    echo "  Use built-in Ansible plugins (e.g., `constructed`, `script`, `yaml`, `aws_ec2`)."
-    echo "  Reference config file:"
-    echo "  inventory.d/plugin_aws.yml or inventory.d/plugin_constructed.yml"
+    echo "  TASK [Ping web group hosts] ****************************************************"
+    echo "  ok: [web1.local] => {"
+    echo "      \"ansible_facts\": {},"
+    echo "      \"changed\": false,"
+    echo "      \"ping\": \"pong\""
+    echo "  }"
+    echo "  ok: [web2.local] => {"
+    echo "      \"ansible_facts\": {},"
+    echo "      \"changed\": false,"
+    echo "      \"ping\": \"pong\""
+    echo "  }"
+    echo
+    echo "  PLAY RECAP *********************************************************************"
+    echo "  web1.local                 : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0"
+    echo "  web2.local                 : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0"
     echo
 
     print_success "Lab complete."
