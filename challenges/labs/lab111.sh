@@ -45,7 +45,6 @@ while true; do
 
   # STEP 1: CPU model name from /proc/cpuinfo
   echo "  Step 1: Print the CPU model name from /proc/cpuinfo (first occurrence)."
-  echo "          (Hint: grep the '^model name' line and stop after the first match)"
   read -p "  lab@lpic-lab111:~$ " cmd1
   echo
   if [[ "$cmd1" != "grep -m1 '^model name' /proc/cpuinfo" && \
@@ -61,7 +60,6 @@ while true; do
 
   # STEP 2: Logical processor count from /proc/cpuinfo
   echo "  Step 2: Count logical processors using /proc/cpuinfo."
-  echo "          (Hint: grep '^processor' and count the lines)"
   read -p "  lab@lpic-lab111:~$ " cmd2
   echo
   if [[ "$cmd2" != "grep -c '^processor' /proc/cpuinfo" && \
@@ -75,7 +73,6 @@ while true; do
 
   # STEP 3: Cross-check CPU facts with lscpu
   echo "  Step 3: Cross-check CPU summary using the standard utility."
-  echo "          (Hint: run lscpu)"
   read -p "  lab@lpic-lab111:~$ " cmd3
   echo
   if [[ "$cmd3" != "lscpu" && "$cmd3" != "sudo lscpu" ]]; then
@@ -92,7 +89,6 @@ while true; do
 
   # STEP 4: Extract MemTotal and MemAvailable from /proc/meminfo
   echo "  Step 4: Show MemTotal and MemAvailable from /proc/meminfo."
-  echo "          (Hint: egrep '^(MemTotal|MemAvailable)')")
   read -p "  lab@lpic-lab111:~$ " cmd4
   echo
   if [[ "$cmd4" != "egrep '^(MemTotal|MemAvailable)' /proc/meminfo" && \
@@ -107,7 +103,6 @@ while true; do
 
   # STEP 5: Cross-check memory with free -h
   echo "  Step 5: Cross-check memory values using a human-readable summary."
-  echo "          (Hint: free -h)"
   read -p "  lab@lpic-lab111:~$ " cmd5
   echo
   if [[ "$cmd5" != "free -h" && "$cmd5" != "sudo free -h" ]]; then
@@ -122,7 +117,6 @@ while true; do
 
   # STEP 6: Compute % memory used from /proc/meminfo (Total - Available)
   echo "  Step 6: Compute percentage memory used using /proc/meminfo only."
-  echo "          (Hint: use awk to read MemTotal and MemAvailable, then print %)"
   read -p "  lab@lpic-lab111:~$ " cmd6
   echo
   if [[ "$cmd6" != "awk '/^MemTotal/{t=$2}/^MemAvailable/{a=$2} END{u=t-a; printf(\"Used: %.1f%%\\n\", (u/t)*100)}' /proc/meminfo" && \
@@ -136,7 +130,6 @@ while true; do
 
   # STEP 7: Bonus — show hugepages summary if present
   echo "  Step 7 (Bonus): Show hugepage settings if supported."
-  echo "          (Hint: grep Huge /proc/meminfo)"
   read -p "  lab@lpic-lab111:~$ " cmd7
   echo
   if [[ "$cmd7" != "grep Huge /proc/meminfo" && "$cmd7" != "grep -E '^Huge' /proc/meminfo" ]]; then

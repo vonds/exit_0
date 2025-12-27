@@ -50,7 +50,6 @@ while true; do
 
   # STEP 1: Show GRUB defaults
   echo "  Step 1: Print the GRUB defaults file lines (timeout, default, cmdline)."
-  echo "          (Hint: grep -E '^GRUB_' /etc/default/grub)"
   read -p "  lab@lpic-lab114:~$ " cmd1
   echo
   if [[ "$cmd1" != "grep -E '^GRUB_' /etc/default/grub" && "$cmd1" != "grep '^GRUB_' /etc/default/grub" ]]; then
@@ -67,7 +66,6 @@ while true; do
 
   # STEP 2: List GRUB menu entries from grub.cfg (first 5)
   echo "  Step 2: Show the first 5 menu entries from the active grub.cfg."
-  echo "          (Hint: grep \"^menuentry\" /boot/grub*/grub.cfg | head -n 5)"
   read -p "  lab@lpic-lab114:~$ " cmd2
   echo
   if [[ "$cmd2" != "grep '^menuentry' /boot/grub*/grub.cfg | head -n 5" && \
@@ -85,7 +83,6 @@ while true; do
 
   # STEP 3: List current kernels present in /boot
   echo "  Step 3: List kernel and initramfs images in /boot."
-  echo "          (Hint: ls -1 /boot | grep -E 'vmlinuz|initrd|initramfs')"
   read -p "  lab@lpic-lab114:~$ " cmd3
   echo
   if [[ "$cmd3" != "ls -1 /boot | grep -E 'vmlinuz|initrd|initramfs'" && \
@@ -102,9 +99,8 @@ while true; do
 
   # STEP 4: Regenerate grub.cfg (accept distro variants)
   echo "  Step 4: Regenerate the GRUB configuration file using your distro's command."
-  echo "          Debian/Ubuntu: sudo update-grub"
-  echo "          RHEL/Fedora:   sudo grub2-mkconfig -o /boot/grub2/grub.cfg"
-  echo "          (Also accepted: grub-mkconfig -o /boot/grub/grub.cfg)"
+ 
+  # RHEL/Fedora: "sudo grub2-mkconfig -o /boot/grub2/grub.cfg"
   read -p "  lab@lpic-lab114:~$ " cmd4
   echo
   if is_update_grub "$cmd4"; then
@@ -132,7 +128,6 @@ while true; do
 
   # STEP 5: Verify timestamp of regenerated grub.cfg
   echo "  Step 5: Show the grub.cfg path and its modification time."
-  echo "          (Hint: ls -l /boot/grub*/grub.cfg)"
   read -p "  lab@lpic-lab114:~$ " cmd5
   echo
   if [[ "$cmd5" != "ls -l /boot/grub*/grub.cfg" ]]; then
@@ -147,7 +142,6 @@ while true; do
 
   # STEP 6: Inspect a key default like GRUB_TIMEOUT or GRUB_DEFAULT
   echo "  Step 6: Show the current GRUB_TIMEOUT value from /etc/default/grub."
-  echo "          (Hint: grep '^GRUB_TIMEOUT=' /etc/default/grub)"
   read -p "  lab@lpic-lab114:~$ " cmd6
   echo
   if [[ "$cmd6" != "grep '^GRUB_TIMEOUT=' /etc/default/grub" ]]; then
@@ -160,7 +154,6 @@ while true; do
 
   # STEP 7: (Safe) Check GRUB installer version (no changes made)
   echo "  Step 7: Print GRUB installer version safely (no device writes)."
-  echo "          (Hint: grub2-install --version  OR  grub-install --version)"
   read -p "  lab@lpic-lab114:~$ " cmd7
   echo
   if [[ "$cmd7" != "grub2-install --version" && "$cmd7" != "grub-install --version" && "$cmd7" != "sudo grub2-install --version" && "$cmd7" != "sudo grub-install --version" ]]; then
@@ -171,9 +164,8 @@ while true; do
   echo "  grub-install (GRUB) 2.06"
   echo
 
-  # STEP 8 (Bonus): Show current default boot target (systemd perspective)
-  echo "  Step 8 (Bonus): Show the current default systemd target (runlevel equivalent)."
-  echo "          (Hint: systemctl get-default)"
+  # STEP 8: Show current default boot target (systemd perspective)
+  echo "  Step 8: Show the current default systemd target (runlevel equivalent)."
   read -p "  lab@lpic-lab114:~$ " cmd8
   echo
   if [[ "$cmd8" != "systemctl get-default" && "$cmd8" != "sudo systemctl get-default" ]]; then

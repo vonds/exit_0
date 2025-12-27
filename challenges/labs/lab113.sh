@@ -45,7 +45,6 @@ while true; do
 
   # STEP 1: Survey /sys top-level
   echo "  Step 1: List the first 10 entries at the top of /sys."
-  echo "          (Hint: ls -l /sys | head -n 10)"
   read -p "  lab@lpic-lab113:~$ " cmd1
   echo
   if [[ "$cmd1" != "ls -l /sys | head -n 10" && "$cmd1" != "ls -l /sys | head" && "$cmd1" != "head -n 10 <(ls -l /sys)" ]]; then
@@ -67,7 +66,6 @@ while true; do
 
   # STEP 2: Survey /sys/class and list network class entries
   echo "  Step 2: List entries in the 'net' class."
-  echo "          (Hint: ls -1 /sys/class/net)"
   read -p "  lab@lpic-lab113:~$ " cmd2
   echo
   if [[ "$cmd2" != "ls -1 /sys/class/net" && "$cmd2" != "ls /sys/class/net" ]]; then
@@ -81,7 +79,6 @@ while true; do
 
   # STEP 3: Survey block devices via sysfs
   echo "  Step 3: Show the block devices directory listing."
-  echo "          (Hint: ls -l /sys/block)"
   read -p "  lab@lpic-lab113:~$ " cmd3
   echo
   if [[ "$cmd3" != "ls -l /sys/block" ]]; then
@@ -96,7 +93,6 @@ while true; do
 
   # STEP 4: Read block device size (sectors) from sysfs
   echo "  Step 4: Print the size (in 512-byte sectors) of /sys/block/sda."
-  echo "          (Hint: cat /sys/block/sda/size)"
   read -p "  lab@lpic-lab113:~$ " cmd4
   echo
   if [[ "$cmd4" != "cat /sys/block/sda/size" ]]; then
@@ -109,7 +105,6 @@ while true; do
 
   # STEP 5: Convert sectors to GiB using awk
   echo "  Step 5: Convert the sector count to GiB (512 bytes per sector)."
-  echo "          (Hint: awk 'BEGIN{b=512} {printf \"%.1f GiB\\n\", ($1*b)/1024/1024/1024}' /sys/block/sda/size)"
   read -p "  lab@lpic-lab113:~$ " cmd5
   echo
   if [[ "$cmd5" != "awk 'BEGIN{b=512} {printf \"%.1f GiB\\n\", ($1*b)/1024/1024/1024}' /sys/block/sda/size" ]]; then
@@ -122,7 +117,6 @@ while true; do
 
   # STEP 6: Read vendor/model via the device subdir
   echo "  Step 6: Show the storage device vendor and model for sda."
-  echo "          (Hints: cat /sys/block/sda/device/vendor  and  .../device/model)"
   read -p "  lab@lpic-lab113:~$ " cmd6a
   echo
   if [[ "$cmd6a" != "cat /sys/block/sda/device/vendor" ]]; then
@@ -144,7 +138,6 @@ while true; do
 
   # STEP 7: Identify the driver bound to sda via sysfs
   echo "  Step 7: Resolve the absolute path of the driver bound to sda's device."
-  echo "          (Hint: readlink -f /sys/block/sda/device/driver)"
   read -p "  lab@lpic-lab113:~$ " cmd7
   echo
   if [[ "$cmd7" != "readlink -f /sys/block/sda/device/driver" ]]; then
@@ -157,7 +150,6 @@ while true; do
 
   # STEP 8: Inspect the uevent file for sda (modalias & properties)
   echo "  Step 8: Print the uevent data for sda."
-  echo "          (Hint: cat /sys/block/sda/uevent)"
   read -p "  lab@lpic-lab113:~$ " cmd8
   echo
   if [[ "$cmd8" != "cat /sys/block/sda/uevent" ]]; then
@@ -173,7 +165,6 @@ while true; do
 
   # STEP 9: Cross-check major:minor with lsblk
   echo "  Step 9: Cross-check sda's major:minor via lsblk."
-  echo "          (Hint: lsblk -o NAME,MAJ:MIN | grep '^sda')"
   read -p "  lab@lpic-lab113:~$ " cmd9
   echo
   if [[ "$cmd9" != "lsblk -o NAME,MAJ:MIN | grep '^sda'" && "$cmd9" != "lsblk -o NAME,MAJ:MIN | grep ^sda" ]]; then
@@ -184,9 +175,8 @@ while true; do
   echo "  sda            8:0"
   echo
 
-  # STEP 10 (Bonus): Follow a network iface to its driver via /sys/class/net
-  echo "  Step 10 (Bonus): Resolve the driver for eth0 through /sys/class/net."
-  echo "          (Hint: readlink -f /sys/class/net/eth0/device/driver)"
+  # STEP 10: Follow a network iface to its driver via /sys/class/net
+  echo "  Step 10: Resolve the driver for eth0 through /sys/class/net."
   read -p "  lab@lpic-lab113:~$ " cmd10
   echo
   if [[ "$cmd10" != "readlink -f /sys/class/net/eth0/device/driver" ]]; then

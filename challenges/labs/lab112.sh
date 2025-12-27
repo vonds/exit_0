@@ -46,7 +46,6 @@ while true; do
 
   # STEP 1: View /proc/interrupts snapshot
   echo "  Step 1: Show a snapshot of the first 10 lines of /proc/interrupts."
-  echo "          (Hint: cat /proc/interrupts | head -n 10)"
   read -p "  lab@lpic-lab112:~$ " cmd1
   echo
   if [[ "$cmd1" != "cat /proc/interrupts | head -n 10" && "$cmd1" != "head -n 10 /proc/interrupts" && "$cmd1" != "cat /proc/interrupts | head" ]]; then
@@ -67,7 +66,6 @@ while true; do
 
   # STEP 2: Live changes in interrupt counts
   echo "  Step 2: Watch interrupt counts update live (1-second refresh, highlight changes)."
-  echo "          (Hint: watch -n 1 -d cat /proc/interrupts)"
   read -p "  lab@lpic-lab112:~$ " cmd2
   echo
   if [[ "$cmd2" != "watch -n 1 -d cat /proc/interrupts" && "$cmd2" != "watch -d -n 1 cat /proc/interrupts" ]]; then
@@ -83,7 +81,6 @@ while true; do
 
   # STEP 3: Locate the network card IRQ line
   echo "  Step 3: Filter /proc/interrupts to show the line for the e1000 NIC."
-  echo "          (Hint: grep -i e1000 /proc/interrupts)"
   read -p "  lab@lpic-lab112:~$ " cmd3
   echo
   if [[ "$cmd3" != "grep -i e1000 /proc/interrupts" && "$cmd3" != "cat /proc/interrupts | grep -i e1000" ]]; then
@@ -96,7 +93,6 @@ while true; do
 
   # STEP 4: Sum total interrupts serviced by that IRQ across CPUs
   echo "  Step 4: Compute the total interrupts on that line (sum CPU columns)."
-  echo "          (Hint: awk to add fields 2..NF-3 on the matched e1000 line)"
   read -p "  lab@lpic-lab112:~$ " cmd4
   echo
   if [[ "$cmd4" != "awk '/e1000/ {s=0; for(i=2;i<=NF-3;i++) s+=$i; print s}' /proc/interrupts" && \
@@ -110,7 +106,6 @@ while true; do
 
   # STEP 5: Inspect I/O ports (legacy/PCI BAR I/O windows)
   echo "  Step 5: Show the first 15 lines of /proc/ioports."
-  echo "          (Hint: head -n 15 /proc/ioports)"
   read -p "  lab@lpic-lab112:~$ " cmd5
   echo
   if [[ "$cmd5" != "head -n 15 /proc/ioports" && "$cmd5" != "cat /proc/ioports | head -n 15" ]]; then
@@ -133,7 +128,6 @@ while true; do
 
   # STEP 6: Inspect physical memory map
   echo "  Step 6: Show 'System RAM' regions from /proc/iomem."
-  echo "          (Hint: grep -i 'System RAM' /proc/iomem | head -n 5)"
   read -p "  lab@lpic-lab112:~$ " cmd6
   echo
   if [[ "$cmd6" != "grep -i 'System RAM' /proc/iomem | head -n 5" && \
@@ -149,7 +143,6 @@ while true; do
 
   # STEP 7: Correlate PCI device -> driver -> module
   echo "  Step 7: From lspci, print the Ethernet device and show its driver section."
-  echo "          (Hint: lspci -nnk | grep -A2 -i ethernet)"
   read -p "  lab@lpic-lab112:~$ " cmd7
   echo
   if [[ "$cmd7" != "lspci -nnk | grep -A2 -i ethernet" && "$cmd7" != "sudo lspci -nnk | grep -A2 -i ethernet" ]]; then
@@ -164,7 +157,6 @@ while true; do
 
   # STEP 8: Verify the module for that driver is loaded
   echo "  Step 8: Confirm that the e1000 kernel module is currently loaded."
-  echo "          (Hint: lsmod | grep ^e1000)"
   read -p "  lab@lpic-lab112:~$ " cmd8
   echo
   if [[ "$cmd8" != "lsmod | grep -E '^e1000(\\s|$)'" && "$cmd8" != "lsmod | grep ^e1000" && "$cmd8" != "grep e1000 /proc/modules" ]]; then
