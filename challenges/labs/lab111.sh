@@ -37,7 +37,7 @@ while true; do
   center_title "$LAB_NAME"
   echo
   center_text "Read CPU & memory facts from /proc and verify them with lscpu and free."
-  center_text "Extract model name, logical CPU count, total/available memory, and % used."
+  center_text "Extract model name and logical CPU count."
   echo
   center_text "Press Enter to begin the lab..."
   read _
@@ -115,24 +115,12 @@ while true; do
   echo "  Swap:            2.0Gi        0B        2.0Gi"
   echo
 
-  # STEP 6: Compute % memory used from /proc/meminfo (Total - Available)
-  echo "  Step 6: Compute percentage memory used using /proc/meminfo only."
+
+  # STEP 6: Bonus — show hugepages summary if present
+  echo "  Step 6: Show hugepage settings if supported."
   read -p "  lab@lpic-lab111:~$ " cmd6
   echo
-  if [[ "$cmd6" != "awk '/^MemTotal/{t=$2}/^MemAvailable/{a=$2} END{u=t-a; printf(\"Used: %.1f%%\\n\", (u/t)*100)}' /proc/meminfo" && \
-        "$cmd6" != "awk 'BEGIN{t=0;a=0} /^MemTotal/{t=$2} /^MemAvailable/{a=$2} END{u=t-a; printf(\"Used: %.1f%%\\n\", (u/t)*100)}' /proc/meminfo" ]]; then
-    print_error "Incorrect. Example: awk '/^MemTotal/{t=$2}/^MemAvailable/{a=$2} END{u=t-a; printf(\"Used: %.1f%%\\n\", (u/t)*100)}' /proc/meminfo"
-    read -p "Press Enter to try again..." _
-    continue
-  fi
-  echo "  Used: 23.5%"
-  echo
-
-  # STEP 7: Bonus — show hugepages summary if present
-  echo "  Step 7 (Bonus): Show hugepage settings if supported."
-  read -p "  lab@lpic-lab111:~$ " cmd7
-  echo
-  if [[ "$cmd7" != "grep Huge /proc/meminfo" && "$cmd7" != "grep -E '^Huge' /proc/meminfo" ]]; then
+  if [[ "$cmd6" != "grep Huge /proc/meminfo" && "$cmd6" != "grep -E '^Huge' /proc/meminfo" ]]; then
     print_error "Incorrect. Example: grep Huge /proc/meminfo"
     read -p "Press Enter to try again..." _
     continue
@@ -145,7 +133,6 @@ while true; do
   print_success "Great work!"
   print_info "You extracted CPU model & logical count from /proc, verified with lscpu,"
   print_info "read MemTotal/Available from /proc/meminfo, cross-checked with free -h,"
-  print_info "and computed % memory used directly from /proc."
   print_info "You earned $LAB_XP XP for completing this lab!"
   award_xp $LAB_XP
   XP=$(jq '.XP' "$SAVE_JSON")

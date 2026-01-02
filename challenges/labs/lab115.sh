@@ -45,11 +45,10 @@ while true; do
 
   # STEP 1: Show current default target
   echo "  Step 1: Show the current default systemd target."
-  echo "          (Hint: systemctl get-default)"
   read -p "  lab@lpic-lab115:~$ " cmd1
   echo
   if [[ "$cmd1" != "systemctl get-default" && "$cmd1" != "sudo systemctl get-default" ]]; then
-    print_error "Incorrect. Use: systemctl get-default"
+    print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
@@ -58,12 +57,11 @@ while true; do
 
   # STEP 2: List active targets (overview)
   echo "  Step 2: List currently active targets (show first ~10 lines)."
-  echo "          (Hint: systemctl list-units --type=target --state=active | head -n 10)"
   read -p "  lab@lpic-lab115:~$ " cmd2
   echo
   if [[ "$cmd2" != "systemctl list-units --type=target --state=active | head -n 10" && \
         "$cmd2" != "systemctl list-units --type=target --state=active | head -10" ]]; then
-    print_error "Incorrect. Example: systemctl list-units --type=target --state=active | head -n 10"
+    print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
@@ -77,11 +75,10 @@ while true; do
 
   # STEP 3: Temporarily switch (isolate) to multi-user (no reboot)
   echo "  Step 3: Switch to multi-user mode WITHOUT changing the default target."
-  echo "          (Hint: systemctl isolate multi-user.target)"
   read -p "  lab@lpic-lab115:~$ " cmd3
   echo
   if [[ "$cmd3" != "systemctl isolate multi-user.target" && "$cmd3" != "sudo systemctl isolate multi-user.target" ]]; then
-    print_error "Incorrect. Use: systemctl isolate multi-user.target"
+    print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
@@ -90,12 +87,11 @@ while true; do
 
   # STEP 4: Verify active target includes multi-user
   echo "  Step 4: Verify multi-user.target is active."
-  echo "          (Hint: systemctl list-units --type=target | grep multi-user.target)"
   read -p "  lab@lpic-lab115:~$ " cmd4
   echo
   if [[ "$cmd4" != "systemctl list-units --type=target | grep multi-user.target" && \
         "$cmd4" != "systemctl list-units --type=target --state=active | grep multi-user.target" ]]; then
-    print_error "Incorrect. Example: systemctl list-units --type=target | grep multi-user.target"
+    print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
@@ -104,11 +100,10 @@ while true; do
 
   # STEP 5: Make multi-user the default (persistent)
   echo "  Step 5: Set the default target to multi-user (persistent across reboots)."
-  echo "          (Hint: systemctl set-default multi-user.target)"
   read -p "  lab@lpic-lab115:~$ " cmd5
   echo
   if [[ "$cmd5" != "systemctl set-default multi-user.target" && "$cmd5" != "sudo systemctl set-default multi-user.target" ]]; then
-    print_error "Incorrect. Use: systemctl set-default multi-user.target"
+    print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
@@ -117,11 +112,10 @@ while true; do
 
   # STEP 6: Inspect the default.target symlink
   echo "  Step 6: Show the default.target symlink path and destination."
-  echo "          (Hint: ls -l /etc/systemd/system/default.target)"
   read -p "  lab@lpic-lab115:~$ " cmd6
   echo
   if [[ "$cmd6" != "ls -l /etc/systemd/system/default.target" ]]; then
-    print_error "Incorrect. Use: ls -l /etc/systemd/system/default.target"
+    print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
@@ -130,11 +124,10 @@ while true; do
 
   # STEP 7: Restore graphical target as the default
   echo "  Step 7: Restore the default target back to graphical."
-  echo "          (Hint: systemctl set-default graphical.target)"
   read -p "  lab@lpic-lab115:~$ " cmd7
   echo
   if [[ "$cmd7" != "systemctl set-default graphical.target" && "$cmd7" != "sudo systemctl set-default graphical.target" ]]; then
-    print_error "Incorrect. Use: systemctl set-default graphical.target"
+    print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
@@ -144,24 +137,22 @@ while true; do
 
   # STEP 8: Verify the symlink now points to graphical.target
   echo "  Step 8: Confirm the new symlink destination."
-  echo "          (Hint: ls -l /etc/systemd/system/default.target)"
   read -p "  lab@lpic-lab115:~$ " cmd8
   echo
   if [[ "$cmd8" != "ls -l /etc/systemd/system/default.target" ]]; then
-    print_error "Incorrect. Use: ls -l /etc/systemd/system/default.target"
+    print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
   echo "  lrwxrwxrwx 1 root root 45 Aug 19 12:42 /etc/systemd/system/default.target -> /lib/systemd/system/graphical.target"
   echo
 
-  # STEP 9: (Optional) Temporarily switch back to graphical now
-  echo "  Step 9 (Optional): Switch the *current* session back to graphical immediately."
-  echo "          (Hint: systemctl isolate graphical.target)"
+  # STEP 9:Temporarily switch back to graphical now
+  echo "  Step 9: Switch the *current* session back to graphical immediately."
   read -p "  lab@lpic-lab115:~$ " cmd9
   echo
   if [[ "$cmd9" != "systemctl isolate graphical.target" && "$cmd9" != "sudo systemctl isolate graphical.target" ]]; then
-    print_error "Incorrect. Use: systemctl isolate graphical.target"
+    print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
@@ -170,11 +161,10 @@ while true; do
 
   # STEP 10: Show runlevel-style view (mapping to targets)
   echo "  Step 10: Show the current runlevel-style status."
-  echo "           (Hint: who -r  OR  runlevel)"
   read -p "  lab@lpic-lab115:~$ " cmd10
   echo
   if [[ "$cmd10" != "who -r" && "$cmd10" != "runlevel" ]]; then
-    print_error "Incorrect. Examples: who -r   OR   runlevel"
+    print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
