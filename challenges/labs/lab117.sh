@@ -47,10 +47,10 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "Package: bash"
-    echo "Status: install ok installed"
-    echo "Priority: required"
-    echo "Version: 5.1-2ubuntu3"
+    echo "  Package: bash"
+    echo "  Status: install ok installed"
+    echo "  Priority: required"
+    echo "  Version: 5.1-2ubuntu3"
     echo
 
     echo "  Step 2: List the first 10 installed packages."
@@ -61,15 +61,15 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "Desired=Unknown/Install/Remove/Purge/Hold"
-    echo "||/ Name           Version       Architecture Description"
-    echo "ii  adduser        3.118         all          add and remove users and groups"
-    echo "ii  apt            2.4.5         amd64        commandline package manager"
-    echo "ii  base-files     12ubuntu4     amd64        Debian base system miscellaneous files"
-    echo "ii  bash           5.1-2ubuntu3  amd64        GNU Bourne Again SHell"
-    echo "ii  bsdutils       1:2.37.2-4    amd64        basic utilities from 2.37"
-    echo "ii  coreutils      8.32-4.1      amd64        GNU core utilities"
-    echo "ii  dash           0.5.11+git    amd64        POSIX-compliant shell"
+    echo "  Desired=Unknown/Install/Remove/Purge/Hold"
+    echo "  ||/ Name           Version       Architecture Description"
+    echo "  ii  adduser        3.118         all          add and remove users and groups"
+    echo "  ii  apt            2.4.5         amd64        commandline package manager"
+    echo "  ii  base-files     12ubuntu4     amd64        Debian base system miscellaneous files"
+    echo "  ii  bash           5.1-2ubuntu3  amd64        GNU Bourne Again SHell"
+    echo "  ii  bsdutils       1:2.37.2-4    amd64        basic utilities from 2.37"
+    echo "  ii  coreutils      8.32-4.1      amd64        GNU core utilities"
+    echo "  ii  dash           0.5.11+git    amd64        POSIX-compliant shell"
     echo
 
     echo "  Step 3: List all files installed by the 'bash' package."
@@ -80,10 +80,10 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "/."
-    echo "/bin/bash"
-    echo "/usr/share/doc/bash/README.gz"
-    echo "/usr/share/man/man1/bash.1.gz"
+    echo "  /."
+    echo "  /bin/bash"
+    echo "  /usr/share/doc/bash/README.gz"
+    echo "  /usr/share/man/man1/bash.1.gz"
     echo
 
     echo "  Step 4: Identify which package owns /bin/bash."
@@ -94,7 +94,7 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "bash: /bin/bash"
+    echo "  bash: /bin/bash"
     echo
 
     echo "  Step 5: Install a local .deb file with dpkg."
@@ -106,15 +106,15 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "Selecting previously unselected package htop."
-    echo "(Reading database ... 123456 files and directories currently installed.)"
-    echo "Preparing to unpack htop_3.0.5-1_amd64.deb ..."
-    echo "Unpacking htop (3.0.5-1) ..."
-    echo "dpkg: dependency problems prevent configuration of htop:"
-    echo " htop depends on libc6 (>= 2.34); however:"
-    echo "  Package libc6 is not configured yet."
-    echo "dpkg: error processing package htop (--install):"
-    echo " dependency problems - leaving unconfigured"
+    echo "  Selecting previously unselected package htop."
+    echo "  (Reading database ... 123456 files and directories currently installed.)"
+    echo "  Preparing to unpack htop_3.0.5-1_amd64.deb ..."
+    echo "  Unpacking htop (3.0.5-1) ..."
+    echo "  dpkg: dependency problems prevent configuration of htop:"
+    echo "   htop depends on libc6 (>= 2.34); however:"
+    echo "    Package libc6 is not configured yet."
+    echo "  dpkg: error processing package htop (--install):"
+    echo "   dependency problems - leaving unconfigured"
     echo
 
     echo "  Step 6: Fix missing dependencies after a dpkg install."
@@ -125,13 +125,13 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "Reading package lists... Done"
-    echo "Building dependency tree"
-    echo "Correcting dependencies... Done"
-    echo "The following additional packages will be installed:"
-    echo "  libc6"
-    echo "Setting up libc6 ..."
-    echo "Setting up htop (3.0.5-1) ..."
+    echo "  Reading package lists... Done"
+    echo "  Building dependency tree"
+    echo "  Correcting dependencies... Done"
+    echo "  The following additional packages will be installed:"
+    echo "    libc6"
+    echo "  Setting up libc6 ..."
+    echo "  Setting up htop (3.0.5-1) ..."
     echo
 
     echo "  Step 7: Remove the package but keep configuration files."
@@ -142,9 +142,9 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "(Reading database ... 123460 files and directories currently installed.)"
-    echo "Removing htop (3.0.5-1) ..."
-    echo "Processing triggers for man-db ..."
+    echo "  (Reading database ... 123460 files and directories currently installed.)"
+    echo "  Removing htop (3.0.5-1) ..."
+    echo "  Processing triggers for man-db ..."
     echo
 
     echo "  Step 8: Purge the package including configuration files."
@@ -155,8 +155,8 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "(Reading database ... 123450 files and directories currently installed.)"
-    echo "Purging configuration files for htop (3.0.5-1) ..."
+    echo "  (Reading database ... 123450 files and directories currently installed.)"
+    echo "  Purging configuration files for htop (3.0.5-1) ..."
     echo
 
     print_success "Lab complete."

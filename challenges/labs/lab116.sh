@@ -45,7 +45,6 @@ while true; do
 
   # STEP 1: List block devices with transport hints
   echo "  Step 1: Show block devices with transport and model hints."
-  echo "          (Hint: lsblk -o NAME,TYPE,ROTA,TRAN,SIZE,MODEL | grep -E '^sd|^nvme|^vd|^sr')"
   read -p "  lab@lpic-lab116:~$ " cmd1
   echo
   if [[ "$cmd1" != "lsblk -o NAME,TYPE,ROTA,TRAN,SIZE,MODEL | grep -E '^sd|^nvme|^vd|^sr'" && \
@@ -64,7 +63,6 @@ while true; do
 
   # STEP 2: Determine if sda is rotational from sysfs
   echo "  Step 2: Check whether sda is rotational via sysfs."
-  echo "          (Hint: cat /sys/block/sda/queue/rotational)"
   read -p "  lab@lpic-lab116:~$ " cmd2
   echo
   if [[ "$cmd2" != "cat /sys/block/sda/queue/rotational" ]]; then
@@ -77,7 +75,6 @@ while true; do
 
   # STEP 3: Determine if nvme0n1 is rotational
   echo "  Step 3: Check whether nvme0n1 is rotational."
-  echo "          (Hint: cat /sys/block/nvme0n1/queue/rotational)"
   read -p "  lab@lpic-lab116:~$ " cmd3
   echo
   if [[ "$cmd3" != "cat /sys/block/nvme0n1/queue/rotational" ]]; then
@@ -90,7 +87,6 @@ while true; do
 
   # STEP 4: Identify transport for sda from udev properties
   echo "  Step 4: Verify the transport (ID_BUS/ID_ATA/SCSI) for sda via udev."
-  echo "          (Hint: udevadm info --query=property --name=/dev/sda | egrep '^(ID_BUS|ID_ATA|ID_SCSI)')"
   read -p "  lab@lpic-lab116:~$ " cmd4
   echo
   if [[ "$cmd4" != "udevadm info --query=property --name=/dev/sda | egrep '^(ID_BUS|ID_ATA|ID_SCSI)'" && \
@@ -106,7 +102,6 @@ while true; do
 
   # STEP 5: Read vendor/model for sda from sysfs
   echo "  Step 5: Show vendor and model for sda via sysfs."
-  echo "          (Hints: cat /sys/block/sda/device/vendor  &&  cat /sys/block/sda/device/model)"
   read -p "  lab@lpic-lab116:~$ " cmd5a
   echo
   if [[ "$cmd5a" != "cat /sys/block/sda/device/vendor" ]]; then
@@ -128,7 +123,6 @@ while true; do
 
   # STEP 6: Inspect I/O scheduler for sda
   echo "  Step 6: Show the active I/O scheduler for sda."
-  echo "          (Hint: cat /sys/block/sda/queue/scheduler)"
   read -p "  lab@lpic-lab116:~$ " cmd6
   echo
   if [[ "$cmd6" != "cat /sys/block/sda/queue/scheduler" ]]; then
@@ -142,7 +136,6 @@ while true; do
 
   # STEP 7: Map a partition back to its parent disk via sysfs
   echo "  Step 7: Resolve sda2's parent disk using sysfs."
-  echo "          (Hint: readlink -f /sys/class/block/sda2/.. | xargs basename)"
   read -p "  lab@lpic-lab116:~$ " cmd7
   echo
   if [[ "$cmd7" != "readlink -f /sys/class/block/sda2/.. | xargs basename" && \
@@ -156,7 +149,6 @@ while true; do
 
   # STEP 8: Identify a USB storage device path in sysfs (example 1-1)
   echo "  Step 8: Print a USB device's vendor/product IDs from sysfs."
-  echo "          (Hint: cat /sys/bus/usb/devices/1-1/idVendor && cat /sys/bus/usb/devices/1-1/idProduct)"
   read -p "  lab@lpic-lab116:~$ " cmd8a
   echo
   if [[ "$cmd8a" != "cat /sys/bus/usb/devices/1-1/idVendor" ]]; then
@@ -178,7 +170,6 @@ while true; do
 
   # STEP 9: Correlate a disk to its PCI/NVMe path
   echo "  Step 9: Resolve the physical device path for nvme0n1 (PCI address)."
-  echo "          (Hint: readlink -f /sys/block/nvme0n1/device)"
   read -p "  lab@lpic-lab116:~$ " cmd9
   echo
   if [[ "$cmd9" != "readlink -f /sys/block/nvme0n1/device" ]]; then
@@ -191,7 +182,6 @@ while true; do
 
   # STEP 10: Cross-check using lsblk with transport & filesystem
   echo "  Step 10: Show disk/partition, transport, FSTYPE, and mountpoints."
-  echo "           (Hint: lsblk -o NAME,TYPE,TRAN,FSTYPE,MOUNTPOINTS)"
   read -p "  lab@lpic-lab116:~$ " cmd10
   echo
   if [[ "$cmd10" != "lsblk -o NAME,TYPE,TRAN,FSTYPE,MOUNTPOINTS" ]]; then

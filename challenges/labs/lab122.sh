@@ -47,16 +47,16 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "bash-5.1.8-3.el9.x86_64"
-    echo "coreutils-8.32-34.el9.x86_64"
-    echo "filesystem-3.16-2.el9.x86_64"
-    echo "glibc-2.34-100.el9.x86_64"
-    echo "grep-3.6-5.el9.x86_64"
-    echo "gzip-1.10-6.el9.x86_64"
-    echo "rpm-4.16.1.3-31.el9.x86_64"
-    echo "shadow-utils-4.9-8.el9.x86_64"
-    echo "vim-minimal-8.2.2637-20.el9.x86_64"
-    echo "which-2.21-29.el9.x86_64"
+    echo "  bash-5.1.8-3.el9.x86_64"
+    echo "  coreutils-8.32-34.el9.x86_64"
+    echo "  filesystem-3.16-2.el9.x86_64"
+    echo "  glibc-2.34-100.el9.x86_64"
+    echo "  grep-3.6-5.el9.x86_64"
+    echo "  gzip-1.10-6.el9.x86_64"
+    echo "  rpm-4.16.1.3-31.el9.x86_64"
+    echo "  shadow-utils-4.9-8.el9.x86_64"
+    echo "  vim-minimal-8.2.2637-20.el9.x86_64"
+    echo "  which-2.21-29.el9.x86_64"
     echo
 
     echo "  Step 2: Show package info for the installed 'bash' package."
@@ -67,12 +67,12 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "Name        : bash"
-    echo "Version     : 5.1.8"
-    echo "Release     : 3.el9"
-    echo "Architecture: x86_64"
-    echo "Summary     : The GNU Bourne Again shell"
-    echo "License     : GPLv3+"
+    echo "  Name        : bash"
+    echo "  Version     : 5.1.8"
+    echo "  Release     : 3.el9"
+    echo "  Architecture: x86_64"
+    echo "  Summary     : The GNU Bourne Again shell"
+    echo "  License     : GPLv3+"
     echo
 
     echo "  Step 3: List files installed by the 'bash' package."
@@ -83,9 +83,9 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "/bin/bash"
-    echo "/etc/skel/.bashrc"
-    echo "/usr/share/man/man1/bash.1.gz"
+    echo "  /bin/bash"
+    echo "  /etc/skel/.bashrc"
+    echo "  /usr/share/man/man1/bash.1.gz"
     echo
 
     echo "  Step 4: Identify which package owns /bin/bash."
@@ -96,7 +96,7 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "bash-5.1.8-3.el9.x86_64"
+    echo "  bash-5.1.8-3.el9.x86_64"
     echo
 
     echo "  Step 5: Verify the integrity of the installed 'bash' package."
@@ -107,7 +107,6 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "(no output means verification passed)"
     echo
 
     echo "  Step 6: Check the GPG signature of a local RPM file."
@@ -119,7 +118,7 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "htop-3.3.0-1.el9.x86_64.rpm: digests signatures OK"
+    echo "  htop-3.3.0-1.el9.x86_64.rpm: digests signatures OK"
     echo
 
     echo "  Step 7: Query info from a local RPM file (not yet installed)."
@@ -130,11 +129,11 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "Name        : htop"
-    echo "Version     : 3.3.0"
-    echo "Release     : 1.el9"
-    echo "Architecture: x86_64"
-    echo "Summary     : Interactive process viewer"
+    echo "  Name        : htop"
+    echo "  Version     : 3.3.0"
+    echo "  Release     : 1.el9"
+    echo "  Architecture: x86_64"
+    echo "  Summary     : Interactive process viewer"
     echo
 
     echo "  Step 8: Install or upgrade the local RPM with verbose progress."
@@ -145,9 +144,9 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "Preparing...                          ################################# [100%]"
-    echo "Updating / installing..."
-    echo "   1:htop-3.3.0-1.el9                 ################################# [100%]"
+    echo "  Preparing...                          ################################# [100%]"
+    echo "  Updating / installing..."
+    echo "     1:htop-3.3.0-1.el9                 ################################# [100%]"
     echo
 
     echo "  Step 9: Remove the htop package."
@@ -158,9 +157,9 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "Preparing packages..."
-    echo "Erasing     : htop-3.3.0-1.el9.x86_64"
-    echo "Verifying   : htop-3.3.0-1.el9.x86_64"
+    echo "  Preparing packages..."
+    echo "  Erasing     : htop-3.3.0-1.el9.x86_64"
+    echo "  Verifying   : htop-3.3.0-1.el9.x86_64"
     echo
 
     echo "  Step 10: Rebuild the RPM database (maintenance)."
@@ -171,8 +170,8 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "Rebuilding RPM database..."
-    echo "Done."
+    echo "  Rebuilding RPM database..."
+    echo "  Done."
     echo
 
     print_success "Lab complete."
