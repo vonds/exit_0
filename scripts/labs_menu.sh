@@ -1,6 +1,4 @@
 #!/bin/bash
-# Sysadmin Lab Menu — Friendly Prompt Mode (no scanning, no names)
-# User types the LAB NUMBER, we run lab<N>.sh if it exists.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LABS_DIR="$SCRIPT_DIR/../challenges/labs"
@@ -20,13 +18,9 @@ fi
 export XP LEVEL
 
 # Drain any pending buffered input (macOS bash-safe: no fractional -t)
-# This fixes the "have to press 3 twice" behavior that happens when some prior
-# read -n 1 leaves a newline in stdin.
 drain_stdin() {
   local _junk
   [ -t 0 ] || return 0
-
-  # -t 0 is immediate and works on macOS bash.
   while IFS= read -r -t 0 -n 1 _junk 2>/dev/null; do :; done
 }
 
@@ -67,11 +61,18 @@ main_lab_menu() {
     echo "       1) Run a lab by number"
     echo "       2) Help / examples"
     echo
+    echo "     Press Enter 2x to return to main menu"
+    echo
 
-    # IMPORTANT: clear any leftover newline/key before reading the menu choice
     drain_stdin
     printf "     Select an option (1 or 2): "
     IFS= read -r menu_choice
+
+    # If user presses Enter with no input, return to the parent menu immediately
+    if [[ -z "$menu_choice" ]]; then
+      drain_stdin
+      return
+    fi
 
     case "$menu_choice" in
       1)
@@ -87,6 +88,11 @@ main_lab_menu() {
 
           case "$choice" in
             b|B|back)
+              draw_header
+              break
+              ;;
+            "" )
+              # Enter here also backs out to the lab menu (same as 'b')
               draw_header
               break
               ;;
@@ -120,8 +126,6 @@ main_lab_menu() {
           echo "     Launching: lab${choice}.sh"
           echo
 
-          # Run lab in a new bash so it can't mess with our functions/vars.
-          # After it returns, drain stdin again in case the lab used read -n 1.
           bash "$lab_file"
           drain_stdin
 
@@ -134,14 +138,15 @@ main_lab_menu() {
         echo "     Help / examples"
         echo
         echo "       • Run lab 148: choose 1, then type 148"
-        echo "       • Back to this menu: type b"
+        echo "       • Back to this menu: type b (or press Enter at the lab # prompt)"
+        echo "       • Return to main menu: press Enter 2x"
         echo
         pause
         draw_header
         ;;
       *)
         echo
-        echo "     Invalid selection. Choose 1, 2, or 3."
+        echo "     Invalid selection. Choose 1 or 2, or press Enter 2x to return."
         echo
         pause
         draw_header
