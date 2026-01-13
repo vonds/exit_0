@@ -162,7 +162,7 @@ while true; do
   echo
 
   # STEP 7: Extend VG with /dev/vdd
-  echo "  Step 8: Extend volume group 'volume1' by adding /dev/vdd."
+  echo "  Step 8: Add /dev/vdd to volume group 'volume1'."
   read -p "  lab@rhel-lab457:~$ " cmd8
   echo
   if [[ "$cmd8" != "sudo vgextend volume1 /dev/vdd" ]]; then
@@ -199,7 +199,7 @@ while true; do
   echo
 
   # STEP 9: Reduce VG by removing /dev/vdd
-  echo "  Step 11: Remove /dev/vdd from volume1 (vgreduce)."
+  echo "  Step 11: Remove /dev/vdd from volume1."
   read -p "  lab@rhel-lab457:~$ " cmd11
   echo
   if [[ "$cmd11" != "sudo vgreduce volume1 /dev/vdd" ]]; then

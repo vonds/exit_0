@@ -4,24 +4,28 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Required modules (fail fast if missing)
 source "$SCRIPT_DIR/ui.sh"       > /dev/null 2>&1 || { echo "Failed to load ui.sh"; exit 1; }
-source "$SCRIPT_DIR/progress.sh" > /dev/null 2>&1 || { echo "Failed to load progress.sh"; exit 1; }
-source "$SCRIPT_DIR/stats.sh"    > /dev/null 2>&1 || { echo "Failed to load stats.sh"; exit 1; }
 source "$SCRIPT_DIR/xp.sh"       > /dev/null 2>&1 || { echo "Failed to load xp.sh"; exit 1; }
-# source "$SCRIPT_DIR/../assets/prompts.sh" > /dev/null 2>&1 || { echo "Failed to load prompts.sh"; exit 1; }
 
 SAVE_JSON="$SCRIPT_DIR/../data/.player_save.json"
 SUCCESS_JSON="$SCRIPT_DIR/../data/.challenge_success.json"
 
 mkdir -p "$SCRIPT_DIR/../data"
-[ ! -f "$SAVE_JSON" ] && echo '{"XP":0,"LEVEL":1,"GLOBAL_LEVEL":1,"COMPLETED":[]}' > "$SAVE_JSON"
+
+# New, simplified save format: XP + LEVEL only (xp.sh is truth)
+[ ! -f "$SAVE_JSON" ] && echo '{"XP":0,"LEVEL":1,"COMPLETED":[]}' > "$SAVE_JSON"
 [ ! -f "$SUCCESS_JSON" ] && echo '{}' > "$SUCCESS_JSON"
 
-XP=$(jq '.XP' "$SAVE_JSON")
-LEVEL=$(jq '.LEVEL' "$SAVE_JSON")
-GLOBAL_LEVEL=$(jq '.GLOBAL_LEVEL // 1' "$SAVE_JSON")
+# Load canonical values (no GLOBAL_LEVEL)
+XP="$(jq -r '.XP // 0' "$SAVE_JSON" 2>/dev/null)"
+LEVEL="$(jq -r '.LEVEL // 1' "$SAVE_JSON" 2>/dev/null)"
+
+# Validate numeric
+[[ "$XP" =~ ^[0-9]+$ ]] || XP=0
+[[ "$LEVEL" =~ ^[0-9]+$ ]] || LEVEL=1
+[ "$LEVEL" -ge 1 ] 2>/dev/null || LEVEL=1
+
 export XP
 export LEVEL
-export GLOBAL_LEVEL
 
 CHALLENGE_COUNT=$(ls "$SCRIPT_DIR/../challenges/expected"/expected*.sh 2>/dev/null | wc -l)
 export CHALLENGE_COUNT
@@ -60,8 +64,14 @@ main_menu() {
     clear
     while true; do
         clear
-        center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
-        center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
+
+        # xp.sh calculates XP-to-next from LEVEL (single source of truth)
+        local xp_to_next
+        xp_to_next="$(calculate_xp_to_next_level)"
+
+        center_draw_stats_panel "$LEVEL" "$XP" "$xp_to_next"
+        center_draw_progress_bar "$XP" "$xp_to_next"
+
         echo
         echo
         print_banner "Main Menu"
