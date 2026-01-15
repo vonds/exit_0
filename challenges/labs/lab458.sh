@@ -64,7 +64,7 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
+
 
   # STEP 2: Mount LV
   echo "  Step 2: Mount /dev/volume1/data at /mnt/data."
@@ -75,7 +75,7 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
+
 
   # STEP 3: Verify mount
   echo "  Step 3: Verify the filesystem is mounted."
@@ -125,7 +125,7 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
+
 
   # STEP 7: Extend LV
   echo "  Step 7: Extend the logical volume by 500M."
@@ -137,7 +137,7 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
+
 
   # STEP 8: Grow XFS filesystem
   echo "  Step 8: Grow the XFS filesystem to use the new space."
@@ -148,7 +148,7 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
+
 
   # STEP 9: Verify final size
   echo "  Step 9: Verify the new filesystem size."
@@ -160,7 +160,7 @@ while true; do
     continue
   fi
   echo "  Filesystem size increased successfully."
-  echo
+
 
   print_success "Excellent work."
   print_info "You demonstrated RHCSA-critical storage skills:"
