@@ -121,7 +121,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
 
   # STEP 6: Create mount point
   echo "  Step 6: Create mount point /secure459."
@@ -133,7 +132,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
 
   # STEP 7: Mount encrypted filesystem
   echo "  Step 7: Mount the encrypted filesystem."
@@ -145,7 +143,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
 
   # STEP 8: Verify mount
   echo "  Step 8: Verify the filesystem is mounted."
@@ -190,7 +187,7 @@ while true; do
   echo
 
   # STEP 11: Reload systemd and test mount
-  echo "  Step 11: Test configuration using mount -a."
+  echo "  Step 11: Test configuration without reloading."
   read -p "  lab@rhel-lab459:~$ " cmd11
   echo
   if [[ "$cmd11" != "sudo mount -a" && \
@@ -199,7 +196,7 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
+ 
 
   print_success "Excellent work."
   print_info "You successfully:"

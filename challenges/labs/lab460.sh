@@ -84,7 +84,7 @@ while true; do
   echo "  Command (m for help): "
 
   # fdisk: press 'n'
-  echo "  fdisk Step 2a: Create a new partition (type 'n')."
+  echo "  fdisk Step 2a: Create a new partition."
   read -p "  Command (m for help): " fd1
   echo
   if [[ "$fd1" != "n" ]]; then
@@ -99,7 +99,7 @@ while true; do
   echo "  Select (default p): "
 
   # fdisk: press Enter for default p
-  echo "  fdisk Step 2b: Press Enter to accept default partition type (p)."
+  echo "  fdisk Step 2b: Press Enter to accept default partition type."
   read -p "  Select (default p): " fd2
   echo
   if [[ -n "$fd2" ]]; then
@@ -149,7 +149,7 @@ while true; do
   echo "  Command (m for help): "
 
   # fdisk: write changes with 'w'
-  echo "  fdisk Step 2f: Write the partition table to disk (type 'w')."
+  echo "  fdisk Step 2f: Write the partition table to disk."
   read -p "  Command (m for help): " fd6
   echo
   if [[ "$fd6" != "w" ]]; then
@@ -163,7 +163,7 @@ while true; do
   echo
 
   # STEP 3: Verify partition table with fdisk -l
-  echo "  Step 3: Verify the new partition exists using fdisk -l."
+  echo "  Step 3: Verify the new partition exists."
   read -p "  lab@rhel-lab460:~$ " cmd3
   echo
   if [[ "$cmd3" != "sudo fdisk -l" && "$cmd3" != "fdisk -l" ]]; then
@@ -231,7 +231,7 @@ while true; do
   echo
 
   # STEP 8: Verify mount with df -h
-  echo "  Step 8: Verify the mount with df -h."
+  echo "  Step 8: Verify the mount."
   read -p "  lab@rhel-lab460:~$ " cmd8
   echo
   if [[ "$cmd8" != "df -h" && "$cmd8" != "sudo df -h" ]]; then
@@ -302,7 +302,7 @@ while true; do
   echo
 
   # STEP 13: Mount again using /etc/fstab (mount -a)
-  echo "  Step 13: Mount using /etc/fstab (mount -a)."
+  echo "  Step 13: Mount using /etc/fstab."
   read -p "  lab@rhel-lab460:~$ " cmd13
   echo
   if [[ "$cmd13" != "sudo mount -a" && "$cmd13" != "mount -a" ]]; then

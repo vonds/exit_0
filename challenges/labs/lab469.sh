@@ -5,10 +5,6 @@
 # installing a package, listing module streams, and installing a specific module stream/profile.
 # Key skills: dnf repolist -v, dnf config-manager --disable, dnf group list --hidden,
 # dnf install, dnf module list, dnf module install.
-#
-# Notes:
-# - Rocky Linux 10 is RHEL-compatible; dnf is preferred, but yum works as a symlink.
-# - This lab uses the same strict template style as Lab 467 (manual entry practice).
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

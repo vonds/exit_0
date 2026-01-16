@@ -108,7 +108,7 @@ while true; do
   echo
 
   # STEP 4: Validate fstab safely with mount -a (no reboot)
-  echo "  Step 4: Validate /etc/fstab safely using mount -a."
+  echo "  Step 4: Validate /etc/fstab safely."
   read -p "  lab@rhel-lab463:~$ " cmd4
   echo
   if [[ "$cmd4" != "sudo mount -a" && \
@@ -117,7 +117,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
 
   # STEP 5: Verify /data463 still mounted correctly
   echo "  Step 5: Verify /data463 is mounted correctly."
@@ -137,7 +136,6 @@ while true; do
   # --- Recovery Scenario 1: Broken fstab ---
   # STEP 6: Simulate a broken fstab entry detection via mount -a failure
   echo "  Step 6: Recovery: mount -a fails due to a broken /etc/fstab entry."
-  echo "  Run mount -a to see the failure."
   read -p "  lab@rhel-lab463:~$ " cmd6
   echo
   if [[ "$cmd6" != "sudo mount -a" && "$cmd6" != "mount -a" ]]; then
@@ -181,7 +179,7 @@ while true; do
   echo
 
   # STEP 9: Re-run mount -a to confirm fstab is now clean
-  echo "  Step 9: Re-run mount -a to confirm the issue is resolved."
+  echo "  Step 9: Confirm the issue is resolved."
   read -p "  lab@rhel-lab463:~$ " cmd9
   echo
   if [[ "$cmd9" != "sudo mount -a" && "$cmd9" != "mount -a" ]]; then
@@ -189,8 +187,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo "  (no output)"
-  echo
 
   # --- Recovery Scenario 2: Failed encrypted mount ---
   # STEP 10: Simulate encrypted mount failing because mapper is not open
@@ -251,7 +247,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
 
   # STEP 14: Verify encrypted mount is present
   echo "  Step 14: Verify /secure463 is mounted."

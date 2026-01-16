@@ -4,11 +4,6 @@
 # Focus: inspecting interfaces/routes, checking listening ports, and MANUALLY editing
 # /etc/hosts and /etc/resolv.conf using vi-style entry (RHCSA expectations).
 # Key skills: ip, ss, netstat, editing critical network files, hostnamectl.
-#
-# Notes:
-# - Rocky Linux 10 (RHEL-compatible)
-# - User must TYPE the lines added in vi (no auto-fill)
-# - Outputs are simulated and indented by two spaces
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

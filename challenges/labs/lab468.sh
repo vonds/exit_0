@@ -6,8 +6,6 @@
 # Key skills: systemctl status/is-active/is-enabled/start/stop/restart/enable/disable/mask/unmask,
 # systemctl show/cat/list-dependencies/get-default, systemctl daemon-reload,
 # journalctl -u, and safe verification workflows.
-#
-# Note: This lab assumes a Rocky Linux 10 host (RHEL-compatible). Commands are RHCSA-aligned.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -48,18 +46,6 @@ while true; do
   center_text "You're on a Rocky Linux 10 server where a teammate reports inconsistent service behavior after reboots."
   center_text "You must validate unit state, adjust startup behavior, apply a unit change,"
   center_text "reload systemd, verify targets, and confirm via logs — RHCSA-style."
-  echo
-  center_text "Requirements (type commands exactly):"
-  center_text "- Inspect sshd state and confirm it is active"
-  center_text "- Identify the sshd unit file path"
-  center_text "- Enable and start httpd at boot"
-  center_text "- Verify httpd enable state and active state"
-  center_text "- Mask httpd (prevent any start), confirm it cannot be started"
-  center_text "- Unmask httpd, then disable it (no autostart), and stop it"
-  center_text "- Enable rpcbind (do not start it now)"
-  center_text "- Apply a unit file change: reload systemd manager (daemon-reload)"
-  center_text "- Confirm default target and list key dependencies of multi-user target"
-  center_text "- View recent logs for sshd using journalctl -u"
   echo
   center_text "Press Enter to begin..."
   read _
