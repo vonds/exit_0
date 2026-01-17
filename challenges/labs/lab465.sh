@@ -141,7 +141,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
 
   # STEP 5: Unmount /mnt
   echo "  Step 5: Unmount /mnt."
@@ -153,7 +152,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
 
   # STEP 6: Create /test directory
   echo "  Step 6: Create mount directory /test."
@@ -167,7 +165,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
 
   # STEP 7: Edit /etc/fstab to add entries (includes intentional bad swap line)
   echo "  Step 7: Edit /etc/fstab."
@@ -190,7 +187,7 @@ while true; do
   echo
 
   # STEP 8: Validate fstab safely (should fail due to wrong swap entry)
-  echo "  Step 8: Validate /etc/fstab safely using mount -a (expect an error)."
+  echo "  Step 8: Validate /etc/fstab safely (expect an error)."
   read -p "  lab@rhel-lab463:~$ " cmd8
   echo
   if [[ "$cmd8" != "sudo mount -a" && \
@@ -220,7 +217,7 @@ while true; do
   echo
 
   # STEP 10: Re-validate fstab (should succeed)
-  echo "  Step 10: Re-run mount -a (should succeed with no errors)."
+  echo "  Step 10: Re-validate /etc/fstab (should succeed with no errors)."
   read -p "  lab@rhel-lab463:~$ " cmd10
   echo
   if [[ "$cmd10" != "sudo mount -a" && \
@@ -229,8 +226,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo "  (no output)"
-  echo
 
   # STEP 11: Relabel XFS filesystem using xfs_admin
   echo "  Step 11: Change the XFS label on /dev/vdb to SwapFS."
