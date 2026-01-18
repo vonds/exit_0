@@ -1,174 +1,194 @@
 #!/bin/bash
 
-# Lab 134: Networking Fundamentals
+# Lab 134: Networking Fundamentals — Fix DNS Failure Caused by Bad resolv.conf (4–8 prompts)
+# Scenario: This host can ping IPs, but name lookups fail. Applications using hostnames break.
+# You must prove it’s DNS (not routing), inspect resolver configuration, fix it, and verify.
+# Key skills: ip route, ping, getent, resolvectl (optional), /etc/resolv.conf inspection, nmcli,
+# restart NetworkManager (or reconnect), and verification workflow.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$(dirname "$SCRIPT_DIR/../..")" && pwd)"
+# (keeping your pattern consistent)
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab Networking: Fundamentals 8"
+LAB_NAME="Lab 134: Networking Fundamentals — Fix DNS (resolv.conf)"
 LAB_ID="lab134"
 LAB_XP=29500
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
 [ ! -f "$LAB_TRACK_FILE" ] && echo '{}' > "$LAB_TRACK_FILE"
 
+PROMPT="  lab@rhel-lab134:~$ "
+
 draw_lab_ui() {
-    clear
-    center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
-    center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
-    echo; echo; echo
+  clear
+  center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
+  center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
+  echo; echo; echo
 }
 
 record_lab_completion() {
-    tmpfile=$(mktemp)
-    jq --arg lab "$LAB_ID" '.[$lab] += 1 // 1' "$LAB_TRACK_FILE" > "$tmpfile" && mv "$tmpfile" "$LAB_TRACK_FILE"
+  tmpfile=$(mktemp)
+  jq --arg lab "$LAB_ID" '.[$lab] += 1 // 1' "$LAB_TRACK_FILE" > "$tmpfile" && mv "$tmpfile" "$LAB_TRACK_FILE"
 }
 
 get_lab_completion_count() {
-    jq -r --arg lab "$LAB_ID" '.[$lab] // 0' "$LAB_TRACK_FILE"
+  jq -r --arg lab "$LAB_ID" '.[$lab] // 0' "$LAB_TRACK_FILE"
 }
 
 while true; do
-    draw_lab_ui
-    center_title "$LAB_NAME"
-    echo
-    center_text "Work with networking fundamentals commands and concepts. (set 8)"
-    echo
-    center_text "Press Enter to begin the lab..."
-    read _
+  draw_lab_ui
+  center_title "$LAB_NAME"
+  echo
+  center_text "Scenario:"
+  center_text "Users report: 'The server can ping 1.1.1.1, but anything using hostnames fails.'"
+  center_text "You suspect DNS misconfiguration on this host."
+  echo
+  center_text "Goal: prove routing works, confirm DNS fails, fix the resolver config, verify resolution."
+  echo
+  center_text "Press Enter to begin the lab..."
+  read _
+  draw_lab_ui
 
-    draw_lab_ui
-    echo "  Step 1: Investigate recent DHCP client activity on this system using the primary system log."
-    read -p "  lab@lab34:~$ " cmd1
-    echo
-    [[ "$cmd1" != "grep -i dhcp /var/log/syslog" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  Aug 29 10:21:14 host dhclient[1234]: DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 5"
-    echo "  Aug 29 10:21:19 host dhclient[1234]: DHCPOFFER from 192.168.1.1"
-    echo "  Aug 29 10:21:20 host dhclient[1234]: DHCPREQUEST on eth0 to 255.255.255.255 port 67"
-    echo "  Aug 29 10:21:20 host dhclient[1234]: DHCPACK from 192.168.1.1"
-    echo
+  # STEP 1: Prove routing/default gateway exists
+  echo "  Step 1: Confirm the host has a default route."
+  read -p "$PROMPT" cmd1
+  echo
+  if [[ "$cmd1" != "ip route" && \
+        "$cmd1" != "ip r" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  echo "  default via 192.168.50.1 dev eth0 proto dhcp metric 100"
+  echo "  192.168.50.0/24 dev eth0 proto kernel scope link src 192.168.50.20 metric 100"
+  echo
 
-    echo "  Step 2: State the allowed character set for hostnames in /etc/hosts as a short phrase."
-    read -p "  lab@lab34:~$ " cmd2
-    echo
-    [[ "$cmd2" != "Alphanumerics, minus, and dot" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    # (No standard output on success)
+  # STEP 2: Prove raw IP connectivity works
+  echo "  Step 2: Prove connectivity to the internet via IP (no DNS)."
+  read -p "$PROMPT" cmd2
+  echo
+  if [[ "$cmd2" != "ping -c 2 1.1.1.1" && \
+        "$cmd2" != "ping -c 2 8.8.8.8" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  echo "  PING 1.1.1.1 (1.1.1.1) 56(84) bytes of data."
+  echo "  64 bytes from 1.1.1.1: icmp_seq=1 ttl=56 time=16.2 ms"
+  echo "  64 bytes from 1.1.1.1: icmp_seq=2 ttl=56 time=15.9 ms"
+  echo
+  echo "  --- ping statistics ---"
+  echo "  2 packets transmitted, 2 received, 0% packet loss"
+  echo
 
-    echo "  Step 3: Enable resolver debugging using a single configuration directive suitable for resolv.conf."
-    read -p "  lab@lab34:~$ " cmd3
-    echo
-    [[ "$cmd3" != "options debug" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    # (No standard output on success)
+  # STEP 3: Demonstrate DNS failure
+  echo "  Step 3: Demonstrate that name resolution is failing."
+  read -p "$PROMPT" cmd3
+  echo
+  if [[ "$cmd3" != "getent hosts example.com" && \
+        "$cmd3" != "getent ahostsv4 example.com" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  echo "  (no output)"
+  echo "  getent: Name or service not known"
+  echo
 
-    echo "  Step 4: View the current journal for the NetworkManager service unit."
-    read -p "  lab@lab34:~$ " cmd4
-    echo
-    [[ "$cmd4" != "journalctl -u NetworkManager" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  Aug 29 10:15:01 host NetworkManager[567]: <info>  [1693306501.1234] device (eth0): state change: disconnected -> activated"
-    echo "  Aug 29 10:15:02 host NetworkManager[567]: <info>  [1693306502.0543] policy: set 'Wired connection 1' (eth0) as default for IPv4 routing"
-    echo
+  # STEP 4: Inspect current resolver config
+  echo "  Step 4: Inspect the current resolver configuration."
+  read -p "$PROMPT" cmd4
+  echo
+  if [[ "$cmd4" != "cat /etc/resolv.conf" && \
+        "$cmd4" != "sudo cat /etc/resolv.conf" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  echo "  # Generated by NetworkManager"
+  echo "  search lab.local"
+  echo "  nameserver 127.0.0.1"
+  echo
 
-    echo "  Step 5: Provide the file path read at boot that defines the system's hostname."
-    read -p "  lab@lab34:~$ " cmd5
-    echo
-    [[ "$cmd5" != "/etc/hostname" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    # (No standard output on success)
+  # STEP 5: Fix resolver by setting DNS via NetworkManager (persistent)
+  echo "  Step 5: Fix DNS persistently by setting a real DNS server on 'System eth0' using nmcli."
+  echo "          Set IPv4 DNS to 1.1.1.1 and 8.8.8.8."
+  read -p "$PROMPT" cmd5
+  echo
+  if [[ "$cmd5" != "sudo nmcli con mod \"System eth0\" ipv4.dns \"1.1.1.1 8.8.8.8\"" && \
+        "$cmd5" != "nmcli con mod \"System eth0\" ipv4.dns \"1.1.1.1 8.8.8.8\"" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  echo
 
-    echo "  Step 6: Perform an IPv6-only route trace to example.com using the IPv6-specific tracer."
-    read -p "  lab@lab34:~$ " cmd6
-    echo
-    [[ "$cmd6" != "traceroute6 example.com" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  traceroute to example.com (2606:2800:220:1:248:1893:25c8:1946), 30 hops max"
-    echo "   1  fe80::1  1.021 ms  0.998 ms  0.990 ms"
-    echo
+  # STEP 6: Bounce the connection to apply
+  echo "  Step 6: Bring the connection down and back up to apply DNS changes."
+  read -p "$PROMPT" cmd6
+  echo
+  if [[ "$cmd6" != "sudo nmcli con down \"System eth0\" && sudo nmcli con up \"System eth0\"" && \
+        "$cmd6" != "nmcli con down \"System eth0\" && nmcli con up \"System eth0\"" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  echo "  Connection 'System eth0' successfully deactivated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/7)"
+  echo "  Connection 'System eth0' successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/8)"
+  echo
 
-    echo "  Step 7: Using dig, request a full DNS zone transfer for example.org."
-    read -p "  lab@lab34:~$ " cmd7
-    echo
-    [[ "$cmd7" != "dig example.org axfr" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  ; <<>> DiG <<>> example.org axfr"
-    echo "  ;; ANSWER SECTION:"
-    echo "  example.org.   86400  IN  SOA  ns1.example.org. hostmaster.example.org. 2025082901 7200 3600 1209600 3600"
-    echo "  example.org.   86400  IN  NS   ns1.example.org."
-    echo "  example.org.   86400  IN  NS   ns2.example.org."
-    echo
+  # STEP 7: Verify resolv.conf now contains real nameservers
+  echo "  Step 7: Confirm /etc/resolv.conf now contains the updated nameservers."
+  read -p "$PROMPT" cmd7
+  echo
+  if [[ "$cmd7" != "cat /etc/resolv.conf" && \
+        "$cmd7" != "sudo cat /etc/resolv.conf" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  echo "  # Generated by NetworkManager"
+  echo "  search lab.local"
+  echo "  nameserver 1.1.1.1"
+  echo "  nameserver 8.8.8.8"
+  echo
 
-    echo "  Step 8: Query ALL available DNS record types for example.com using the host utility."
-    read -p "  lab@lab34:~$ " cmd8
-    echo
-    [[ "$cmd8" != "host -a example.com" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  Trying \"example.com\""
-    echo "  ;; ->>HEADER<<- opcode: QUERY, status: NOERROR"
-    echo "  example.com has address 93.184.216.34"
-    echo
+  # STEP 8: Verify name resolution works again
+  echo "  Step 8: Verify name resolution works now."
+  read -p "$PROMPT" cmd8
+  echo
+  if [[ "$cmd8" != "getent hosts example.com" && \
+        "$cmd8" != "getent ahostsv4 example.com" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  echo "  93.184.216.34   example.com"
+  echo
 
-    echo "  Step 9: Provide the per-user defaults file path used by dig."
-    read -p "  lab@lab34:~$ " cmd9
-    echo
-    [[ "$cmd9" != "~/.digrc" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    # (No standard output on success)
+  print_success "Nice work."
+  print_info "You solved a real incident where IP connectivity worked but DNS failed:"
+  print_info "- verified routing and raw IP connectivity"
+  print_info "- reproduced the DNS failure with getent"
+  print_info "- identified bad resolver config in /etc/resolv.conf"
+  print_info "- fixed DNS persistently via NetworkManager (nmcli)"
+  print_info "- validated resolver configuration and successful name resolution"
+  print_info "You earned $LAB_XP XP for completing this lab."
+  award_xp $LAB_XP
 
-    echo "  Step 10: What DNS record type is defined specifically for POP3 servers? Answer succinctly."
-    read -p "  lab@lab34:~$ " cmd10
-    echo
-    [[ "$cmd10" != "none" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    # (No standard output for this answer)
+  XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
+  record_lab_completion
 
-    print_success "Nice work!"
-    print_info "You earned $LAB_XP XP for completing this lab."
-    award_xp $LAB_XP
-    XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
-    record_lab_completion
-
-    completion_count=$(get_lab_completion_count)
-    echo
-    print_info "You've successfully completed this lab $completion_count time(s)."
-    echo
-    center_text "Would you like to:"
-    center_text "1) Retry this lab"
-    center_text "2) Return to Sysadmin Lab Menu"
-    echo
-    read -p "  > " post_choice
-    [[ "$post_choice" == "2" ]] && exit 0
+  completion_count=$(get_lab_completion_count)
+  echo
+  print_info "You've successfully completed this lab $completion_count time(s)."
+  echo
+  center_text "Would you like to:"
+  center_text "1) Retry this lab"
+  center_text "2) Return to Sysadmin Lab Menu"
+  echo
+  read -p "  > " post_choice
+  [[ "$post_choice" == "2" ]] && exit 0
 done

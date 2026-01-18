@@ -9,12 +9,11 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
-source don’t interrupt the program.
 
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab 466: Stratis End-to-End + Snapshot Rollback (Rocky 10)"
+LAB_NAME="Lab 466: Stratis End-to-End + Snapshot Rollback"
 LAB_ID="lab466"
 LAB_XP=46600
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
@@ -59,7 +58,7 @@ while true; do
 
   # STEP 1: Refresh repo metadata
   echo "  Step 1: Refresh repository metadata cache (Rocky 10 uses dnf)."
-  read -p "  lab@rhel-lab463:~$ " cmd1
+  read -p "  lab@rhel-lab466:~$ " cmd1
   echo
   if [[ "$cmd1" != "sudo dnf makecache" && \
         "$cmd1" != "dnf makecache" ]]; then
@@ -76,7 +75,7 @@ while true; do
 
   # STEP 2: Install Stratis packages
   echo "  Step 2: Install stratisd and stratis-cli."
-  read -p "  lab@rhel-lab463:~$ " cmd2
+  read -p "  lab@rhel-lab466:~$ " cmd2
   echo
   if [[ "$cmd2" != "sudo dnf install -y stratisd stratis-cli" && \
         "$cmd2" != "dnf install -y stratisd stratis-cli" ]]; then
@@ -104,7 +103,7 @@ while true; do
 
   # STEP 3: Enable + start daemon
   echo "  Step 3: Enable and start stratisd now."
-  read -p "  lab@rhel-lab463:~$ " cmd3
+  read -p "  lab@rhel-lab466:~$ " cmd3
   echo
   if [[ "$cmd3" != "sudo systemctl enable --now stratisd.service" && \
         "$cmd3" != "systemctl enable --now stratisd.service" && \
@@ -118,7 +117,7 @@ while true; do
 
   # STEP 4: Confirm service status
   echo "  Step 4: Check service status (no pager)."
-  read -p "  lab@rhel-lab463:~$ " cmd4
+  read -p "  lab@rhel-lab466:~$ " cmd4
   echo
   if [[ "$cmd4" != "systemctl status stratisd --no-pager" && \
         "$cmd4" != "sudo systemctl status stratisd --no-pager" ]]; then
@@ -140,7 +139,7 @@ while true; do
 
   # STEP 5: Verify packages
   echo "  Step 5: Verify installed RPMs."
-  read -p "  lab@rhel-lab463:~$ " cmd5
+  read -p "  lab@rhel-lab466:~$ " cmd5
   echo
   if [[ "$cmd5" != "rpm -q stratisd stratis-cli" && \
         "$cmd5" != "sudo rpm -q stratisd stratis-cli" ]]; then
@@ -154,7 +153,7 @@ while true; do
 
   # STEP 6: Confirm CLI exists
   echo "  Step 6: Confirm the stratis CLI is available."
-  read -p "  lab@rhel-lab463:~$ " cmd6
+  read -p "  lab@rhel-lab466:~$ " cmd6
   echo
   if [[ "$cmd6" != "command -v stratis" && \
         "$cmd6" != "which stratis" ]]; then
@@ -167,7 +166,7 @@ while true; do
 
   # STEP 7: Pool list (empty)
   echo "  Step 7: Confirm there are no pools yet."
-  read -p "  lab@rhel-lab463:~$ " cmd7
+  read -p "  lab@rhel-lab466:~$ " cmd7
   echo
   if [[ "$cmd7" != "sudo stratis pool list" && \
         "$cmd7" != "stratis pool list" ]]; then
@@ -180,7 +179,7 @@ while true; do
 
   # STEP 8: Create pool
   echo "  Step 8: Create pool 'developers' from /dev/vdb and /dev/vdc."
-  read -p "  lab@rhel-lab463:~$ " cmd8
+  read -p "  lab@rhel-lab466:~$ " cmd8
   echo
   if [[ "$cmd8" != "sudo stratis pool create developers /dev/vdb /dev/vdc" && \
         "$cmd8" != "stratis pool create developers /dev/vdb /dev/vdc" ]]; then
@@ -190,47 +189,55 @@ while true; do
   fi
   echo
 
-  # STEP 9: Save pool list
-  echo "  Step 9: Save pool list output to /home/bob/pool1.txt."
-  read -p "  lab@rhel-lab463:~$ " cmd9
+  # STEP 9: Verify pool list (no file save)
+  echo "  Step 9: Verify the pool exists by listing Stratis pools."
+  read -p "  lab@rhel-lab466:~$ " cmd9
   echo
-  if [[ "$cmd9" != "sudo stratis pool list > /home/bob/pool1.txt" && \
-        "$cmd9" != "stratis pool list > /home/bob/pool1.txt" ]]; then
+  if [[ "$cmd9" != "sudo stratis pool list" && \
+        "$cmd9" != "stratis pool list" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
+  echo "  Name        Total Physical Size  Total Physical Used"
+  echo "  developers  10.00 GiB            546 MiB"
   echo
 
   # STEP 10: Create filesystem
   echo "  Step 10: Create filesystem 'devfs' in pool 'developers'."
-  read -p "  lab@rhel-lab463:~$ " cmd10
+  read -p "  lab@rhel-lab466:~$ " cmd10
   echo
   if [[ "$cmd10" != "sudo stratis fs create developers devfs" && \
-        "$cmd10" != "stratis fs create developers devfs" ]]; then
+        "$cmd10" != "stratis fs create developers devfs" && \
+        "$cmd10" != "sudo stratis filesystem create developers devfs" && \
+        "$cmd10" != "stratis filesystem create developers devfs" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
   echo
 
-  # STEP 11: Save fs list output
-  echo "  Step 11: Save filesystem list output to /home/bob/fs1.txt."
-  read -p "  lab@rhel-lab463:~$ " cmd11
+  # STEP 11: Verify filesystem list (no file save)
+  echo "  Step 11: Verify the filesystem exists by listing Stratis filesystems."
+  read -p "  lab@rhel-lab466:~$ " cmd11
   echo
-  if [[ "$cmd11" != "sudo stratis fs > /home/bob/fs1.txt" && \
-        "$cmd11" != "stratis fs > /home/bob/fs1.txt" && \
-        "$cmd11" != "sudo stratis fs list > /home/bob/fs1.txt" && \
-        "$cmd11" != "stratis fs list > /home/bob/fs1.txt" ]]; then
+  if [[ "$cmd11" != "sudo stratis fs list" && \
+        "$cmd11" != "stratis fs list" && \
+        "$cmd11" != "sudo stratis filesystem list" && \
+        "$cmd11" != "stratis filesystem list" && \
+        "$cmd11" != "sudo stratis fs" && \
+        "$cmd11" != "stratis fs" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
+  echo "  Pool        Name    Used      Created               Device"
+  echo "  developers  devfs   1.0 GiB   2026-01-15 01:40:22   /stratis/developers/devfs"
   echo
 
   # STEP 12: Create mountpoint
   echo "  Step 12: Create mountpoint /mnt/devstorage."
-  read -p "  lab@rhel-lab463:~$ " cmd12
+  read -p "  lab@rhel-lab466:~$ " cmd12
   echo
   if [[ "$cmd12" != "sudo mkdir /mnt/devstorage" && \
         "$cmd12" != "sudo mkdir -p /mnt/devstorage" && \
@@ -242,10 +249,9 @@ while true; do
   fi
   echo
 
-  # STEP 13: Edit fstab
-  echo "  Step 13: Edit /etc/fstab and add the Stratis mount entry:"
-  echo "          /dev/stratis/developers/devfs /mnt/devstorage xfs x-systemd.requires=stratisd.service 0 0"
-  read -p "  lab@rhel-lab463:~$ " cmd13
+  # STEP 13: Edit fstab (no answer)
+  echo "  Step 13: Edit /etc/fstab and add a Stratis mount entry so devfs mounts at /mnt/devstorage on boot."
+  read -p "  lab@rhel-lab466:~$ " cmd13
   echo
   if [[ "$cmd13" != "sudo vi /etc/fstab" && \
         "$cmd13" != "sudo vim /etc/fstab" && \
@@ -255,12 +261,12 @@ while true; do
     continue
   fi
   echo "  (editor opened)"
-  echo "  (added line and saved)"
+  echo "  (saved and exited)"
   echo
 
   # STEP 14: Reload systemd units
   echo "  Step 14: Reload systemd after editing fstab."
-  read -p "  lab@rhel-lab463:~$ " cmd14
+  read -p "  lab@rhel-lab466:~$ " cmd14
   echo
   if [[ "$cmd14" != "sudo systemctl daemon-reload" && \
         "$cmd14" != "systemctl daemon-reload" ]]; then
@@ -272,7 +278,7 @@ while true; do
 
   # STEP 15: Mount all from fstab
   echo "  Step 15: Mount all entries from /etc/fstab."
-  read -p "  lab@rhel-lab463:~$ " cmd15
+  read -p "  lab@rhel-lab466:~$ " cmd15
   echo
   if [[ "$cmd15" != "sudo mount -a" && \
         "$cmd15" != "mount -a" ]]; then
@@ -284,7 +290,7 @@ while true; do
 
   # STEP 16: Create file
   echo "  Step 16: Create a test file in the mounted Stratis filesystem."
-  read -p "  lab@rhel-lab463:~$ " cmd16
+  read -p "  lab@rhel-lab466:~$ " cmd16
   echo
   if [[ "$cmd16" != "sudo touch /mnt/devstorage/developers.txt" && \
         "$cmd16" != "touch /mnt/devstorage/developers.txt" ]]; then
@@ -296,7 +302,7 @@ while true; do
 
   # STEP 17: Add disk to pool
   echo "  Step 17: Add /dev/vdd to pool 'developers'."
-  read -p "  lab@rhel-lab463:~$ " cmd17
+  read -p "  lab@rhel-lab466:~$ " cmd17
   echo
   if [[ "$cmd17" != "sudo stratis pool add-data developers /dev/vdd" && \
         "$cmd17" != "stratis pool add-data developers /dev/vdd" ]]; then
@@ -306,24 +312,32 @@ while true; do
   fi
   echo
 
-  # STEP 18: Save blockdev output
-  echo "  Step 18: Save Stratis block device output to /home/bob/fs2.txt."
-  read -p "  lab@rhel-lab463:~$ " cmd18
+  # STEP 18: Verify block devices (no file save)
+  echo "  Step 18: Verify Stratis block devices."
+  read -p "  lab@rhel-lab466:~$ " cmd18
   echo
-  if [[ "$cmd18" != "sudo stratis blockdev > /home/bob/fs2.txt" && \
-        "$cmd18" != "stratis blockdev > /home/bob/fs2.txt" ]]; then
+  if [[ "$cmd18" != "sudo stratis blockdev" && \
+        "$cmd18" != "stratis blockdev" && \
+        "$cmd18" != "sudo stratis blockdev list" && \
+        "$cmd18" != "stratis blockdev list" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
+  echo "  Pool        Device     Physical Size"
+  echo "  developers  /dev/vdb   5.00 GiB"
+  echo "  developers  /dev/vdc   5.00 GiB"
+  echo "  developers  /dev/vdd   5.00 GiB"
   echo
 
   # STEP 19: Create snapshot
   echo "  Step 19: Create snapshot devfs-snapshot from devfs."
-  read -p "  lab@rhel-lab463:~$ " cmd19
+  read -p "  lab@rhel-lab466:~$ " cmd19
   echo
   if [[ "$cmd19" != "sudo stratis fs snapshot developers devfs devfs-snapshot" && \
-        "$cmd19" != "stratis fs snapshot developers devfs devfs-snapshot" ]]; then
+        "$cmd19" != "stratis fs snapshot developers devfs devfs-snapshot" && \
+        "$cmd19" != "sudo stratis filesystem snapshot developers devfs devfs-snapshot" && \
+        "$cmd19" != "stratis filesystem snapshot developers devfs devfs-snapshot" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
@@ -332,7 +346,7 @@ while true; do
 
   # STEP 20: Delete file (bad change)
   echo "  Step 20: Simulate a bad change by deleting the test file."
-  read -p "  lab@rhel-lab463:~$ " cmd20
+  read -p "  lab@rhel-lab466:~$ " cmd20
   echo
   if [[ "$cmd20" != "sudo rm /mnt/devstorage/developers.txt" && \
         "$cmd20" != "rm /mnt/devstorage/developers.txt" ]]; then
@@ -344,10 +358,12 @@ while true; do
 
   # STEP 21: Rename devfs -> devfs-bad
   echo "  Step 21: Rename current filesystem devfs -> devfs-bad."
-  read -p "  lab@rhel-lab463:~$ " cmd21
+  read -p "  lab@rhel-lab466:~$ " cmd21
   echo
   if [[ "$cmd21" != "sudo stratis fs rename developers devfs devfs-bad" && \
-        "$cmd21" != "stratis fs rename developers devfs devfs-bad" ]]; then
+        "$cmd21" != "stratis fs rename developers devfs devfs-bad" && \
+        "$cmd21" != "sudo stratis filesystem rename developers devfs devfs-bad" && \
+        "$cmd21" != "stratis filesystem rename developers devfs devfs-bad" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
@@ -356,10 +372,12 @@ while true; do
 
   # STEP 22: Rename snapshot -> devfs (rollback)
   echo "  Step 22: Roll back by renaming snapshot devfs-snapshot -> devfs."
-  read -p "  lab@rhel-lab463:~$ " cmd22
+  read -p "  lab@rhel-lab466:~$ " cmd22
   echo
   if [[ "$cmd22" != "sudo stratis fs rename developers devfs-snapshot devfs" && \
-        "$cmd22" != "stratis fs rename developers devfs-snapshot devfs" ]]; then
+        "$cmd22" != "stratis fs rename developers devfs-snapshot devfs" && \
+        "$cmd22" != "sudo stratis filesystem rename developers devfs-snapshot devfs" && \
+        "$cmd22" != "stratis filesystem rename developers devfs-snapshot devfs" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
@@ -368,7 +386,7 @@ while true; do
 
   # STEP 23: Unmount
   echo "  Step 23: Unmount /mnt/devstorage."
-  read -p "  lab@rhel-lab463:~$ " cmd23
+  read -p "  lab@rhel-lab466:~$ " cmd23
   echo
   if [[ "$cmd23" != "sudo umount /mnt/devstorage" && \
         "$cmd23" != "umount /mnt/devstorage" ]]; then
@@ -380,7 +398,7 @@ while true; do
 
   # STEP 24: Mount again
   echo "  Step 24: Mount /mnt/devstorage again."
-  read -p "  lab@rhel-lab463:~$ " cmd24
+  read -p "  lab@rhel-lab466:~$ " cmd24
   echo
   if [[ "$cmd24" != "sudo mount /mnt/devstorage" && \
         "$cmd24" != "mount /mnt/devstorage" ]]; then
@@ -395,7 +413,7 @@ while true; do
   print_info "- installed stratisd/stratis-cli and enabled stratisd"
   print_info "- created pool 'developers' and filesystem 'devfs'"
   print_info "- mounted persistently via /etc/fstab with a systemd dependency"
-  print_info "- added /dev/vdd to the pool and captured blockdev output"
+  print_info "- added /dev/vdd to the pool and verified block devices"
   print_info "- created a snapshot and practiced rollback via filesystem renames"
   print_info "You earned $LAB_XP XP for completing this lab."
   award_xp $LAB_XP

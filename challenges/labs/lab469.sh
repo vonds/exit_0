@@ -48,7 +48,7 @@ while true; do
   echo
   center_text "Requirements (type commands exactly):"
   center_text "- Inspect enabled repos (verbose)"
-  center_text "- Attempt to disable repo 'KodeKloud' (it is not present)"
+  center_text "- Attempt to disable repo 'TrainingRepo' (it is not present)"
   center_text "- List hidden groups"
   center_text "- Install httpd"
   center_text "- List module streams for php"
@@ -80,18 +80,18 @@ while true; do
   echo
 
   # STEP 2: Attempt to disable a missing repo
-  echo "  Step 2: Attempt to disable repository named 'KodeKloud'."
+  echo "  Step 2: Attempt to disable repository named 'TrainingRepo'."
   read -p "$PROMPT" cmd2
   echo
-  if [[ "$cmd2" != "sudo dnf config-manager --disable KodeKloud" && \
-        "$cmd2" != "dnf config-manager --disable KodeKloud" && \
-        "$cmd2" != "sudo yum-config-manager --disable KodeKloud" && \
-        "$cmd2" != "yum-config-manager --disable KodeKloud" ]]; then
+  if [[ "$cmd2" != "sudo dnf config-manager --disable TrainingRepo" && \
+        "$cmd2" != "dnf config-manager --disable TrainingRepo" && \
+        "$cmd2" != "sudo yum-config-manager --disable TrainingRepo" && \
+        "$cmd2" != "yum-config-manager --disable TrainingRepo" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  Error: No matching repo to modify: KodeKloud."
+  echo "  Error: No matching repo to modify: TrainingRepo."
   echo
 
   # STEP 3: group list --hidden

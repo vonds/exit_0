@@ -83,7 +83,6 @@ while true; do
   echo
   echo "  Command (m for help): "
 
-  # fdisk: press 'n'
   echo "  fdisk Step 2a: Create a new partition."
   read -p "  Command (m for help): " fd1
   echo
@@ -98,7 +97,6 @@ while true; do
   echo "     e   extended (container for logical partitions)"
   echo "  Select (default p): "
 
-  # fdisk: press Enter for default p
   echo "  fdisk Step 2b: Press Enter to accept default partition type."
   read -p "  Select (default p): " fd2
   echo
@@ -110,7 +108,6 @@ while true; do
 
   echo "  Partition number (1-4, default 1): "
 
-  # fdisk: press Enter for default 1
   echo "  fdisk Step 2c: Press Enter to accept default partition number (1)."
   read -p "  Partition number (1-4, default 1): " fd3
   echo
@@ -122,7 +119,6 @@ while true; do
 
   echo "  First sector (2048-10485759, default 2048): "
 
-  # fdisk: press Enter for default first sector
   echo "  fdisk Step 2d: Press Enter to accept default first sector."
   read -p "  First sector (2048-10485759, default 2048): " fd4
   echo
@@ -134,7 +130,6 @@ while true; do
 
   echo "  Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-10485759, default 10485759): "
 
-  # fdisk: press Enter for default last sector (use whole disk)
   echo "  fdisk Step 2e: Press Enter to accept default last sector (use full disk)."
   read -p "  Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-10485759, default 10485759): " fd5
   echo
@@ -148,7 +143,6 @@ while true; do
   echo
   echo "  Command (m for help): "
 
-  # fdisk: write changes with 'w'
   echo "  fdisk Step 2f: Write the partition table to disk."
   read -p "  Command (m for help): " fd6
   echo
@@ -217,7 +211,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
 
   # STEP 7: Mount the filesystem
   echo "  Step 7: Mount /dev/nvme1 to /data."
@@ -228,7 +221,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
 
   # STEP 8: Verify mount with df -h
   echo "  Step 8: Verify the mount."
@@ -245,7 +237,7 @@ while true; do
   echo
 
   # STEP 9: Edit /etc/fstab
-  echo "  Step 9: Edit /etc/fstab to mount /dev/nvme1 at /data on boot."
+  echo "  Step 9: Open /etc/fstab for editing."
   read -p "  lab@rhel-lab460:~$ " cmd9
   echo
   if [[ "$cmd9" != "sudo vim /etc/fstab" && "$cmd9" != "sudo nano /etc/fstab" ]]; then
@@ -254,16 +246,26 @@ while true; do
     continue
   fi
   echo "  (editor opened)"
-  echo "  (added line at end)"
-  echo "  /dev/nvme1\t/data\txfs\tdefaults\t0\t0"
+  echo
+
+  # STEP 10: Add the fstab line (NEW PROMPT)
+  echo "  Step 10: In the editor, add an /etc/fstab entry that will mount /dev/nvme1 at /data as XFS on boot."
+  read -p "  : " fstab_line
+  echo
+  if [[ "$fstab_line" != "/dev/nvme1 /data xfs defaults 0 0" ]]; then
+    print_error "Incorrect. Type the line exactly (with single spaces as shown)."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  echo "  (line added)"
   echo "  (saved and exited)"
   echo
 
-  # STEP 10: Reboot
-  echo "  Step 10: Reboot the system."
-  read -p "  lab@rhel-lab460:~$ " cmd10
+  # STEP 11: Reboot
+  echo "  Step 11: Reboot the system."
+  read -p "  lab@rhel-lab460:~$ " cmd11
   echo
-  if [[ "$cmd10" != "sudo reboot" && "$cmd10" != "reboot" ]]; then
+  if [[ "$cmd11" != "sudo reboot" && "$cmd11" != "reboot" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
@@ -271,54 +273,53 @@ while true; do
   echo "  Rebooting..."
   echo
 
-  # STEP 11: Verify mount after reboot
-  echo "  Step 11: After reboot, verify /data is mounted."
-  read -p "  lab@rhel-lab460:~$ " cmd11
-  echo
-  if [[ "$cmd11" != "df -h | grep /data" && \
-        "$cmd11" != "mount | grep /data" && \
-        "$cmd11" != "findmnt /data" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to try again..." _
-    continue
-  fi
-  if [[ "$cmd11" == *"findmnt"* ]]; then
-    echo "  TARGET SOURCE     FSTYPE OPTIONS"
-    echo "  /data  /dev/nvme1 xfs    rw,relatime,seclabel,attr2,inode64,logbufs=8,logbsize=32k"
-  else
-    echo "  /dev/nvme1      5.0G   33M  5.0G   1% /data"
-  fi
-  echo
-
-  # STEP 12: Unmount the disk
-  echo "  Step 12: Unmount /data."
+  # STEP 12: Verify mount after reboot
+  echo "  Step 12: After reboot, verify /data is mounted."
   read -p "  lab@rhel-lab460:~$ " cmd12
   echo
-  if [[ "$cmd12" != "sudo umount /data" && "$cmd12" != "umount /data" ]]; then
+  if [[ "$cmd12" != "df -h | grep /data" && \
+        "$cmd12" != "mount | grep /data" && \
+        "$cmd12" != "findmnt /data" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
+  if [[ "$cmd12" == *"findmnt"* ]]; then
+    echo "  TARGET SOURCE     FSTYPE OPTIONS"
+    echo "  /data  /dev/nvme1 xfs    rw,relatime,seclabel,attr2,inode64,logbufs=8,logbsize=32k"
+    echo
+  else
+    echo "  /dev/nvme1      5.0G   33M  5.0G   1% /data"
+    echo
+  fi
 
-  # STEP 13: Mount again using /etc/fstab (mount -a)
-  echo "  Step 13: Mount using /etc/fstab."
+  # STEP 13: Unmount the disk
+  echo "  Step 13: Unmount /data."
   read -p "  lab@rhel-lab460:~$ " cmd13
   echo
-  if [[ "$cmd13" != "sudo mount -a" && "$cmd13" != "mount -a" ]]; then
+  if [[ "$cmd13" != "sudo umount /data" && "$cmd13" != "umount /data" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
 
-  # STEP 14: Final verification
-  echo "  Step 14: Verify /data is mounted again."
+  # STEP 14: Mount again using /etc/fstab (mount -a)
+  echo "  Step 14: Mount using /etc/fstab."
   read -p "  lab@rhel-lab460:~$ " cmd14
   echo
-  if [[ "$cmd14" != "df -h | grep /data" && \
-        "$cmd14" != "mount | grep /data" && \
-        "$cmd14" != "findmnt /data" ]]; then
+  if [[ "$cmd14" != "sudo mount -a" && "$cmd14" != "mount -a" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+
+  # STEP 15: Final verification
+  echo "  Step 15: Verify /data is mounted again."
+  read -p "  lab@rhel-lab460:~$ " cmd15
+  echo
+  if [[ "$cmd15" != "df -h | grep /data" && \
+        "$cmd15" != "mount | grep /data" && \
+        "$cmd15" != "findmnt /data" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue

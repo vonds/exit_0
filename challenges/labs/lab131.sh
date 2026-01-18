@@ -1,181 +1,188 @@
 #!/bin/bash
 
-# Lab 131: Networking Fundamentals
+# Lab 131: Networking Fundamentals — Fix Hostname Override + Verify DNS Path (4–8 prompts)
+# Scenario: A developer hardcoded a hostname override months ago. Now the app is hitting the wrong server.
+# You must identify where the override is coming from (/etc/hosts vs DNS), remove the bad override,
+# confirm correct DNS resolution, and verify the service is reachable.
+# Key skills: getent hosts, grep, sudoedit/vim, resolvectl (or cat /etc/resolv.conf), dig, curl.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab Networking: Fundamentals 5"
+LAB_NAME="Lab 131: Networking Fundamentals — Fix Hostname Override"
 LAB_ID="lab131"
 LAB_XP=29500
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
 [ ! -f "$LAB_TRACK_FILE" ] && echo '{}' > "$LAB_TRACK_FILE"
 
+PROMPT="  lab@rhel-lab131:~$ "
+
 draw_lab_ui() {
-    clear
-    center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
-    center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
-    echo; echo; echo
+  clear
+  center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
+  center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
+  echo; echo; echo
 }
 
 record_lab_completion() {
-    tmpfile=$(mktemp)
-    jq --arg lab "$LAB_ID" '.[$lab] += 1 // 1' "$LAB_TRACK_FILE" > "$tmpfile" && mv "$tmpfile" "$LAB_TRACK_FILE"
+  tmpfile=$(mktemp)
+  jq --arg lab "$LAB_ID" '.[$lab] += 1 // 1' "$LAB_TRACK_FILE" > "$tmpfile" && mv "$tmpfile" "$LAB_TRACK_FILE"
 }
 
 get_lab_completion_count() {
-    jq -r --arg lab "$LAB_ID" '.[$lab] // 0' "$LAB_TRACK_FILE"
+  jq -r --arg lab "$LAB_ID" '.[$lab] // 0' "$LAB_TRACK_FILE"
 }
 
 while true; do
-    draw_lab_ui
-    center_title "$LAB_NAME"
-    echo
-    center_text "Work with networking fundamentals commands and concepts. (set 5)"
-    echo
-    center_text "Press Enter to begin the lab..."
-    read _
+  draw_lab_ui
+  center_title "$LAB_NAME"
+  echo
+  center_text "Scenario:"
+  center_text "Users report the internal app at portal.lab.local is loading the WRONG environment."
+  center_text "Ticket notes: 'It looks like this host resolves portal.lab.local to 127.0.0.1.'"
+  center_text "You must confirm the resolution path, remove any bad /etc/hosts override,"
+  center_text "verify DNS is used, and confirm the service is reachable."
+  echo
+  center_text "Expected DNS result (from the ticket): portal.lab.local -> 10.0.2.50"
+  center_text "Verification target: http://portal.lab.local"
+  echo
+  center_text "Press Enter to begin the lab..."
+  read _
+  draw_lab_ui
 
-    draw_lab_ui
-    echo "  Step 1: Marketing requests that www.example.com resolve to the local machine on this host only."
-    echo "  Provide the single /etc/hosts line you would add to enforce this override."
-    read -p "  lab@lab131:~$ " cmd1
-    echo
-    [[ "$cmd1" != "127.0.0.1 www.example.com" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
+  # STEP 1: Confirm current resolution
+  echo "  Step 1: Check what IP portal.lab.local resolves to on this host."
+  read -p "$PROMPT" cmd1
+  echo
+  if [[ "$cmd1" != "getent hosts portal.lab.local" && \
+        "$cmd1" != "getent ahosts portal.lab.local" && \
+        "$cmd1" != "dig +short portal.lab.local" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  if [[ "$cmd1" == dig* ]]; then
+    echo "  10.0.2.50"
+  else
+    echo "  127.0.0.1   portal.lab.local"
+  fi
+  echo
 
-    echo "  Step 2: You modified routes using a command that changes the active default path."
-    echo "  Ensure the kernel immediately uses the updated routing information with a one-liner."
-    read -p "  lab@lab131:~$ " cmd2
-    echo
-    [[ "$cmd2" != "ip route flush cache" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    # (No standard output on success)
+  # STEP 2: Search /etc/hosts for an override
+  echo "  Step 2: Check /etc/hosts for an entry that mentions portal.lab.local."
+  read -p "$PROMPT" cmd2
+  echo
+  if [[ "$cmd2" != "grep -n portal.lab.local /etc/hosts" && \
+        "$cmd2" != "sudo grep -n portal.lab.local /etc/hosts" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  echo "  6:127.0.0.1 portal.lab.local portal"
+  echo
 
-    echo "  Step 3: A mail administrator asks you to confirm the domain's SPF policy via DNS."
-    echo "  Issue a dig query that requests the correct record type for example.org."
-    read -p "  lab@lab131:~$ " cmd3
-    echo
-    [[ "$cmd3" != "dig example.org -t txt" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  ; <<>> DiG <<>> example.org -t txt"
-    echo "  ;; ANSWER SECTION:"
-    echo "  example.org.    300   IN   TXT   \"v=spf1 include:_spf.example.net -all\""
-    echo
+  # STEP 3: Edit /etc/hosts to remove the bad mapping
+  echo "  Step 3: Edit /etc/hosts and remove the portal.lab.local override line."
+  read -p "$PROMPT" cmd3
+  echo
+  if [[ "$cmd3" != "sudo vim /etc/hosts" && \
+        "$cmd3" != "sudo vi /etc/hosts" && \
+        "$cmd3" != "sudo nano /etc/hosts" && \
+        "$cmd3" != "sudoedit /etc/hosts" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  echo "  (editor opened)"
+  echo "  (removed the bad line and saved)"
+  echo
 
-    echo "  Step 4: During a postmortem you are asked which transport establishes connections with a three-segment handshake."
-    echo "  Reply with the protocol name only."
-    read -p "  lab@lab131:~$ " cmd4
-    echo
-    [[ "$cmd4" != "TCP" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    # (No standard output on success)
+  # STEP 4: Confirm resolution now comes from DNS (should be 10.0.2.50)
+  echo "  Step 4: Re-check resolution and confirm portal.lab.local resolves to 10.0.2.50."
+  read -p "$PROMPT" cmd4
+  echo
+  if [[ "$cmd4" != "getent hosts portal.lab.local" && \
+        "$cmd4" != "dig +short portal.lab.local" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  if [[ "$cmd4" == "dig +short portal.lab.local" ]]; then
+    echo "  10.0.2.50"
+  else
+    echo "  10.0.2.50   portal.lab.local"
+  fi
+  echo
 
-    echo "  Step 5: Capacity planning needs the total address count for the private 172.16.0.0/12 range."
-    echo "  Provide the number of IPv4 addresses in that block."
-    read -p "  lab@lab131:~$ " cmd5
-    echo
-    [[ "$cmd5" != "1,048,576" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    # (No standard output on success)
+  # STEP 5: Verify the resolver configuration (sanity check)
+  echo "  Step 5: Check which DNS server(s) this host is using."
+  read -p "$PROMPT" cmd5
+  echo
+  if [[ "$cmd5" != "resolvectl status" && \
+        "$cmd5" != "sudo resolvectl status" && \
+        "$cmd5" != "cat /etc/resolv.conf" && \
+        "$cmd5" != "sudo cat /etc/resolv.conf" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  if [[ "$cmd5" == *"resolvectl status"* ]]; then
+    echo "  Link 2 (eth0)"
+    echo "       DNS Servers: 10.0.2.3"
+    echo "  Current DNS Server: 10.0.2.3"
+  else
+    echo "  # Generated by NetworkManager"
+    echo "  nameserver 10.0.2.3"
+  fi
+  echo
 
-    echo "  Step 6: You can load the team's web portal over HTTPS, but all ping attempts to the same host time out."
-    echo "  State the most likely cause in a few words."
-    read -p "  lab@lab131:~$ " cmd6
-    echo
-    [[ "$cmd6" != "ICMP blocked" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    # (No standard output on success)
+  # STEP 6: Verify the app endpoint is reachable
+  echo "  Step 6: Verify the portal responds over HTTP."
+  read -p "$PROMPT" cmd6
+  echo
+  if [[ "$cmd6" != "curl -I http://portal.lab.local" && \
+        "$cmd6" != "curl -I http://portal.lab.local/" && \
+        "$cmd6" != "curl -sS http://portal.lab.local | head" && \
+        "$cmd6" != "curl -sS http://portal.lab.local/ | head" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  if [[ "$cmd6" == "curl -I"* ]]; then
+    echo "  HTTP/1.1 200 OK"
+    echo "  Content-Type: text/html; charset=UTF-8"
+    echo "  Server: nginx"
+  else
+    echo "  <html>"
+    echo "  <head><title>Portal</title></head>"
+    echo "  <body>OK</body>"
+    echo "  </html>"
+  fi
+  echo
 
-    echo "  Step 7: While reviewing the route table, you notice entries with the flags 'UG'."
-    echo "  What does the 'G' indicate? Reply with a single word."
-    read -p "  lab@lab131:~$ " cmd7
-    echo
-    [[ "$cmd7" != "gateway" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    # (No standard output on success)
+  print_success "Nice work."
+  print_info "You fixed a real hostname-resolution outage by:"
+  print_info "- confirming the bad resolution"
+  print_info "- locating an /etc/hosts override"
+  print_info "- removing the override safely"
+  print_info "- validating DNS resolution to the correct IP"
+  print_info "- verifying the application endpoint responds"
+  print_info "You earned $LAB_XP XP for completing this lab."
+  award_xp $LAB_XP
 
-    echo "  Step 8: For a forensic snapshot, request a full DNS zone transfer of example.org from 192.168.1.4."
-    echo "  Provide the exact command."
-    read -p "  lab@lab131:~$ " cmd8
-    echo
-    [[ "$cmd8" != "dig example.org @192.168.1.4 axfr" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  ; <<>> DiG <<>> example.org @192.168.1.4 axfr"
-    echo "  ;; ANSWER SECTION:"
-    echo "  example.org.   86400  IN  SOA  ns1.example.org. hostmaster.example.org. 2025082801 7200 3600 1209600 3600"
-    echo "  example.org.   86400  IN  NS   ns1.example.org."
-    echo "  example.org.   86400  IN  NS   ns2.example.org."
-    echo "  ;; XFR size: 3 records (messages 1, bytes 200)"
-    echo
+  XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
+  record_lab_completion
 
-    echo "  Step 9: Operations asks for cumulative per-protocol networking stats, including packets forwarded by the kernel."
-    echo "  Display a summary from the local system."
-    read -p "  lab@lab131:~$ " cmd9
-    echo
-    [[ "$cmd9" != "netstat -s" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  Ip:"
-    echo "      Forwarding: 42"
-    echo "      InReceives: 102394"
-    echo "      InDelivers: 101982"
-    echo "      OutRequests: 99833"
-    echo
-
-    echo "  Step 10: Using the ip utility without specifying a protocol family defaults to which family?"
-    echo "  Reply with the keyword only."
-    read -p "  lab@lab131:~$ " cmd10
-    echo
-    [[ "$cmd10" != "inet" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    # (No standard output on success)
-
-    print_success "Nice work!"
-    print_info "You earned $LAB_XP XP for completing this lab."
-    award_xp $LAB_XP
-    XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
-    record_lab_completion
-
-    completion_count=$(get_lab_completion_count)
-    echo
-    print_info "You've successfully completed this lab $completion_count time(s)."
-    echo
-    center_text "Would you like to:"
-    center_text "1) Retry this lab"
-    center_text "2) Return to Sysadmin Lab Menu"
-    echo
-    read -p "  > " post_choice
-    [[ "$post_choice" == "2" ]] && exit 0
+  completion_count=$(get_lab_completion_count)
+  echo
+  print_info "You've successfully completed this lab $completion_count time(s)."
+  echo
+  center_text "Would you like to:"
+  center_text "1) Retry this lab"
+  center_text "2) Return to Sysadmin Lab Menu"
+  echo
+  read -p "  > " post_choice
+  [[ "$post_choice" == "2" ]] && exit 0
 done
