@@ -81,7 +81,6 @@ while true; do
   echo "  Changes will remain in memory only, until you decide to write them."
   echo "  Be careful before using the write command."
   echo
-  echo "  Command (m for help): "
 
   echo "  fdisk Step 2a: Create a new partition."
   read -p "  Command (m for help): " fd1
@@ -95,7 +94,6 @@ while true; do
   echo "  Partition type"
   echo "     p   primary (0 primary, 0 extended, 4 free)"
   echo "     e   extended (container for logical partitions)"
-  echo "  Select (default p): "
 
   echo "  fdisk Step 2b: Press Enter to accept default partition type."
   read -p "  Select (default p): " fd2
@@ -106,8 +104,6 @@ while true; do
     continue
   fi
 
-  echo "  Partition number (1-4, default 1): "
-
   echo "  fdisk Step 2c: Press Enter to accept default partition number (1)."
   read -p "  Partition number (1-4, default 1): " fd3
   echo
@@ -117,8 +113,6 @@ while true; do
     continue
   fi
 
-  echo "  First sector (2048-10485759, default 2048): "
-
   echo "  fdisk Step 2d: Press Enter to accept default first sector."
   read -p "  First sector (2048-10485759, default 2048): " fd4
   echo
@@ -127,8 +121,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-
-  echo "  Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-10485759, default 10485759): "
 
   echo "  fdisk Step 2e: Press Enter to accept default last sector (use full disk)."
   read -p "  Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-10485759, default 10485759): " fd5
@@ -141,7 +133,6 @@ while true; do
 
   echo "  Created a new partition 1 of type 'Linux' and of size 5 GiB."
   echo
-  echo "  Command (m for help): "
 
   echo "  fdisk Step 2f: Write the partition table to disk."
   read -p "  Command (m for help): " fd6

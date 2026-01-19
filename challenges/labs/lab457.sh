@@ -174,7 +174,7 @@ while true; do
   echo
 
   # STEP 8: Remove the VG (clean reset), then recreate it with 3 PVs
-  echo "  Step 9: Remove the volume group volume1 (clean reset)."
+  echo "  Step 9: Delete the volume group volume1."
   read -p "  lab@rhel-lab457:~$ " cmd9
   echo
   if [[ "$cmd9" != "sudo vgremove volume1" && \
