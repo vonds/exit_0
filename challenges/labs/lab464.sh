@@ -162,7 +162,7 @@ while true; do
   echo
 
   # STEP 6: Confirm details (spare + bitmap)
-  echo "  Step 6: Confirm details (including spare) with mdadm --detail."
+  echo "  Step 6: Confirm details (including spare) with mdadm."
   read -p "  lab@rhel-lab463:~$ " cmd6
   echo
   if [[ "$cmd6" != "sudo mdadm --detail /dev/md0" && \
