@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Lab 381: SELinux + Storage — Fix SELinux Blocking a Mounted Directory (4–8 prompts)
+# Lab 381: SELinux + Storage — Fix SELinux Blocking a Mounted Directory
 # Scenario: A web service started failing right after a new filesystem was mounted.
 # The mount is present and permissions look fine, but SELinux is denying access.
 # Your job: confirm SELinux is enforcing, identify the AVC denial, label the mount path
