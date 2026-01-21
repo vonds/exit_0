@@ -65,38 +65,51 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo "  NAME     SIZE TYPE MOUNTPOINT"
-  echo "  nvme1     5G  disk"
+  echo "  NAME        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS"
+  echo "  nvme0n1     259:0    0   30G  0 disk"
+  echo "  ├─nvme0n1p1 259:1    0  600M  0 part /boot/efi"
+  echo "  ├─nvme0n1p2 259:2    0    1G  0 part /boot"
+  echo "  └─nvme0n1p3 259:3    0 28.4G  0 part"
+  echo "    ├─rhel-root 253:0  0   12G  0 lvm  /"
+  echo "    ├─rhel-swap 253:1  0    2G  0 lvm  [SWAP]"
+  echo "    └─rhel-home 253:2  0 14.4G  0 lvm  /home"
+  echo "  nvme1n1     259:4    0    5G  0 disk"
   echo
 
   # STEP 2: Initialize LUKS encryption
-  echo "  Step 2: Encrypt /dev/nvme1 using LUKS."
+  echo "  Step 2: Encrypt /dev/nvme1n1 using LUKS."
   read -p "  lab@rhel-lab459:~$ " cmd2
   echo
-  if [[ "$cmd2" != "sudo cryptsetup luksFormat /dev/nvme1" && \
-        "$cmd2" != "cryptsetup luksFormat /dev/nvme1" ]]; then
+  if [[ "$cmd2" != "sudo cryptsetup luksFormat /dev/nvme1n1" && \
+        "$cmd2" != "cryptsetup luksFormat /dev/nvme1n1" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
   echo "  WARNING!"
-  echo "  This will overwrite data on /dev/nvme1."
-  echo "  Are you sure? (Type YES in uppercase): YES"
-  echo "  Enter passphrase:"
-  echo "  Verify passphrase:"
+  echo "  ========"
+  echo "  This will overwrite data on /dev/nvme1n1 irrevocably."
+  echo
+  echo -n "  Are you sure? (Type 'yes' in uppercase): "
+  echo "YES"
+  echo -n "  Enter passphrase for /dev/nvme1n1: "
+  echo
+  echo -n "  Verify passphrase: "
+  echo
   echo
 
   # STEP 3: Open encrypted device
   echo "  Step 3: Open the encrypted device as crypt459."
   read -p "  lab@rhel-lab459:~$ " cmd3
   echo
-  if [[ "$cmd3" != "sudo cryptsetup open /dev/nvme1 crypt459" && \
-        "$cmd3" != "cryptsetup open /dev/nvme1 crypt459" ]]; then
+  if [[ "$cmd3" != "sudo cryptsetup open /dev/nvme1n1 crypt459" && \
+        "$cmd3" != "cryptsetup open /dev/nvme1n1 crypt459" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo "  Enter passphrase for /dev/nvme1:"
+  echo -n "  Enter passphrase for /dev/nvme1n1: "
+  echo
   echo
 
   # STEP 4: Verify mapper device exists
@@ -108,7 +121,9 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo "  crypt459  5G  crypt"
+  echo "  NAME        MAJ:MIN RM  SIZE RO TYPE  MOUNTPOINTS"
+  echo "  nvme1n1     259:4    0    5G  0 disk"
+  echo "  └─crypt459  253:3    0    5G  0 crypt"
   echo
 
   # STEP 5: Create filesystem on encrypted device
@@ -121,6 +136,17 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
+  echo "  meta-data=/dev/mapper/crypt459 isize=512    agcount=4, agsize=327616 blks"
+  echo "           =                       sectsz=512   attr=2, projid32bit=1"
+  echo "           =                       crc=1        finobt=1, sparse=1, rmapbt=0"
+  echo "           =                       reflink=1    bigtime=1 inobtcount=1"
+  echo "  data     =                       bsize=4096   blocks=1310720, imaxpct=25"
+  echo "           =                       sunit=0      swidth=0 blks"
+  echo "  naming   =version 2              bsize=4096   ascii-ci=0, ftype=1"
+  echo "  log      =internal log           bsize=4096   blocks=6400, version=2"
+  echo "           =                       sectsz=512   sunit=0 blks, lazy-count=1"
+  echo "  realtime =none                   extsz=4096   blocks=0, rtextents=0"
+  echo
 
   # STEP 6: Create mount point
   echo "  Step 6: Create mount point /secure459."
@@ -132,6 +158,7 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
+  # mkdir is silent on success.
 
   # STEP 7: Mount encrypted filesystem
   echo "  Step 7: Mount the encrypted filesystem."
@@ -143,6 +170,7 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
+  # mount is silent on success.
 
   # STEP 8: Verify mount
   echo "  Step 8: Verify the filesystem is mounted."
@@ -155,29 +183,41 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo "  /dev/mapper/crypt459   5.0G   33M  5.0G   1% /secure459"
+
+  if [[ "$cmd8" == "findmnt /secure459" ]]; then
+    echo "  TARGET     SOURCE              FSTYPE OPTIONS"
+    echo "  /secure459 /dev/mapper/crypt459 xfs    rw,relatime,seclabel,attr2,inode64,logbufs=8,logbsize=32k,noquota"
+  elif [[ "$cmd8" == "mount | grep secure459" ]]; then
+    echo "  /dev/mapper/crypt459 on /secure459 type xfs (rw,relatime,seclabel,attr2,inode64,logbufs=8,logbsize=32k,noquota)"
+  else
+    echo "  /dev/mapper/crypt459  5.0G   47M  5.0G   1% /secure459"
+  fi
   echo
 
   # STEP 9: Configure /etc/crypttab
-  echo "  Step 9: Configure /etc/crypttab for persistent unlock."
+  echo "  Step 9: Configure /etc/crypttab for persistent unlock (use the LUKS UUID)."
   read -p "  lab@rhel-lab459:~$ " cmd9
   echo
   if [[ "$cmd9" != "sudo vim /etc/crypttab" && \
-        "$cmd9" != "sudo nano /etc/crypttab" ]]; then
+        "$cmd9" != "sudo nano /etc/crypttab" && \
+        "$cmd9" != "sudoedit /etc/crypttab" && \
+        "$cmd9" != "sudo vi /etc/crypttab" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
   echo "  (added line)"
-  echo "  crypt459  /dev/nvme1  none  luks"
+  echo "  crypt459  UUID=3b0f1d2a-9d8a-4d5a-9e3f-3d2e8a7c1b55  none  luks"
   echo
 
   # STEP 10: Configure /etc/fstab
-  echo "  Step 10: Configure /etc/fstab to mount encrypted filesystem."
+  echo "  Step 10: Configure /etc/fstab to mount the decrypted mapper device."
   read -p "  lab@rhel-lab459:~$ " cmd10
   echo
   if [[ "$cmd10" != "sudo vim /etc/fstab" && \
-        "$cmd10" != "sudo nano /etc/fstab" ]]; then
+        "$cmd10" != "sudo nano /etc/fstab" && \
+        "$cmd10" != "sudoedit /etc/fstab" && \
+        "$cmd10" != "sudo vi /etc/fstab" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
@@ -186,25 +226,55 @@ while true; do
   echo "  /dev/mapper/crypt459  /secure459  xfs  defaults  0  0"
   echo
 
-  # STEP 11: Reload systemd and test mount
-  echo "  Step 11: Test configuration without reloading."
+  # STEP 11: Reload systemd + test mounts
+  echo "  Step 11: Reload systemd units and test mounting without rebooting."
   read -p "  lab@rhel-lab459:~$ " cmd11
   echo
-  if [[ "$cmd11" != "sudo mount -a" && \
-        "$cmd11" != "mount -a" ]]; then
+  if [[ "$cmd11" != "sudo systemctl daemon-reload" && \
+        "$cmd11" != "systemctl daemon-reload" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to try again..." _
     continue
   fi
- 
+  # daemon-reload is silent on success.
+
+  echo "  Step 12: Test the fstab entry now."
+  read -p "  lab@rhel-lab459:~$ " cmd12
+  echo
+  if [[ "$cmd12" != "sudo mount -a" && \
+        "$cmd12" != "mount -a" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+  # mount -a is silent on success when no errors.
+
+  echo "  Step 13: Verify the mount is still present."
+  read -p "  lab@rhel-lab459:~$ " cmd13
+  echo
+  if [[ "$cmd13" != "findmnt /secure459" && \
+        "$cmd13" != "df -h /secure459" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to try again..." _
+    continue
+  fi
+
+  if [[ "$cmd13" == "findmnt /secure459" ]]; then
+    echo "  TARGET     SOURCE              FSTYPE OPTIONS"
+    echo "  /secure459 /dev/mapper/crypt459 xfs    rw,relatime,seclabel,attr2,inode64,logbufs=8,logbsize=32k,noquota"
+  else
+    echo "  Filesystem              Size  Used Avail Use% Mounted on"
+    echo "  /dev/mapper/crypt459    5.0G   47M  5.0G   1% /secure459"
+  fi
+  echo
 
   print_success "Excellent work."
   print_info "You successfully:"
   print_info "- encrypted a disk using LUKS"
-  print_info "- unlocked it using cryptsetup"
-  print_info "- created and mounted a filesystem on the encrypted device"
-  print_info "- configured /etc/crypttab and /etc/fstab for persistence"
-  print_info "This is exactly the disk encryption knowledge RHCSA expects."
+  print_info "- unlocked it with cryptsetup"
+  print_info "- created and mounted an XFS filesystem on the encrypted device"
+  print_info "- configured /etc/crypttab (UUID-based) and /etc/fstab for persistence"
+  print_info "- reloaded systemd and validated mounts without reboot"
   print_info "You earned $LAB_XP XP."
   award_xp $LAB_XP
 
