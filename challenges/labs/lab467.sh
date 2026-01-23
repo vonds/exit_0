@@ -80,7 +80,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 3: Open root crontab ONCE
   echo "  Step 3: Open ROOT crontab editor."

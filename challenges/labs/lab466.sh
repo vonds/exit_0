@@ -2,7 +2,6 @@
 
 # Lab 466: Rocky Linux 10 Storage — Stratis End-to-End (Install, Service, Pool/FS, fstab, Add Disk, Snapshot Rollback)
 # Focus: installing Stratis, enabling stratisd, creating a pool and filesystem, mounting persistently via /etc/fstab,
-# adding an additional data disk, creating a snapshot, simulating a bad change, and rolling back by renaming.
 # Key skills: dnf makecache, dnf install, systemctl enable --now, systemctl status, rpm -q, command -v,
 # stratis pool/fs/blockdev, mkdir, /etc/fstab edit, systemctl daemon-reload, mount -a, touch, rm,
 # stratis pool add-data, stratis fs snapshot, stratis fs rename, umount, mount.
@@ -113,7 +112,6 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo
 
   # STEP 4: Confirm service status
   echo "  Step 4: Check service status (no pager)."
