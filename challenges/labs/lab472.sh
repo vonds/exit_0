@@ -87,7 +87,7 @@ while true; do
   echo "  Step 3: Remove account expiration for user jane."
   read -p "$PROMPT" cmd3
   echo
-  if [[ "$cmd3" != "sudo usermod -e \"\" jane" && "$cmd3" != "sudo usermod -e '' jane" ]]; then
+  if [[ "$cmd3" != "sudo usermod -e '' jane" && "$cmd3" != "sudo usermod -e '' jane" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
@@ -131,7 +131,7 @@ while true; do
   echo "  Step 7: Add user jane to supplementary group developers."
   read -p "$PROMPT" cmd7
   echo
-  if [[ "$cmd7" != "sudo usermod -a -G developers jane" ]]; then
+  if [[ "$cmd7" != "sudo usermod -aG developers jane" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue

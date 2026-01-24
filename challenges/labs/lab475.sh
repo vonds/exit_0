@@ -71,7 +71,7 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  (vi opened)"
+  echo "  (vim opened)"
   echo
 
   echo "  Step 3: Paste the SELinux context EXACTLY as seen (single line):"
@@ -152,7 +152,7 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  (vi opened)"
+  echo "  (vim opened)"
   echo
 
   echo "  Step 10: Add the following line EXACTLY:"
@@ -221,7 +221,7 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  (vi opened)"
+  echo "  (vim opened)"
   echo
 
   echo "  Step 16: Enter the SELinux ROLES value for xguest_u:"

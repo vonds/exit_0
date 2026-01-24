@@ -51,246 +51,176 @@ while true; do
   read _
   draw_lab_ui
 
-  # STEP 1: systemctl status sshd.service
+  # STEP 1
   echo "  Step 1: Check sshd service status."
   read -p "$PROMPT" cmd1
   echo
-  if [[ "$cmd1" != "systemctl status sshd.service" && \
-        "$cmd1" != "sudo systemctl status sshd.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "● sshd.service - OpenSSH server daemon"
-  echo "     Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; preset: enabled)"
-  echo "     Active: active (running) since Thu 2026-01-15 11:20:18 UTC; 25min ago"
-  echo "       Docs: man:sshd(8)"
-  echo "             man:sshd_config(5)"
-  echo "   Main PID: 1383 (sshd)"
-  echo "      Tasks: 1 (limit: 411434)"
-  echo "     Memory: 16.9M"
-  echo "     CGroup: /system.slice/sshd.service"
-  echo "             └─1383 \"sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups\""
+  [[ "$cmd1" != "systemctl status sshd.service" && "$cmd1" != "sudo systemctl status sshd.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  ● sshd.service - OpenSSH server daemon"
+  echo "       Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; preset: enabled)"
+  echo "       Active: active (running) since Thu 2026-01-15 11:20:18 UTC; 25min ago"
+  echo "         Docs: man:sshd(8)"
+  echo "               man:sshd_config(5)"
+  echo "     Main PID: 1383 (sshd)"
+  echo "        Tasks: 1 (limit: 411434)"
+  echo "       Memory: 16.9M"
+  echo "       CGroup: /system.slice/sshd.service"
+  echo "               └─1383 \"sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups\""
   echo
 
-  # STEP 2: Confirm sshd active state
+  # STEP 2
   echo "  Step 2: Confirm sshd is active using systemctl is-active."
   read -p "$PROMPT" cmd2
   echo
-  if [[ "$cmd2" != "systemctl is-active sshd.service" && \
-        "$cmd2" != "sudo systemctl is-active sshd.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "active"
+  [[ "$cmd2" != "systemctl is-active sshd.service" && "$cmd2" != "sudo systemctl is-active sshd.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  active"
   echo
 
-  # STEP 3: Identify unit file path (no random files)
+  # STEP 3
   echo "  Step 3: Display the unit file path for sshd using systemctl show."
-  echo "          (Hint: use the FragmentPath property)"
   read -p "$PROMPT" cmd3
   echo
-  if [[ "$cmd3" != "systemctl show -p FragmentPath sshd.service" && \
-        "$cmd3" != "sudo systemctl show -p FragmentPath sshd.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "FragmentPath=/usr/lib/systemd/system/sshd.service"
+  [[ "$cmd3" != "systemctl show -p FragmentPath sshd.service" && "$cmd3" != "sudo systemctl show -p FragmentPath sshd.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  FragmentPath=/usr/lib/systemd/system/sshd.service"
   echo
 
-  # STEP 4: Check httpd enable state
+  # STEP 4
   echo "  Step 4: Check whether httpd is enabled."
   read -p "$PROMPT" cmd4
   echo
-  if [[ "$cmd4" != "systemctl is-enabled httpd.service" && \
-        "$cmd4" != "sudo systemctl is-enabled httpd.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "disabled"
+  [[ "$cmd4" != "systemctl is-enabled httpd.service" && "$cmd4" != "sudo systemctl is-enabled httpd.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  disabled"
   echo
 
-  # STEP 5: Enable and start httpd
+  # STEP 5
   echo "  Step 5: Enable and start httpd immediately."
   read -p "$PROMPT" cmd5
   echo
-  if [[ "$cmd5" != "sudo systemctl enable --now httpd.service" && \
-        "$cmd5" != "systemctl enable --now httpd.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "Created symlink /etc/systemd/system/multi-user.target.wants/httpd.service → /usr/lib/systemd/system/httpd.service."
+  [[ "$cmd5" != "sudo systemctl enable --now httpd.service" && "$cmd5" != "systemctl enable --now httpd.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  Created symlink /etc/systemd/system/multi-user.target.wants/httpd.service → /usr/lib/systemd/system/httpd.service."
   echo
 
-  # STEP 6: Verify httpd enabled
+  # STEP 6
   echo "  Step 6: Verify httpd is enabled."
   read -p "$PROMPT" cmd6
   echo
-  if [[ "$cmd6" != "systemctl is-enabled httpd.service" && \
-        "$cmd6" != "sudo systemctl is-enabled httpd.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "enabled"
+  [[ "$cmd6" != "systemctl is-enabled httpd.service" && "$cmd6" != "sudo systemctl is-enabled httpd.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  enabled"
   echo
 
-  # STEP 7: Verify httpd active
+  # STEP 7
   echo "  Step 7: Verify httpd is active."
   read -p "$PROMPT" cmd7
   echo
-  if [[ "$cmd7" != "systemctl is-active httpd.service" && \
-        "$cmd7" != "sudo systemctl is-active httpd.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "active"
+  [[ "$cmd7" != "systemctl is-active httpd.service" && "$cmd7" != "sudo systemctl is-active httpd.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  active"
   echo
 
-  # STEP 8: Mask httpd
+  # STEP 8
   echo "  Step 8: Mask httpd so it cannot be started by anything."
   read -p "$PROMPT" cmd8
   echo
-  if [[ "$cmd8" != "sudo systemctl mask httpd.service" && \
-        "$cmd8" != "systemctl mask httpd.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "Created symlink /etc/systemd/system/httpd.service → /dev/null."
+  [[ "$cmd8" != "sudo systemctl mask httpd.service" && "$cmd8" != "systemctl mask httpd.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  Created symlink /etc/systemd/system/httpd.service → /dev/null."
   echo
 
-  # STEP 9: Attempt to start masked service (expect failure)
+  # STEP 9
   echo "  Step 9: Try to start httpd while it is masked (should fail)."
   read -p "$PROMPT" cmd9
   echo
-  if [[ "$cmd9" != "sudo systemctl start httpd.service" && \
-        "$cmd9" != "systemctl start httpd.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "Failed to start httpd.service: Unit httpd.service is masked."
+  [[ "$cmd9" != "sudo systemctl start httpd.service" && "$cmd9" != "systemctl start httpd.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  Failed to start httpd.service: Unit httpd.service is masked."
   echo
 
-  # STEP 10: Unmask httpd
+  # STEP 10
   echo "  Step 10: Unmask httpd."
   read -p "$PROMPT" cmd10
   echo
-  if [[ "$cmd10" != "sudo systemctl unmask httpd.service" && \
-        "$cmd10" != "systemctl unmask httpd.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "Removed \"/etc/systemd/system/httpd.service\"."
+  [[ "$cmd10" != "sudo systemctl unmask httpd.service" && "$cmd10" != "systemctl unmask httpd.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  Removed \"/etc/systemd/system/httpd.service\"."
   echo
 
-  # STEP 11: Disable httpd (no autostart)
+  # STEP 11
   echo "  Step 11: Disable httpd so it does not start at boot."
   read -p "$PROMPT" cmd11
   echo
-  if [[ "$cmd11" != "sudo systemctl disable httpd.service" && \
-        "$cmd11" != "systemctl disable httpd.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "Removed \"/etc/systemd/system/multi-user.target.wants/httpd.service\"."
+  [[ "$cmd11" != "sudo systemctl disable httpd.service" && "$cmd11" != "systemctl disable httpd.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  Removed \"/etc/systemd/system/multi-user.target.wants/httpd.service\"."
   echo
 
-  # STEP 12: Stop httpd
+  # STEP 12
   echo "  Step 12: Stop httpd now."
   read -p "$PROMPT" cmd12
   echo
-  if [[ "$cmd12" != "sudo systemctl stop httpd.service" && \
-        "$cmd12" != "systemctl stop httpd.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo
+  [[ "$cmd12" != "sudo systemctl stop httpd.service" && "$cmd12" != "systemctl stop httpd.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
   echo "  (httpd stopped)"
   echo
 
-  # STEP 13: Enable rpcbind (do not start now)
+  # STEP 13
   echo "  Step 13: Enable rpcbind at boot (do NOT start it now)."
   read -p "$PROMPT" cmd13
   echo
-  if [[ "$cmd13" != "sudo systemctl enable rpcbind.service" && \
-        "$cmd13" != "systemctl enable rpcbind.service" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "Created symlink /etc/systemd/system/multi-user.target.wants/rpcbind.service → /usr/lib/systemd/system/rpcbind.service."
+  [[ "$cmd13" != "sudo systemctl enable rpcbind.service" && "$cmd13" != "systemctl enable rpcbind.service" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  Created symlink /etc/systemd/system/multi-user.target.wants/rpcbind.service → /usr/lib/systemd/system/rpcbind.service."
   echo
 
-  # STEP 14: daemon-reload
-  echo "  Step 14: Reload systemd manager configuration (daemon-reload)."
+  # STEP 14
+  echo "  Step 14: Reload systemd manager configuration."
   read -p "$PROMPT" cmd14
   echo
-  if [[ "$cmd14" != "sudo systemctl daemon-reload" && \
-        "$cmd14" != "systemctl daemon-reload" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
+  [[ "$cmd14" != "sudo systemctl daemon-reload" && "$cmd14" != "systemctl daemon-reload" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
   echo
   echo "  (daemon-reload complete)"
   echo
 
-  # STEP 15: Confirm default target
+  # STEP 15
   echo "  Step 15: Show the current default target."
   read -p "$PROMPT" cmd15
   echo
-  if [[ "$cmd15" != "systemctl get-default" && \
-        "$cmd15" != "sudo systemctl get-default" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "multi-user.target"
+  [[ "$cmd15" != "systemctl get-default" && "$cmd15" != "sudo systemctl get-default" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  multi-user.target"
   echo
 
-  # STEP 16: List dependencies of multi-user target
+  # STEP 16
   echo "  Step 16: List dependencies of multi-user.target."
   read -p "$PROMPT" cmd16
   echo
-  if [[ "$cmd16" != "systemctl list-dependencies multi-user.target" && \
-        "$cmd16" != "sudo systemctl list-dependencies multi-user.target" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "multi-user.target"
-  echo "● ├─basic.target"
-  echo "● ├─getty.target"
-  echo "● ├─network.target"
-  echo "● ├─remote-fs.target"
-  echo "● ├─sshd.service"
-  echo "● └─systemd-user-sessions.service"
+  [[ "$cmd16" != "systemctl list-dependencies multi-user.target" && "$cmd16" != "sudo systemctl list-dependencies multi-user.target" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  multi-user.target"
+  echo "  ● ├─basic.target"
+  echo "  ● ├─getty.target"
+  echo "  ● ├─network.target"
+  echo "  ● ├─remote-fs.target"
+  echo "  ● ├─sshd.service"
+  echo "  ● └─systemd-user-sessions.service"
   echo
 
-  # STEP 17: View logs for sshd
+  # STEP 17
   echo "  Step 17: Show the most recent 10 journal entries for sshd."
   read -p "$PROMPT" cmd17
   echo
-  if [[ "$cmd17" != "sudo journalctl -u sshd.service -n 10" && \
-        "$cmd17" != "journalctl -u sshd.service -n 10" ]]; then
-    print_error "Incorrect."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo "Jan 15 11:20:18 rocky10 systemd[1]: Starting OpenSSH server daemon..."
-  echo "Jan 15 11:20:18 rocky10 sshd[1383]: Server listening on 0.0.0.0 port 22."
-  echo "Jan 15 11:20:18 rocky10 sshd[1383]: Server listening on :: port 22."
-  echo "Jan 15 11:20:18 rocky10 systemd[1]: Started OpenSSH server daemon."
+  [[ "$cmd17" != "sudo journalctl -u sshd.service -n 10" && "$cmd17" != "journalctl -u sshd.service -n 10" ]] && { print_error "Incorrect."; read -p "Press Enter to retry..." _; continue; }
+
+  echo "  Jan 15 11:20:18 rocky10 systemd[1]: Starting OpenSSH server daemon..."
+  echo "  Jan 15 11:20:18 rocky10 sshd[1383]: Server listening on 0.0.0.0 port 22."
+  echo "  Jan 15 11:20:18 rocky10 sshd[1383]: Server listening on :: port 22."
+  echo "  Jan 15 11:20:18 rocky10 systemd[1]: Started OpenSSH server daemon."
   echo
 
   print_success "Great job."

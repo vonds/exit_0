@@ -2,7 +2,7 @@
 
 # Lab 470: Rocky Linux 10 Networking — Interfaces, Routes, Ports, Hosts, DNS (RHCSA Focus)
 # Focus: inspecting interfaces/routes, checking listening ports, and MANUALLY editing
-# /etc/hosts and /etc/resolv.conf using vi-style entry (RHCSA expectations).
+# /etc/hosts and /etc/resolv.conf using vim-style entry (RHCSA expectations).
 # Key skills: ip, ss, netstat, editing critical network files, hostnamectl.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -43,7 +43,7 @@ while true; do
   center_text "Scenario:"
   center_text "You're validating and adjusting network configuration on a Rocky Linux 10 server."
   center_text "You must inspect interfaces and routes, verify listening services,"
-  center_text "and manually update name resolution files using vi."
+  center_text "and manually update name resolution files using vim."
   echo
   center_text "Press Enter to begin..."
   read _
@@ -83,22 +83,22 @@ while true; do
   echo
 
   # STEP 5: Edit /etc/hosts
-  echo "  Step 5: Open /etc/hosts in vi."
+  echo "  Step 5: Open /etc/hosts in vim."
   read -p "$PROMPT" cmd5
   echo
-  [[ "$cmd5" != "sudo vi /etc/hosts" ]] && { print_error "Incorrect."; read _; continue; }
-  echo "  (vi opened)"
+  [[ "$cmd5" != "sudo vim /etc/hosts" ]] && { print_error "Incorrect."; read _; continue; }
+  echo "  (vim opened)"
   echo
 
-  echo "  Step 6: In vi, type the following line EXACTLY:"
+  echo "  Step 6: In vim, type the following line EXACTLY:"
   read -p "  > " hosts_entry
-  if [[ "$hosts_entry" != "8.8.8.8         example.com" ]]; then
+  if [[ "$hosts_entry" != "8.8.8.8    example.com" ]]; then
     print_error "Incorrect entry."
     read _
     continue
   fi
   echo
-  echo "  (save and exit vi)"
+  echo "  (save and exit vim)"
   echo
 
   # STEP 7: Add IP address
@@ -117,14 +117,14 @@ while true; do
   echo
 
   # STEP 9: Edit /etc/resolv.conf
-  echo "  Step 9: Open /etc/resolv.conf in vi."
+  echo "  Step 9: Open /etc/resolv.conf in vim."
   read -p "$PROMPT" cmd9
   echo
-  [[ "$cmd9" != "sudo vi /etc/resolv.conf" ]] && { print_error "Incorrect."; read _; continue; }
-  echo "  (vi opened)"
+  [[ "$cmd9" != "sudo vim /etc/resolv.conf" ]] && { print_error "Incorrect."; read _; continue; }
+  echo "  (vim opened)"
   echo
 
-  echo "  Step 10: In vi, type the following line EXACTLY:"
+  echo "  Step 10: In vim, type the following line EXACTLY:"
   read -p "  > " resolv_entry
   if [[ "$resolv_entry" != "nameserver 8.8.8.8" ]]; then
     print_error "Incorrect entry."
@@ -132,7 +132,7 @@ while true; do
     continue
   fi
   echo
-  echo "  (save and exit vi)"
+  echo "  (save and exit vim)"
   echo
 
   # STEP 11: hostnamectl
