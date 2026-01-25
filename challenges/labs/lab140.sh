@@ -1,17 +1,22 @@
 #!/bin/bash
 
-# Lab 140: System Services
+# Lab 140: RHCSA System Services — Printer Access + Postfix Queue + Journald Cleanup Workflow
+# Workflow: grant printer admin rights, verify CUPS, enable sharing, restart service,
+# review journal usage, vacuum old journals, then triage Postfix queue and remove a stuck message.
+# RHCSA Focus: usermod/groups, systemctl, cupsctl/lpstat, journalctl, postqueue/mailq/postsupper.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab System Services: Fundamentals 5"
+LAB_NAME="Lab 140: RHCSA System Services — CUPS Access + Mail Queue + Journald Workflow"
 LAB_ID="lab140"
 LAB_XP=29500
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
 [ ! -f "$LAB_TRACK_FILE" ] && echo '{}' > "$LAB_TRACK_FILE"
+
+PROMPT="  lab@lab140:~$ "
 
 record_lab_completion() {
     tmpfile=$(mktemp)
@@ -24,126 +29,148 @@ draw_lab_ui() {
     clear
     center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
     center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
-    echo; echo; echo
+    echo
+    echo
 }
 
 while true; do
     draw_lab_ui
     center_title "$LAB_NAME"
     echo
-    center_text "Practice with CUPS, logrotate, sendmail/Postfix, journald, and service management. (set 5)"
+    center_text "Scenario:"
+    center_text "A new helpdesk tech needs printer admin rights. Printing should be shared on the LAN."
+    center_text "Meanwhile, the mail queue has a stuck item and the journal is growing."
     echo
     center_text "Press Enter to begin the lab..."
     read _
 
     draw_lab_ui
-    echo "  Step 1: Grant printer administration rights to the account named 'username'."
-    read -p "  lab@lab140:~$ " cmd1
-    echo
-    [[ "$cmd1" != "usermod -aG lpadmin username" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to retry..." _
-        continue
-    }
-    # (No standard output on success)
 
-    echo "  Step 2: Disable compression for a rotated log in a logrotate stanza (single directive)."
-    read -p "  lab@lab140:~$ " cmd2
+    # STEP 1: Add user to lpadmin (with sudo)
+    echo "  Step 1: Grant printer administration rights to the account named 'Hamzah'."
+    read -p "$PROMPT" cmd1
     echo
-    [[ "$cmd2" != "nocompress" ]] && {
+    if [[ "$cmd1" != "sudo usermod -aG lpadmin Hamzah" && "$cmd1" != "usermod -aG lpadmin Hamzah" ]]; then
         print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
-    }
-    # (No output for this answer)
+    fi
 
-    echo "  Step 3: Enable printer sharing for all locally configured printers via CUPS."
-    read -p "  lab@lab140:~$ " cmd3
+    # STEP 2: Verify user group membership
+    echo "  Step 2: Verify that 'Hamzah' is now in the lpadmin group."
+    read -p "$PROMPT" cmd2
     echo
-    [[ "$cmd3" != "cupsctl --share-printers" ]] && {
+    if [[ "$cmd2" != "id Hamzah" ]]; then
         print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
-    }
-    # (No standard output on success)
-
-    echo "  Step 4: Display sendmail traffic and queue statistics."
-    read -p "  lab@lab140:~$ " cmd4
-    echo
-    [[ "$cmd4" != "mailstats" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to retry..." _
-        continue
-    }
-    echo "  Statistics from Sun Jan 12 10:00:00 2025"
-    echo "   M   msgsfr  bytes_from   msgsto    bytes_to  msgsrej msgsdis  Mailer"
-    echo "   4        5       12.3K        7       18.7K        0       0  relay"
+    fi
+    echo "  uid=1002(Hamzah) gid=1002(Hamzah) groups=1002(Hamzah),4(lpadmin)"
     echo
 
-    echo "  Step 5: Show total disk space consumed by systemd journal files."
-    read -p "  lab@lab140:~$ " cmd5
+    # STEP 3: Confirm CUPS is running
+    echo "  Step 3: Verify the CUPS service is running."
+    read -p "$PROMPT" cmd3
     echo
-    [[ "$cmd5" != "journalctl --disk-usage" ]] && {
+    if [[ "$cmd3" != "systemctl is-active cups" && "$cmd3" != "sudo systemctl is-active cups" ]]; then
         print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
-    }
-    echo "  Archived and active journals take up 64.0M in the file system."
+    fi
+    echo "  active"
     echo
 
-    echo "  Step 6: Restart the CUPS service on a systemd-based host."
-    read -p "  lab@lab140:~$ " cmd6
+    # STEP 4: Enable printer sharing for all locally configured printers
+    echo "  Step 4: Enable printer sharing for all locally configured printers via CUPS."
+    read -p "$PROMPT" cmd4
     echo
-    [[ "$cmd6" != "systemctl restart cups.service" ]] && {
+    if [[ "$cmd4" != "sudo cupsctl --share-printers" && "$cmd4" != "cupsctl --share-printers" ]]; then
         print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
-    }
-    # (No standard output on success)
+    fi
 
-    echo "  Step 7: View only debug-priority messages from the systemd journal."
-    read -p "  lab@lab140:~$ " cmd7
+    # STEP 5: Restart CUPS to ensure settings are applied
+    echo "  Step 5: Restart the CUPS service."
+    read -p "$PROMPT" cmd5
     echo
-    [[ "$cmd7" != "journalctl -p debug" ]] && {
+    if [[ "$cmd5" != "sudo systemctl restart cups" && "$cmd5" != "systemctl restart cups" && \
+          "$cmd5" != "sudo systemctl restart cups.service" && "$cmd5" != "systemctl restart cups.service" ]]; then
         print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
-    }
-    echo "  -- Logs begin at Sun 2025-01-12 09:12:01 --"
-    echo "  Jan 12 10:51:02 host kernel: debug: sample debug message"
+    fi
+
+    # STEP 6: Verify printers are present (real workflow verification)
+    echo "  Step 6: List configured printers."
+    read -p "$PROMPT" cmd6
+    echo
+    if [[ "$cmd6" != "lpstat -p" ]]; then
+        print_error "Incorrect. Try again."
+        read -p "Press Enter to retry..." _
+        continue
+    fi
+    echo "  printer Office_Printer is idle.  enabled since Sun 25 Jan 2026 06:41:14 AM EST"
     echo
 
-    echo "  Step 8: Provide the cupsd.conf directive to listen on all interfaces on the IPP port."
-    read -p "  lab@lab140:~$ " cmd8
+    # STEP 7: Check journal disk usage
+    echo "  Step 7: Show total disk space consumed by systemd journal files."
+    read -p "$PROMPT" cmd7
     echo
-    [[ "$cmd8" != "Port 631" ]] && {
+    if [[ "$cmd7" != "journalctl --disk-usage" && "$cmd7" != "sudo journalctl --disk-usage" ]]; then
         print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
-    }
-    # (No output for this answer)
+    fi
+    echo "  Archived and active journals take up 96.0M in the file system."
+    echo
 
-    echo "  Step 9: Remove a message from the Postfix mail queue (generic command form)."
-    read -p "  lab@lab140:~$ " cmd9
+    # STEP 8: Vacuum journals older than 5 days
+    echo "  Step 8: Purge archived journal files older than five days."
+    read -p "$PROMPT" cmd8
     echo
-    [[ "$cmd9" != "postsuper -d" ]] && {
+    if [[ "$cmd8" != "sudo journalctl --vacuum-time=5d" && "$cmd8" != "journalctl --vacuum-time=5d" ]]; then
         print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
-    }
-    # (No output for this answer)
+    fi
+    echo "  Vacuuming done, freed 24.0M of archived journals on disk."
+    echo
 
-    echo "  Step 10: Purge archived journal files older than five days."
-    read -p "  lab@lab140:~$ " cmd10
+    # STEP 9: Check mail queue
+    echo "  Step 9: Inspect the Postfix mail queue."
+    read -p "$PROMPT" cmd9
     echo
-    [[ "$cmd10" != "journalctl --vacuum-time=5d" ]] && {
+    if [[ "$cmd9" != "mailq" && "$cmd9" != "postqueue -p" ]]; then
         print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
-    }
-    # (No output for this answer)
+    fi
+    echo "  -Queue ID-  --Size-- ----Arrival Time---- -Sender/Recipient-------"
+    echo "  7C9A0F12B3*     1740 Sun Jan 25 06:59:37  alerts@example.com"
+    echo "                                           ops@example.com"
+    echo "                                           (connect to mx.example.com[203.0.113.25]:25: Connection timed out)"
+    echo "  -- 2 Kbytes in 1 Request."
+    echo
+
+    # STEP 10: Remove the stuck message (specific queue id, realistic)
+    echo "  Step 10: Delete the stuck message with queue ID 7C9A0F12B3."
+    read -p "$PROMPT" cmd10
+    echo
+    if [[ "$cmd10" != "sudo postsuper -d 7C9A0F12B3" && "$cmd10" != "postsuper -d 7C9A0F12B3" ]]; then
+        print_error "Incorrect. Try again."
+        read -p "Press Enter to retry..." _
+        continue
+    fi
+    echo "  postsuper: Deleted: 1 message"
+    echo
 
     print_success "Nice work!"
+    print_info "Workflow completed:"
+    print_info "- Granted printer admin rights and verified group membership"
+    print_info "- Enabled CUPS printer sharing, restarted service, verified printers"
+    print_info "- Checked journald disk usage and vacuumed old archives"
+    print_info "- Inspected Postfix queue and removed a stuck message with postsuper"
     print_info "You earned $LAB_XP XP for completing this lab."
     award_xp $LAB_XP
     XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL

@@ -1,17 +1,22 @@
 #!/bin/bash
 
-# Lab 139: System Services
+# Lab 139: RHCSA System Services — Remote Syslog Reception + Log Rotation Workflow
+# Workflow: enable rsyslog UDP reception, open firewall, restart/verify,
+# generate a test message, confirm it lands in logs, then set up logrotate for a custom app log.
+# RHCSA Focus: rsyslog config drop-ins, firewall-cmd, systemctl, ss, logger, tail, logrotate test.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab System Services: Fundamentals 4"
+LAB_NAME="Lab 139: RHCSA System Services — Remote Syslog + Logrotate Workflow"
 LAB_ID="lab139"
 LAB_XP=29500
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
 [ ! -f "$LAB_TRACK_FILE" ] && echo '{}' > "$LAB_TRACK_FILE"
+
+PROMPT="  lab@lab139:~$ "
 
 record_lab_completion() {
     tmpfile=$(mktemp)
@@ -24,130 +29,179 @@ draw_lab_ui() {
     clear
     center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
     center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
-    echo; echo; echo
+    echo
+    echo
 }
 
 while true; do
     draw_lab_ui
     center_title "$LAB_NAME"
     echo
-    center_text "Practice with rsyslog, Postfix, NTP, CUPS, journald, and logrotate. (set 4)"
+    center_text "Scenario:"
+    center_text "A team needs this host to receive syslog over UDP/514 from a legacy device."
+    center_text "You must enable rsyslog UDP reception safely, allow it through the firewall,"
+    center_text "verify the listener, confirm logs arrive, then set up logrotate for a custom app log."
     echo
     center_text "Press Enter to begin the lab..."
     read _
 
     draw_lab_ui
-    echo "  Step 1: Enable the rsyslog UDP listener on port 514 (legacy imudp already loaded)."
-    echo "          Type the exact directive used to start the UDP server."
-    read -p "  lab@lab139:~$ " cmd1
+
+    # STEP 1: Enable UDP reception (simple command)
+    echo "  Step 1: Create the rsyslog UDP listener config drop-in."
+    echo "          (Write two lines into /etc/rsyslog.d/10-udp514.conf)"
+    read -p "$PROMPT" cmd1
     echo
-    [[ "$cmd1" != "\$UDPServerRun 514" ]] && {
-        print_error "Incorrect. Try again."
+    if [[ "$cmd1" != "sudo nano /etc/rsyslog.d/10-udp514.conf" && \
+          "$cmd1" != "nano /etc/rsyslog.d/10-udp514.conf" && \
+          "$cmd1" != "sudo vi /etc/rsyslog.d/10-udp514.conf" && \
+          "$cmd1" != "vi /etc/rsyslog.d/10-udp514.conf" && \
+          "$cmd1" != "sudo vim /etc/rsyslog.d/10-udp514.conf" && \
+          "$cmd1" != "vim /etc/rsyslog.d/10-udp514.conf" ]]; then
+        print_error "Incorrect. Use an editor to create the file."
         read -p "Press Enter to retry..." _
         continue
-    }
-    # (No standard output on success)
-
-    echo "  Step 2: Immediately process (flush) all queued mail on a Postfix server."
-    read -p "  lab@lab139:~$ " cmd2
+    fi
+    echo "  (File created/edited: /etc/rsyslog.d/10-udp514.conf)"
+    echo "  (Add these lines inside the file:)"
+    echo "  module(load=\"imudp\")"
+    echo "  input(type=\"imudp\" port=\"514\")"
     echo
-    [[ "$cmd2" != "postqueue -f" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to retry..." _
-        continue
-    }
-    # (No standard output on success)
 
-    echo "  Step 3: Allow ntpd to sync even when the initial time offset is very large."
-    echo "          Provide the ntpd option that permits a one-time big step at startup."
-    read -p "  lab@lab139:~$ " cmd3
+    # STEP 2: Validate rsyslog config
+    echo "  Step 2: Validate the rsyslog configuration syntax."
+    read -p "$PROMPT" cmd2
     echo
-    if [[ "$cmd3" == "ntpd -g" || "$cmd3" == "ntpd -g 0" ]]; then
-        :
-    else
+    if [[ "$cmd2" != "rsyslogd -N1" && "$cmd2" != "sudo rsyslogd -N1" ]]; then
         print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
     fi
-    # (No output for this answer)
-
-    echo "  Step 4: Name the journald.conf key that limits the size of individual persistent journal files."
-    read -p "  lab@lab139:~$ " cmd4
+    echo "  rsyslogd: version 8.2310.0, config validation run (level 1), master config /etc/rsyslog.conf"
+    echo "  rsyslogd: End of config validation run. Bye."
     echo
-    [[ "$cmd4" != "SystemMaxFileSize" ]] && {
+
+    # STEP 3: Restart rsyslog
+    echo "  Step 3: Restart rsyslog to apply the change."
+    read -p "$PROMPT" cmd3
+    echo
+    if [[ "$cmd3" != "sudo systemctl restart rsyslog" && "$cmd3" != "systemctl restart rsyslog" ]]; then
         print_error "Incorrect. Try again."
-        read -p "Press Enter to retry..." _
-        continue
-    }
-    # (No output for this answer)
-
-    echo "  Step 5: Show completed CUPS jobs from the command line."
-    read -p "  lab@lab139:~$ " cmd5
-    echo
-    [[ "$cmd5" != "lpstat -W completed" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to retry..." _
-        continue
-    }
-    echo "  HP_LaserJet_01-219  username  1024   Mon 10:45  Completed"
-    echo "  PDF_Printer-220     buildbot  5632   Mon 10:47  Completed"
-    echo
-
-    echo "  Step 6: In logrotate, specify the directive that runs a script after rotation completes."
-    read -p "  lab@lab139:~$ " cmd6
-    echo
-    [[ "$cmd6" != "postrotate" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to retry..." _
-        continue
-    }
-    # (No output for this answer)
-
-    echo "  Step 7: State the protocol/port to allow inbound on the firewall for standard SMTP."
-    read -p "  lab@lab139:~$ " cmd7
-    echo
-    [[ "$cmd7" != "tcp/25" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to retry..." _
-        continue
-    }
-    # (No output for this answer)
-
-    echo "  Step 8: Rebuild the sendmail access database after editing /etc/access."
-    read -p "  lab@lab139:~$ " cmd8
-    echo
-    if [[ "$cmd8" =~ ^makemap($|\s) ]]; then
-        :
-    else
-        print_error "Incorrect. Try again. (Hint: rebuild the DB from /etc/access)"
         read -p "Press Enter to retry..." _
         continue
     fi
-    # (No standard output on success)
 
-    echo "  Step 9: Provide the absolute path to the primary syslog-ng configuration file."
-    read -p "  lab@lab139:~$ " cmd9
+    # STEP 4: Open firewall for UDP/514
+    echo "  Step 4: Allow UDP port 514 through the firewall permanently."
+    read -p "$PROMPT" cmd4
     echo
-    [[ "$cmd9" != "/etc/syslog-ng/syslog-ng.conf" ]] && {
+    if [[ "$cmd4" != "sudo firewall-cmd --permanent --add-port=514/udp" ]]; then
         print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
-    }
-    # (No output for this answer)
-
-    echo "  Step 10: Choose an appropriate syslog facility for a custom application."
-    read -p "  lab@lab139:~$ " cmd10
+    fi
+    echo "  success"
     echo
-    if [[ "$cmd10" =~ ^local[0-7]$ ]]; then
-        :
-    else
-        print_error "Incorrect. Use a single facility like local0 through local7."
+
+    # STEP 5: Reload firewall
+    echo "  Step 5: Reload the firewall to apply permanent rules."
+    read -p "$PROMPT" cmd5
+    echo
+    if [[ "$cmd5" != "sudo firewall-cmd --reload" ]]; then
+        print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
     fi
-    # (No output for this answer)
+    echo "  success"
+    echo
+
+    # STEP 6: Verify listener exists
+    echo "  Step 6: Verify rsyslog is listening on UDP/514."
+    read -p "$PROMPT" cmd6
+    echo
+    if [[ "$cmd6" != "ss -lunp | grep ':514 '" ]]; then
+        print_error "Incorrect. Try again."
+        read -p "Press Enter to retry..." _
+        continue
+    fi
+    echo "  UNCONN 0      0              0.0.0.0:514         0.0.0.0:*    users:((\"rsyslogd\",pid=1019,fd=7))"
+    echo
+
+    # STEP 7: Generate a test message
+    echo "  Step 7: Generate a test syslog message using local0.notice."
+    read -p "$PROMPT" cmd7
+    echo
+    if [[ "$cmd7" != "logger -p local0.notice 'test: UDP syslog receiving enabled'" ]]; then
+        print_error "Incorrect. Use logger with local0.notice."
+        read -p "Press Enter to retry..." _
+        continue
+    fi
+
+    # STEP 8: Confirm message appears in /var/log/messages
+    echo "  Step 8: Confirm the test message is present in /var/log/messages."
+    read -p "$PROMPT" cmd8
+    echo
+    if [[ "$cmd8" != "sudo tail -n 8 /var/log/messages" && "$cmd8" != "tail -n 8 /var/log/messages" ]]; then
+        print_error "Incorrect. Try again."
+        read -p "Press Enter to retry..." _
+        continue
+    fi
+    echo "  Jan 25 07:14:21 lab139 rsyslogd[1019]: imudp: Acquired UDP socket, server will listen on port 514."
+    echo "  Jan 25 07:14:33 lab139 lab[pts/0]: test: UDP syslog receiving enabled"
+    echo "  Jan 25 07:14:35 lab139 sudo[1752]:      lab : TTY=pts/0 ; PWD=/home/lab ; USER=root ; COMMAND=/usr/bin/tail -n 8 /var/log/messages"
+    echo
+
+    # STEP 9: Create logrotate policy (simple editor command)
+    echo "  Step 9: Create the logrotate policy file for /var/log/acmeapp.log."
+    echo "          (Create/edit /etc/logrotate.d/acmeapp)"
+    read -p "$PROMPT" cmd9
+    echo
+    if [[ "$cmd9" != "sudo nano /etc/logrotate.d/acmeapp" && \
+          "$cmd9" != "nano /etc/logrotate.d/acmeapp" && \
+          "$cmd9" != "sudo vi /etc/logrotate.d/acmeapp" && \
+          "$cmd9" != "vi /etc/logrotate.d/acmeapp" && \
+          "$cmd9" != "sudo vim /etc/logrotate.d/acmeapp" && \
+          "$cmd9" != "vim /etc/logrotate.d/acmeapp" ]]; then
+        print_error "Incorrect. Use an editor to create the file."
+        read -p "Press Enter to retry..." _
+        continue
+    fi
+    echo "  (File created/edited: /etc/logrotate.d/acmeapp)"
+    echo "  (Add this content inside the file:)"
+    echo "  /var/log/acmeapp.log {"
+    echo "      daily"
+    echo "      rotate 7"
+    echo "      compress"
+    echo "      missingok"
+    echo "      notifempty"
+    echo "      create 0640 root root"
+    echo "  }"
+    echo
+
+    # STEP 10: Test logrotate config in debug mode
+    echo "  Step 10: Test the new logrotate policy in debug mode (no changes)."
+    read -p "$PROMPT" cmd10
+    echo
+    if [[ "$cmd10" != "sudo logrotate -d /etc/logrotate.d/acmeapp" ]]; then
+        print_error "Incorrect. Try again."
+        read -p "Press Enter to retry..." _
+        continue
+    fi
+    echo "  reading config file /etc/logrotate.d/acmeapp"
+    echo "  Reading state from file: /var/lib/logrotate/logrotate.status"
+    echo "  Handling 1 logs"
+    echo "  rotating pattern: /var/log/acmeapp.log  after 1 days (7 rotations)"
+    echo "  empty log files are not rotated, old logs are removed"
+    echo "  consider log /var/log/acmeapp.log"
+    echo "  log does not exist -- skipping"
+    echo
 
     print_success "Nice work!"
+    print_info "Workflow completed:"
+    print_info "- Enabled rsyslog UDP reception using a safe drop-in config"
+    print_info "- Opened firewall for UDP/514 and verified the listener with ss"
+    print_info "- Confirmed logging pipeline using logger + /var/log/messages"
+    print_info "- Created and tested a logrotate policy with logrotate -d"
     print_info "You earned $LAB_XP XP for completing this lab."
     award_xp $LAB_XP
     XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL

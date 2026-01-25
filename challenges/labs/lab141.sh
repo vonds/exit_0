@@ -1,17 +1,22 @@
 #!/bin/bash
 
-# Lab 141: System Services
+# Lab 141: RHCSA System Services — Mail Alias + Postfix Queue + Time/Journal Workflow
+# Workflow: configure a root alias, rebuild aliases, verify Postfix, inspect queue,
+# view a queued message with postcat, verify time zone state, and review kernel logs in journald.
+# RHCSA Focus: /etc/aliases + newaliases, systemctl, mailq/postqueue, postcat, timedatectl, date, journalctl.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab System Services: Fundamentals 6"
+LAB_NAME="Lab 141: RHCSA System Services — Mail + Time + journald Workflow"
 LAB_ID="lab141"
 LAB_XP=29500
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
 [ ! -f "$LAB_TRACK_FILE" ] && echo '{}' > "$LAB_TRACK_FILE"
+
+PROMPT="  lab@lab141:~$ "
 
 record_lab_completion() {
     tmpfile=$(mktemp)
@@ -24,144 +29,186 @@ draw_lab_ui() {
     clear
     center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
     center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
-    echo; echo; echo
+    echo
+    echo
 }
 
 while true; do
     draw_lab_ui
     center_title "$LAB_NAME"
     echo
-    center_text "Practice with mail, time, journald, and printing essentials. (set 6)"
+    center_text "Scenario:"
+    center_text "Ops wants all root mail forwarded to two addresses. A queued message needs inspection."
+    center_text "You will update /etc/aliases, rebuild the aliases database, verify Postfix,"
+    center_text "inspect the mail queue, view a message with postcat, then confirm time/journal signals."
     echo
     center_text "Press Enter to begin the lab..."
     read _
 
     draw_lab_ui
-    echo "  Step 1: Specify the per-user Procmail configuration file path used to control forwarding rules."
-    read -p "  lab@lab141:~$ " cmd1
+
+    # STEP 1: Edit /etc/aliases (terminal command, not trivia)
+    echo "  Step 1: Open /etc/aliases to add a root forwarding alias."
+    read -p "$PROMPT" cmd1
     echo
-    [[ "$cmd1" != "~/.procmailrc" ]] && {
+    if [[ "$cmd1" != "sudo nano /etc/aliases" && \
+          "$cmd1" != "nano /etc/aliases" && \
+          "$cmd1" != "sudo vi /etc/aliases" && \
+          "$cmd1" != "vi /etc/aliases" && \
+          "$cmd1" != "sudo vim /etc/aliases" && \
+          "$cmd1" != "vim /etc/aliases" ]]; then
+        print_error "Incorrect. Use an editor to modify /etc/aliases."
+        read -p "Press Enter to retry..." _
+        continue
+    fi
+    echo "  (Edit file: /etc/aliases)"
+    echo "  (Add this line inside the file:)"
+    echo "  root: admin@example.com, webmaster@example.com"
+    echo
+
+    # STEP 2: Rebuild aliases DB
+    echo "  Step 2: Rebuild the aliases database so Postfix picks up the change."
+    read -p "$PROMPT" cmd2
+    echo
+    if [[ "$cmd2" != "sudo newaliases" && "$cmd2" != "newaliases" ]]; then
         print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
-    }
+    fi
+    echo "  /etc/aliases: 86 aliases, longest 52 bytes, 948 bytes total"
+    echo
 
+    # STEP 3: Verify Postfix is running
+    echo "  Step 3: Confirm Postfix is active."
+    read -p "$PROMPT" cmd3
     echo
-    echo "  Step 2: Define an alias to forward mail for 'root' to admin@example.com and webmaster@example.com."
-    echo "          Enter the exact line as it should appear in /etc/aliases."
-    read -p "  lab@lab141:~$ " cmd2
-    echo
-    [[ "$cmd2" != "root: admin@example.com, webmaster@example.com" ]] && {
-        print_error "Incorrect. Use canonical /etc/aliases syntax with full addresses."
-        read -p "Press Enter to retry..." _
-        continue
-    }
-
-    echo
-    echo "  Step 3: View the full contents of a specific message in the Postfix queue (command only)."
-    read -p "  lab@lab141:~$ " cmd3
-    echo
-    [[ "$cmd3" != "postcat" ]] && {
+    if [[ "$cmd3" != "systemctl is-active postfix" && "$cmd3" != "sudo systemctl is-active postfix" ]]; then
         print_error "Incorrect. Try again."
         read -p "Press Enter to retry..." _
         continue
-    }
-    echo "  *** MESSAGE FILE BEGIN ***"
-    echo "  From: root@example.local"
+    fi
+    echo "  active"
+    echo
+
+    # STEP 4: Inspect the mail queue
+    echo "  Step 4: Show the Postfix mail queue."
+    read -p "$PROMPT" cmd4
+    echo
+    if [[ "$cmd4" != "mailq" && "$cmd4" != "postqueue -p" ]]; then
+        print_error "Incorrect. Try again."
+        read -p "Press Enter to retry..." _
+        continue
+    fi
+    echo "  -Queue ID-  --Size-- ----Arrival Time---- -Sender/Recipient-------"
+    echo "  A1B2C3D4E5*     1468 Sun Jan 25 07:10:41  root@lab141"
+    echo "                                           admin@example.com"
+    echo "  -- 2 Kbytes in 1 Request."
+    echo
+
+    # STEP 5: View a queued message with postcat (real terminal command)
+    echo "  Step 5: View the contents of the queued message A1B2C3D4E5."
+    read -p "$PROMPT" cmd5
+    echo
+    if [[ "$cmd5" != "sudo postcat -q A1B2C3D4E5" && "$cmd5" != "postcat -q A1B2C3D4E5" ]]; then
+        print_error "Incorrect. Use postcat to view a queued message by ID."
+        read -p "Press Enter to retry..." _
+        continue
+    fi
+    echo "  *** ENVELOPE RECORDS active ***"
+    echo "  message_size:           1468"
+    echo "  message_arrival_time:   Sun Jan 25 07:10:41 2026"
+    echo "  sender:                 root@lab141"
+    echo "  recipient:              admin@example.com"
+    echo "  *** MESSAGE CONTENTS active ***"
+    echo "  Received: by lab141 (Postfix, from userid 0)"
+    echo "          id A1B2C3D4E5; Sun, 25 Jan 2026 07:10:41 -0500 (EST)"
+    echo "  From: root@lab141"
     echo "  To: admin@example.com"
-    echo "  Subject: Test"
-    echo "  Date: Sun, 12 Jan 2025 10:57:12 -0600"
+    echo "  Subject: RHCSA-LAB141 queued test"
+    echo "  Date: Sun, 25 Jan 2026 07:10:41 -0500"
     echo
     echo "  This is a queued test message."
-    echo "  *** MESSAGE FILE END ***"
     echo
 
-    echo "  Step 4: Identify the log file where Postfix delivery errors are recorded on many rsyslog-based systems."
-    read -p "  lab@lab141:~$ " cmd4
+    # STEP 6: List time zones (real command)
+    echo "  Step 6: List available time zones."
+    read -p "$PROMPT" cmd6
     echo
-    [[ "$cmd4" != "/var/log/mail.err" ]] && {
-        print_error "Incorrect. Try the mail facility's common error log path."
+    if [[ "$cmd6" != "timedatectl list-timezones | head -n 5" ]]; then
+        print_error "Incorrect. Use timedatectl and limit output with head."
         read -p "Press Enter to retry..." _
         continue
-    }
-
-    echo
-    echo "  Step 5: Begin an SMTP session using Extended Hello from host 'mail.example.com'."
-    read -p "  lab@lab141:~$ " cmd5
-    echo
-    [[ "$cmd5" != "EHLO mail.example.com" ]] && {
-        print_error "Incorrect. Use the ESMTP greeting with the local hostname."
-        read -p "Press Enter to retry..." _
-        continue
-    }
-    echo "  250-mail.example.com Hello"
-    echo "  250-SIZE 52428800"
-    echo "  250-PIPELINING"
-    echo "  250-STARTTLS"
-    echo "  250 AUTH PLAIN LOGIN"
-    echo
-
-    echo "  Step 6: List all supported time zones available on this system."
-    read -p "  lab@lab141:~$ " cmd6
-    echo
-    [[ "$cmd6" != "timedatectl list-timezones" ]] && {
-        print_error "Incorrect. Use the system time management tool to enumerate zones."
-        read -p "Press Enter to retry..." _
-        continue
-    }
+    fi
     echo "  Africa/Abidjan"
-    echo "  America/Chicago"
-    echo "  Asia/Tokyo"
-    echo "  Europe/Berlin"
-    echo "  UTC"
+    echo "  Africa/Accra"
+    echo "  Africa/Addis_Ababa"
+    echo "  Africa/Algiers"
+    echo "  Africa/Asmara"
     echo
 
-    echo "  Step 7: Interpret this link: /etc/localtime -> /usr/share/zoneinfo/America/Chicago."
-    echo "          State what this means in one line."
-    read -p "  lab@lab141:~$ " cmd7
+    # STEP 7: Show current time zone and local time (single command)
+    echo "  Step 7: Show current local time and time zone."
+    read -p "$PROMPT" cmd7
     echo
-    [[ "$cmd7" != "The file is a symlink to a timezone in /usr/share/zoneinfo." ]] && {
-        print_error "Incorrect. Describe the relationship succinctly."
+    if [[ "$cmd7" != "timedatectl" && "$cmd7" != "timedatectl status" ]]; then
+        print_error "Incorrect. Use timedatectl."
         read -p "Press Enter to retry..." _
         continue
-    }
+    fi
+    echo "  Local time: Sun 2026-01-25 07:16:09 EST"
+    echo "  Universal time: Sun 2026-01-25 12:16:09 UTC"
+    echo "  RTC time: Sun 2026-01-25 12:16:09"
+    echo "  Time zone: America/New_York (EST, -0500)"
+    echo "  System clock synchronized: yes"
+    echo "  NTP service: active"
+    echo "  RTC in local TZ: no"
+    echo
 
+    # STEP 8: Provide chrony config path using a terminal command (not trivia)
+    echo "  Step 8: Display the path of the active chrony configuration file."
+    read -p "$PROMPT" cmd8
     echo
-    echo "  Step 8: Show the current local time and time zone using a single command."
-    read -p "  lab@lab141:~$ " cmd8
-    echo
-    [[ "$cmd8" != "date" ]] && {
-        print_error "Incorrect. Use the standard command that prints local time."
+    if [[ "$cmd8" != "ls -l /etc/chrony.conf" ]]; then
+        print_error "Incorrect. Use ls -l to show the file path and metadata."
         read -p "Press Enter to retry..." _
         continue
-    }
-    echo "  Sun Jan 12 10:59:03 CST 2025"
+    fi
+    echo "  -rw-r--r--. 1 root root 1247 Jan 25 06:58 /etc/chrony.conf"
     echo
 
-    echo "  Step 9: Provide the absolute path to Chrony's main configuration file."
-    read -p "  lab@lab141:~$ " cmd9
+    # STEP 9: Display only kernel messages from the journal
+    echo "  Step 9: Display only kernel messages from the systemd journal (last 5)."
+    read -p "$PROMPT" cmd9
     echo
-    [[ "$cmd9" != "/etc/chrony.conf" ]] && {
-        print_error "Incorrect. Provide the primary Chrony config path."
+    if [[ "$cmd9" != "journalctl -k -n 5" && "$cmd9" != "sudo journalctl -k -n 5" ]]; then
+        print_error "Incorrect. Use journalctl -k with -n."
         read -p "Press Enter to retry..." _
         continue
-    }
+    fi
+    echo "  Jan 25 06:58:21 lab141 kernel: Linux version 6.6.7 (builder@ci) ..."
+    echo "  Jan 25 06:58:24 lab141 kernel: x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'"
+    echo "  Jan 25 06:58:31 lab141 kernel: e1000e 0000:00:03.0 eth0: Link is Up 1000 Mbps Full Duplex"
+    echo "  Jan 25 07:02:14 lab141 kernel: IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready"
+    echo "  Jan 25 07:12:03 lab141 kernel: audit: type=1100 audit(1737807123.911:219): pid=1 uid=0 auid=4294967295 msg='unit=postfix comm=\"systemd\"'"
+    echo
 
+    # STEP 10: Verify root alias line exists (quick verification)
+    echo "  Step 10: Verify the root alias line exists in /etc/aliases."
+    read -p "$PROMPT" cmd10
     echo
-    echo "  Step 10: Display only kernel messages from the systemd journal."
-    read -p "  lab@lab141:~$ " cmd10
-    echo
-    [[ "$cmd10" != "journalctl -k" ]] && {
-        print_error "Incorrect. Use the journal query option for kernel transport."
+    if [[ "$cmd10" != "grep '^root:' /etc/aliases" && "$cmd10" != "sudo grep '^root:' /etc/aliases" ]]; then
+        print_error "Incorrect. Use grep to verify the alias line."
         read -p "Press Enter to retry..." _
         continue
-    }
-    echo "  -- Logs begin at Sun 2025-01-12 09:12:01 --"
-    echo "  Jan 12 10:59:10 host kernel: Linux version 6.6.7 (builder@ci) ..."
-    echo "  Jan 12 10:59:12 host kernel: eth0: Link is Up - 1Gbps/Full ..."
+    fi
+    echo "  root: admin@example.com, webmaster@example.com"
     echo
 
-    print_success "Nice work!"
+    print_success "Great job!"
+    print_info "Workflow completed:"
+    print_info "- Updated /etc/aliases, rebuilt alias DB with newaliases, verified Postfix"
+    print_info "- Inspected queue and viewed a queued message with postcat"
+    print_info "- Verified time zone state and reviewed kernel logs with journalctl -k"
     print_info "You earned $LAB_XP XP for completing this lab."
     award_xp $LAB_XP
     XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
