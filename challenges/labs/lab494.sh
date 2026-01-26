@@ -1,20 +1,6 @@
 #!/bin/bash
 
 # Lab 494: Preserve System Journals (Persistent systemd-journald Logs)
-# Focus: Configure persistent journaling, verify storage paths, restart journald, flush logs
-#
-# RHCSA Objective:
-# - Preserve system journals
-#
-# Key skills validated:
-# - Inspect journal storage mode
-# - Configure journald for persistent storage
-# - Restart journald
-# - Flush volatile logs
-# - Verify persistent log storage path
-#
-# Difficulty: Intermediate
-# XP: 49400
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

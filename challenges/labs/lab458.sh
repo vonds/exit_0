@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 458: RHEL Storage Ops — Mount, Persist, Grow XFS Safely
-# Focus: mounting LVs, making mounts persistent, extending an LV with an existing XFS filesystem,
-# and verifying requirements exactly as RHCSA expects.
-# Key skills: mkdir, mount, findmnt, df -h, blkid, /etc/fstab, lvextend, xfs_growfs, vgs/lvs
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

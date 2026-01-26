@@ -1,11 +1,6 @@
 #!/bin/bash
 
 # Lab 459: RHEL Storage Security — Encrypt a Disk with LUKS and Persist It
-# Focus: encrypting a block device using LUKS, unlocking it, creating a filesystem,
-# mounting it, and ensuring persistence across reboots.
-# Key skills: lsblk, cryptsetup luksFormat/open, mkfs.xfs, mount,
-# /etc/crypttab, /etc/fstab, systemctl daemon-reload, verification workflow.
-# Disk used in this lab: /dev/nvme1 (5GiB, unused)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

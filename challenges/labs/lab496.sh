@@ -1,21 +1,6 @@
 #!/bin/bash
 
 # Lab 496: Securely Transfer Files Between Systems (scp, rsync over SSH, sftp)
-# Focus: Secure file transfer using scp, rsync (over SSH), and sftp; optional key-based auth setup.
-#
-# RHCSA Objective:
-# - Securely transfer files between systems
-#
-# Key skills validated:
-# - Copy a file to a remote host with scp
-# - Copy a directory recursively with scp -r
-# - Copy a file from remote to local with scp
-# - Sync directories efficiently with rsync -avz over SSH
-# - Perform interactive transfers with sftp (put/get)
-# - (Optional) Set up SSH keys for passwordless transfers
-#
-# Difficulty: Intermediate
-# XP: 49600
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

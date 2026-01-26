@@ -1,11 +1,6 @@
 #!/bin/bash
 
 # Lab 482: RHCSA Users & Access — Log In and Switch Users in Multiuser Targets
-# Focus: working in multi-user.target, logging in, switching users with su and sudo,
-# managing sudo privileges, locking/unlocking accounts, monitoring logged-in users,
-# and controlling root access.
-# Key skills: systemctl get-default/isolate/set-default, ssh, su, sudo, visudo,
-# passwd, who, w, sshd_config
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

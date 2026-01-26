@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 469: Rocky Linux 10 Package Management — Repos + Groups + Modules (RHCSA Focus)
-# Focus: inspecting repo configuration, safely handling a missing repo name, exploring comps groups,
-# installing a package, listing module streams, and installing a specific module stream/profile.
-# Key skills: dnf repolist -v, dnf config-manager --disable, dnf group list --hidden,
-# dnf install, dnf module list, dnf module install.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

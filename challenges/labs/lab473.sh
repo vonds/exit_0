@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 473: Rocky Linux 10 — Root Account Control & PAM su Hardening (RHCSA Focus)
-# Focus: managing root password state, enforcing su restrictions with pam_wheel,
-# and denying users via pam_listfile.
-# Key skills: passwd, PAM configuration, vi editing, security hardening.
-
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

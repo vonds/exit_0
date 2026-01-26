@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 481: RHCSA Networking — Access Remote Systems Using SSH
-# Focus: basic SSH access, non-standard ports, key-based authentication,
-# ssh-agent usage, scp file transfer, SSH hardening, and basic troubleshooting.
-# Key skills: ssh, ssh-keygen, ssh-copy-id, ssh-agent, ssh-add, scp,
-# systemctl, firewall-cmd, sshd_config
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

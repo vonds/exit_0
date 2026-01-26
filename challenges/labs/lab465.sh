@@ -1,11 +1,6 @@
 #!/bin/bash
 
 # Lab 465: RHEL Storage — Filesystem Labels + fstab Edits (Mount + Swap Entry Mistake Simulation)
-# Focus: creating filesystems with labels, mounting/unmounting, editing /etc/fstab safely, and
-# managing labels with xfs_admin. This lab intentionally includes a common "fstab swap line mistake"
-# scenario so you practice spotting it before reboot.
-# Key skills: cat /etc/fstab, mkfs.xfs -L, mkfs.ext4 -N, mount/umount, mkdir,
-# /etc/fstab editing, xfs_admin -L, blkid (optional), mount -a (safe validation).
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

@@ -1,22 +1,6 @@
 #!/bin/bash
 
 # Lab 500: LVM — Create and Delete Logical Volumes (lvcreate/lvs/lvdisplay/mkfs/mount/lvremove)
-# Focus: Create an LV from an existing VG, format it, mount it, verify it,
-#        then unmount and delete it safely.
-#
-# RHCSA Objective:
-# - Create and delete logical volumes
-#
-# Key skills validated:
-# - Create logical volumes (lvcreate)
-# - Inspect LVs (lvs, lvdisplay)
-# - Format an LV (mkfs.ext4)
-# - Mount/unmount an LV (mount, umount)
-# - Verify mounts (df -h, lsblk)
-# - Delete LVs (lvremove)
-#
-# Difficulty: Intermediate
-# XP: 50000
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

@@ -1,19 +1,6 @@
 #!/bin/bash
 
 # Lab 493: Locate and Interpret System Log Files and Journals
-# Focus: /var/log files, journalctl filtering, real-time monitoring, searching, and interpretation
-#
-# RHCSA Objective:
-# - Locate and interpret system log files and journals
-#
-# Key skills validated:
-# - /var/log/messages, /var/log/secure, /var/log/boot.log, /var/log/dmesg
-# - journalctl: filtering by service, time, priority, real-time following
-# - grep searching inside logs
-# - journal disk usage
-#
-# Difficulty: Intermediate
-# XP: 49300
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

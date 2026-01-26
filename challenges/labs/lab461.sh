@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 461: RHEL Storage Management — LVM Creation and Extension Using fdisk
-# Focus: creating LVM-backed storage from raw disks, then extending it with an additional disk.
-# Key skills: fdisk (interactive), partition type 8e (Linux LVM), lvm2, pvcreate, pvdisplay,
-# vgcreate, vgdisplay, lvcreate, lvdisplay, mkfs.xfs, mount, df -h, vgextend, lvextend, xfs_growfs.
-# Disks used in this lab: /dev/nvme1 (initial), /dev/nvme2 (extension)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

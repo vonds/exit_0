@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 462: RHEL Storage Management — Stratis Pools, Filesystems, and Snapshots
-# Focus: installing and managing Stratis, creating a pool, adding disks, creating filesystems,
-# mounting them, and creating snapshots.
-# Key skills: dnf, systemctl enable/start/status, lsblk, stratis pool/filesystem/snapshot commands,
-# mount, df -h, verification workflow.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

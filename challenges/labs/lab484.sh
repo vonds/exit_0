@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 484: RHCSA File Management — Create Hard and Soft Links
-# Focus: creating/verifying/removing hard links and symbolic links, spotting broken symlinks,
-# and using ls/stat/find to validate inode/link behavior.
-# Key skills: ln, ln -s, ls -li, ls -l, stat, rm, cat, find -type l
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

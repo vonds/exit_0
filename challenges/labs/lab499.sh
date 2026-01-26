@@ -1,21 +1,6 @@
 #!/bin/bash
 
 # Lab 499: LVM — Assign Physical Volumes to Volume Groups (vgcreate/vgextend/vgs/vgdisplay/vgreduce)
-# Focus: Create a VG from PVs, extend a VG with an additional PV, verify VG state,
-#        and (optionally) remove a PV from a VG.
-#
-# RHCSA Objective:
-# - Assign physical volumes to volume groups
-#
-# Key skills validated:
-# - Create PVs (pvcreate) as prerequisites
-# - Create a VG with vgcreate
-# - Add PVs to an existing VG with vgextend
-# - Verify VG/PV membership with vgs, pvs, vgdisplay
-# - Remove a PV from a VG with vgreduce (exam-relevant)
-#
-# Difficulty: Intermediate
-# XP: 49900
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

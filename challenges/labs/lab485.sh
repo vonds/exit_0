@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 485: RHCSA Permissions — List, Set, and Change Standard ugo/rwx Permissions
-# Focus: reading ls -l output, chmod (symbolic + numeric), directory permission meaning,
-# ownership changes (chown), and special bits (setuid, setgid, sticky).
-# Key skills: ls -l, chmod, stat, chown, mkdir, touch, install (optional), find (optional)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

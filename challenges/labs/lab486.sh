@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 486: RHCSA Documentation — man, info, apropos, and /usr/share/doc
-# Focus: locating and using system documentation efficiently under exam conditions.
-# Key skills: man (search + sections), info, apropos, whatis, --help, help (built-ins),
-# and reading package docs in /usr/share/doc.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

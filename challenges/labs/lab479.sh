@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # Lab 479: RHCSA Fundamentals — Input/Output Redirection (>, >>, <, |, 2>, &>, /dev/null)
-# Focus: stdout/stderr redirection, pipes, stdin redirection, combining streams, and suppression.
-# Key skills: >, >>, <, |, 2>, 2>>, &>, /dev/null, wc, head, cat, ls
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

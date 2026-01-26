@@ -1,11 +1,6 @@
 #!/bin/bash
 
 # Lab 476: Rocky Linux 10 — Podman Basics + Image Cleanup + Skopeo Inspect/Sync (RHCSA Focus)
-# Focus: pulling/running nginx with Podman, listing images/containers, stopping/removing containers,
-# correctly removing images using real IDs, installing skopeo, inspecting an image, and syncing it to a dir.
-# Key skills: podman pull/run/images/ps/stop/rm/rmi, dnf/yum install, skopeo inspect/sync.
-#
-
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 474: Rocky Linux 10 — SSH & Squid Configuration Hardening (RHCSA Focus)
-# Focus: securing SSH daemon behavior and managing Squid proxy access controls.
-# Key skills: editing sshd_config, restarting sshd, editing squid.conf,
-# ACL ordering, allow/deny logic, and precise vi-based configuration.
-
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

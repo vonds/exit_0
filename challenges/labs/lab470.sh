@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 470: Rocky Linux 10 Networking — Interfaces, Routes, Ports, Hosts, DNS (RHCSA Focus)
-# Focus: inspecting interfaces/routes, checking listening ports, and MANUALLY editing
-# /etc/hosts and /etc/resolv.conf using vim-style entry (RHCSA expectations).
-# Key skills: ip, ss, netstat, editing critical network files, hostnamectl.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

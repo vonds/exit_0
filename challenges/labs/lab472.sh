@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 472: Rocky Linux 10 — User & Group Administration (RHCSA Focus)
-# Focus: account expiration, system users, shells, password aging,
-# group management, UID/GID control, locking users, and cleanup.
-# Key skills: useradd, usermod, userdel, groupadd, groupmod, groupdel, chage.
-
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

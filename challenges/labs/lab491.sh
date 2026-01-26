@@ -1,16 +1,6 @@
 #!/bin/bash
 
 # Lab 491: Adjust Process Scheduling (nice / renice)
-# Focus: changing process priority using nice + renice and verifying via ps/top
-#
-# RHCSA Objective:
-# - Adjust process scheduling
-#
-# Key skills validated:
-# - Start a process with a custom nice value (nice -n)
-# - Increase priority with a negative nice value (requires sudo)
-# - Change priority of a running process (renice)
-# - Verify NI/PRI using ps (and top-style output awareness)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

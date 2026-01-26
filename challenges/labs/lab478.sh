@@ -1,12 +1,6 @@
 #!/bin/bash
 
 # Lab 478: RHCSA Fundamentals — Access Shell & Use Correct Command Syntax (8–12 prompts)
-# Focus: logging in, navigating the filesystem, correct command syntax,
-# file manipulation, redirection, sudo usage, viewing/editing files,
-# and shell efficiency basics exactly as RHCSA expects.
-#
-# Key skills: ssh, cd, ls, mkdir, rmdir, cp, mv, rm, wildcards, redirection,
-# sudo, cat, vim, history, bash fundamentals.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

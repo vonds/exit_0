@@ -1,20 +1,6 @@
 #!/bin/bash
 
 # Lab 488: Booting Systems into Different Targets Manually
-# Focus: understanding and controlling systemd targets at runtime and boot time.
-#
-# RHCSA Objective:
-# 02- Boot systems into different targets manually
-#
-# This lab validates your ability to:
-# - switch targets on a running system
-# - change the default boot target
-# - understand rescue vs emergency modes
-# - boot into specific targets via GRUB (conceptual but exam-critical)
-#
-# NOTE:
-# Actions that would normally reboot the system are simulated.
-# The goal is command accuracy and workflow correctness.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

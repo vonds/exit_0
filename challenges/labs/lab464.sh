@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 464: RHEL Storage — Create RAID1 with mdadm (Add Hot Spare) and Verify
-# Focus: installing mdadm, creating a RAID1 array, enabling a write-intent bitmap,
-# adding a spare device, and verifying status.
-# Key skills: cat /proc/mdstat, dnf install mdadm, mdadm --create, mdadm --manage --add,
-# mdadm --detail, lsblk
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

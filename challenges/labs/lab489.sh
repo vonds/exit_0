@@ -1,22 +1,6 @@
 #!/bin/bash
 
 # Lab 489: Interrupt the Boot Process to Gain System Access
-# Focus: interrupting GRUB to access the system for recovery tasks.
-#
-# RHCSA Objective:
-# 03- Interrupt the boot process in order to gain access to a system
-#
-# This lab validates your ability to:
-# - interrupt GRUB during boot
-# - modify kernel parameters
-# - use rd.break to access initramfs
-# - remount and chroot into the root filesystem
-# - reset the root password correctly on SELinux systems
-#
-# IMPORTANT:
-# This lab SIMULATES reboot and GRUB interaction.
-# You are being tested on command accuracy and recovery workflow,
-# exactly as RHCSA expects.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

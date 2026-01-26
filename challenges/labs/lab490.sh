@@ -1,19 +1,6 @@
 #!/bin/bash
 
 # Lab 490: Identify CPU / Memory Intensive Processes and Kill Them
-# Focus: monitoring system performance and terminating runaway processes
-#
-# RHCSA Objective:
-# 04- Identify CPU and memory intensive processes and kill processes
-#
-# This lab validates your ability to:
-# - inspect live system performance
-# - identify CPU- and memory-heavy processes
-# - extract PIDs using ps/top-style workflows
-# - terminate processes safely and forcefully when required
-#
-# This lab simulates realistic system output and workflows
-# exactly aligned with RHCSA expectations.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

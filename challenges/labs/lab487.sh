@@ -1,24 +1,6 @@
 #!/bin/bash
 
 # Lab 487: System Lifecycle Management — Boot, Reboot, and Shutdown
-# Focus: safely rebooting, shutting down, changing boot targets, rescue mode,
-# GRUB awareness, forced reboots, and boot log inspection.
-#
-# This lab is aligned directly with RHCSA Objective:
-# 01- Boot, reboot, and shut down a system normally
-#
-# IMPORTANT:
-# - Some steps simulate actions that would normally reboot the system.
-# - You are validating correct commands and workflows, not actually rebooting
-#   the lab environment unless explicitly instructed by an examiner.
-#
-# Key skills:
-# systemctl reboot/poweroff/isolate/set-default
-# shutdown scheduling and cancellation
-# rescue/emergency targets
-# GRUB interaction awareness
-# journalctl boot logs
-# forced reboot handling
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

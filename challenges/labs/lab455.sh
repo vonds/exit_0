@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # Lab 455: RHEL Storage Automation — create filesystems on LVs and mount them
-# Focus: bash scripting practice + mkfs + mounting + verification with df -h
-# Key skills: mkfs.xfs, mkfs.ext4, mkfs.vfat, mkdir -p, mount, lsblk/blkid, df -h
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

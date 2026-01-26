@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 483: RHCSA Archives & Compression — tar, gzip, and bzip2
-# Focus: creating archives, compressing/uncompressing files, extracting archives,
-# and inspecting contents using tar, gzip, gunzip, bzip2, and bunzip2.
-# Key skills: tar -c/-x/-t with -z/-j, gzip/gunzip, bzip2/bunzip2, -C extraction.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

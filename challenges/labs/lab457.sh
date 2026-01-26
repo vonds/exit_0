@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 457: RHEL Storage Ops — Build PVs, Create/Extend VG, Create/Resize LV, Make XFS, Remove LV
-# Focus: installing LVM tooling, initializing physical volumes, creating/extending/reducing a VG,
-# creating and resizing an LV, formatting with XFS, and safely removing an LV.
-# Key skills: dnf, pvcreate/pvs/pvremove, vgcreate/vgs/vgextend/vgreduce/vgremove, lvcreate/lvs/lvresize/lvremove,
-# lsblk, mkfs.xfs, and basic verification.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

@@ -1,22 +1,6 @@
 #!/bin/bash
 
 # Lab 495: Start, Stop, and Check the Status of Network Services
-# Focus: Manage network-related services with systemctl (start/stop/restart/status/enable/disable/mask),
-#        reload firewalld, and inspect service logs with journalctl.
-#
-# RHCSA Objective:
-# - Start, stop, and check the status of network services
-#
-# Key skills validated:
-# - Check service status and interpret systemctl output
-# - Start/stop services safely
-# - Enable/disable services for boot persistence
-# - Reload firewalld rules
-# - Mask/unmask a service
-# - View service logs with journalctl
-#
-# Difficulty: Intermediate
-# XP: 49500
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

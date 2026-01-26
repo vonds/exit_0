@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 456: RHEL Networking Automation — configure a new NIC with nmcli + update /etc/hosts safely
-# Focus: bash scripting practice + nmcli connection config + safe file backup/appends
-# Key skills: nmcli dev status, nmcli con add/mod/up, IPv4 manual config, cp backups,
-# hostname selection, safe append to /etc/hosts (no overwrite), and verification.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

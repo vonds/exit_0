@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # Lab 454: RHEL Storage Automation — script partitions 2x1GB disks and builds LVM
-# Focus: bash scripting practice + non-interactive parted + LVM object creation
-# Key skills: lsblk, parted -s, partprobe, pvcreate, vgcreate/vgextend, lvcreate, and verification (pvs/vgs/lvs)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

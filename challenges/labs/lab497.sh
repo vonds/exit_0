@@ -1,21 +1,6 @@
 #!/bin/bash
 
 # Lab 497: Partition Management (MBR + GPT) — List, Create, Delete
-# Focus: Use fdisk for MBR, gdisk/parted for GPT, and refresh the kernel partition table.
-#
-# RHCSA Objective:
-# - List, create, delete partitions on MBR and GPT disks
-#
-# Key skills validated:
-# - Identify disk label type (MBR/DOS vs GPT)
-# - List partitions with fdisk and parted
-# - Create/delete an MBR partition with fdisk
-# - Create/delete a GPT partition with gdisk
-# - Create a GPT partition with parted (non-interactive)
-# - Refresh kernel partition table with partprobe
-#
-# Difficulty: Intermediate
-# XP: 49700
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

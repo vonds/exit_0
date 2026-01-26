@@ -1,23 +1,6 @@
 #!/bin/bash
 
 # Lab 502: Add Partitions, Logical Volumes, and Swap Non-Destructively
-# Focus: Create a new partition and mount it persistently, create an LV and mount it persistently,
-#        extend an LV and grow the filesystem online, and add swap using an LV (persistent).
-#
-# RHCSA Objective:
-# - Add new partitions and logical volumes, and swap to a system non-destructively
-#
-# Key skills validated:
-# - Use fdisk to add a partition safely
-# - Inform the kernel of partition changes (partprobe)
-# - Make a filesystem and mount it
-# - Persist mounts in /etc/fstab using UUID (user types the exact line)
-# - Create/extend LVs and grow ext4 online
-# - Create/enable swap on an LV and persist it in /etc/fstab (user types the exact line)
-# - Test fstab safely with mount -a and swapoff/swapon
-#
-# Difficulty: Advanced
-# XP: 50200
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

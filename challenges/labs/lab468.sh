@@ -1,11 +1,6 @@
 #!/bin/bash
 
 # Lab 468: Rocky Linux 10 Startup Processes — systemd Service Management (RHCSA Focus)
-# Focus: checking service status, identifying unit file paths, managing enable/disable,
-# starting/stopping/restarting, masking/unmasking, daemon-reload, targets, and journal review.
-# Key skills: systemctl status/is-active/is-enabled/start/stop/restart/enable/disable/mask/unmask,
-# systemctl show/cat/list-dependencies/get-default, systemctl daemon-reload,
-# journalctl -u, and safe verification workflows.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

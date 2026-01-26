@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 465: Rocky Linux 10 — SELinux Contexts & sysctl Management (RHCSA Focus)
-# Focus: inspecting SELinux contexts, persisting security info to files,
-# managing kernel parameters with sysctl, toggling SELinux enforcing mode,
-# and querying SELinux users and roles.
-# Key skills: ps auxZ, ls -Z, sysctl, sysctl.conf, chcon, setenforce, semanage.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

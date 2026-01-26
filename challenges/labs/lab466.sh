@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 466: Rocky Linux 10 Storage — Stratis End-to-End (Install, Service, Pool/FS, fstab, Add Disk, Snapshot Rollback)
-# Focus: installing Stratis, enabling stratisd, creating a pool and filesystem, mounting persistently via /etc/fstab,
-# Key skills: dnf makecache, dnf install, systemctl enable --now, systemctl status, rpm -q, command -v,
-# stratis pool/fs/blockdev, mkdir, /etc/fstab edit, systemctl daemon-reload, mount -a, touch, rm,
-# stratis pool add-data, stratis fs snapshot, stratis fs rename, umount, mount.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

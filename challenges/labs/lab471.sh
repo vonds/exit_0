@@ -1,15 +1,6 @@
 #!/bin/bash
 
 # Lab 471: Rocky Linux 10 — Firewall, Routing, Time, and NTP (RHCSA Focus)
-# Focus: managing firewalld rules, zones, runtime vs permanent config,
-# adding routes (temporary + persistent via NM), IP addressing,
-# timezone management, and NTP with chrony.
-# Key skills: firewall-cmd, ip route, nmcli, ip addr, timedatectl, chrony.
-#
-# Notes:
-# - Rocky Linux 10 (RHEL-compatible)
-# - Manual-entry, RHCSA-style lab
-# - All outputs are simulated and indented by two spaces (realistic formatting)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

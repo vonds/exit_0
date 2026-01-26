@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 460: RHEL Storage Management — Create Partition, XFS Filesystem, Mount, and Persist via fstab
-# Focus: basic disk partitioning, filesystem creation, mounting, and persistence across reboots.
-# Key skills: lsblk, fdisk (interactive), mkfs.xfs, blkid, mount, df -h, /etc/fstab, reboot, mount -a, umount.
-# Disk used in this lab: /dev/nvme (5GiB, unpartitioned)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 467: RHEL Scheduling — at + cron + anacron (Manual Entry Practice)
-# Focus: viewing at queue, removing a queued job, manually writing cron/anacron entries,
-# and creating a user cron that runs privileged service restarts via sudo.
-# Key skills: atq, atrm, sudo crontab -e, sudo -u student crontab -e, /etc/anacrontab,
-# correct cron timing fields, and safe verification with crontab -l.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

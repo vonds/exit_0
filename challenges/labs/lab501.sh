@@ -1,21 +1,6 @@
 #!/bin/bash
 
 # Lab 501: Mount Filesystems at Boot by UUID or LABEL (/etc/fstab)
-# Focus: Identify UUID/LABEL, create mount points, update /etc/fstab using UUID or LABEL,
-#        test safely with mount -a, verify mounts, and validate persistence logic.
-#
-# RHCSA Objective:
-# - Configure systems to mount file systems at boot by UUID or label
-#
-# Key skills validated:
-# - Identify UUID/LABEL with blkid/lsblk
-# - Create mount points
-# - Add the correct /etc/fstab line (UUID= / LABEL=)
-# - Test /etc/fstab entries with mount -a
-# - Verify mounts with df -h and findmnt
-#
-# Difficulty: Intermediate
-# XP: 50100
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

@@ -1,15 +1,6 @@
 #!/bin/bash
 
 # Lab 492: Manage Tuning Profiles (tuned / tuned-adm)
-# Focus: list profiles, change active profile, verify, create a custom profile, and disable tuning
-#
-# RHCSA Objective:
-# - Manage tuning profiles
-#
-# Key skills validated:
-# - systemctl status tuned
-# - tuned-adm list / active / profile / off
-# - Create a custom profile in /etc/tuned/<name>/tuned.conf
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

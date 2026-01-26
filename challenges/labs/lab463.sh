@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 463: RHEL Storage Polish — UUID-based Mounts + Recovery (Broken fstab + Failed Encrypted Mount)
-# Focus: replacing device-path mounts with UUID= in /etc/fstab, safely validating mounts, and
-# recovering from two common storage failures: a broken /etc/fstab entry and a failed LUKS mount.
-# Key skills: lsblk -f, blkid, findmnt, df -h, /etc/fstab, mount -a, journalctl (optional),
-# cryptsetup luksOpen, /etc/crypttab, systemctl daemon-reload, safe troubleshooting workflow.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 480: RHCSA Fundamentals — grep + Regular Expressions for Text Analysis
-# Focus: basic grep, anchors (^ $), wildcards (.), character classes ([]),
-#        case-insensitive search (-i), inverse match (-v), count (-c),
-#        line numbers (-n), recursive search (-r), and extended regex (-E).
-# Key skills: grep, grep -E, ps, pipes, basic regex thinking
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

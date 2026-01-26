@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 477: Rocky Linux 10 — Mock RHCSA Exam (Full Task Chain)
-# Focus: archive + text processing, scripting, services, tuned, nice, swap, LVM, Stratis,
-# cron, packages, firewall, routing, users/groups/sudoers, containers (Podman), skopeo.
-#
-
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
