@@ -38,8 +38,6 @@ In the interest of building a functional learning tool quickly, I made deliberat
 
 This reflects a realistic engineering workflow: identifying gaps, using available tools to unblock progress, and validating solutions through direct interaction with the system. The codebase captures not just a finished product, but an authentic learning process and an iterative approach to problem-solving.
 
-For recruiters and senior engineers, exit_0 demonstrates system-level thinking, pragmatic tool usage, modular shell scripting, and the ability to design learning infrastructure under constraints while maintaining ownership and accountability for the final result.
-
 # Intended Audience
 
 exit_0 is designed for learners who want to move beyond surface-level Linux familiarity and for engineers who value depth through hands-on practice. It is particularly useful for those preparing for roles in system administration, DevOps, site reliability, or infrastructure engineering. At the same time, the project is structured cleanly enough that experienced engineers can quickly understand the codebase and extend it without unnecessary complexity.
