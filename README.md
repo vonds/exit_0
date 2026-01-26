@@ -32,7 +32,7 @@ Progress tracking, experience points, and UI feedback are handled automatically 
 
 # What Makes exit_0 Different
 
-exit_0 is intentionally built using Bash and standard Unix tools rather than higher-level frameworks. This keeps the environment close to real production systems, makes the codebase easy to inspect, and ensures that users are learning skills that transfer directly to real-world Linux administration. The project emphasizes realistic command usage, predictable system behavior, and repetition—qualities that matter in professional environments.
+exit_0 is intentionally built using Bash and standard Unix tools rather than higher-level frameworks. This keeps the environment close to real production systems, makes the codebase easy to inspect, and ensures that users are learning skills that transfer directly to real-world Linux administration. The project emphasizes realistic command usage, predictable system behavior, and repetition.
 
 In the interest of building a functional learning tool quickly, I made deliberate use of AI-assisted development for parts of the system I was less familiar with and to accelerate the creation of lab content. The goal was not to outsource understanding, but to remove friction so I could focus on learning Linux itself while still shipping a usable tool. All AI-assisted scripts and labs were reviewed, tested, and refined through hands-on use in the terminal, and many were modified or rewritten as my understanding deepened.
 
