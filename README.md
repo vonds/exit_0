@@ -26,7 +26,7 @@ To start the game from the project root, run:
 
 Once launched, you’ll be presented with an interactive terminal menu. Navigation is handled using simple numeric selections and standard input. From the welcome menu, you can enter the labs interface, review progress and stats, or explore other available options.
 
-Labs are scenario-based and designed to simulate realistic Linux usage and system administration tasks. You are expected to engage directly with the terminal—running commands, interpreting output, and responding to prompts as you would on a real system. Successful completion of a lab awards experience points and records your progress locally, allowing you to exit and resume at any time.
+Labs are scenario-based and designed to simulate realistic Linux usage and system administration tasks. You are expected to engage directly with the terminal; running commands, interpreting output, and responding to prompts as you would on a real system. Successful completion of a lab awards experience points and records your progress locally, allowing you to exit and resume at any time.
 
 Progress tracking, experience points, and UI feedback are handled automatically in the background. Some additional features; such as expanded progression mechanics, deeper analytics, and additional UI polish—are already partially implemented and functional, but are still works in progress. The core lab system, however, is stable and fully usable.
 
