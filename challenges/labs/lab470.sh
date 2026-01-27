@@ -84,8 +84,7 @@ while true; do
   read -p "$PROMPT" cmd5
   echo
   [[ "$cmd5" != "sudo vim /etc/hosts" ]] && { print_error "Incorrect."; read _; continue; }
-  echo "  (vim opened)"
-  echo
+
 
   echo "  Step 6: In vim, type the following line EXACTLY:"
   read -p "  > " hosts_entry
@@ -103,7 +102,7 @@ while true; do
   read -p "$PROMPT" cmd7
   echo
   [[ "$cmd7" != "sudo ip a add 10.0.0.50/24 dev eth0" ]] && { print_error "Incorrect."; read _; continue; }
-  echo
+ 
 
   # STEP 8: ip route show
   echo "  Step 8: Verify routing table again."
@@ -118,8 +117,6 @@ while true; do
   read -p "$PROMPT" cmd9
   echo
   [[ "$cmd9" != "sudo vim /etc/resolv.conf" ]] && { print_error "Incorrect."; read _; continue; }
-  echo "  (vim opened)"
-  echo
 
   echo "  Step 10: In vim, type the following line EXACTLY:"
   read -p "  > " resolv_entry
