@@ -1,23 +1,6 @@
 #!/bin/bash
 
 # Lab 382: Diagnose Slow I/O on One Filesystem (/var)
-# Focus: Prove a slow-write symptom, identify the specific filesystem affected,
-#        inspect mount options, trace the root cause to /etc/fstab,
-#        fix the misconfiguration safely, remount, and validate improvement.
-#
-# RHCSA Objective (related):
-# - Locate and interpret system log files and journals (for troubleshooting)
-# - Manage storage and mounts (fstab, mount options)
-#
-# Key skills validated:
-# - Measure write performance with a simple dd test
-# - Identify the backing device and mount options for a filesystem (findmnt)
-# - Inspect /etc/fstab entries for a specific mount
-# - Correct an fstab entry and safely remount without rebooting
-# - Validate improvement with a repeatable test
-#
-# Difficulty: Intermediate
-# XP: 38200
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
