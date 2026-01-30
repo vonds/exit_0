@@ -66,7 +66,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 2: add system user
   echo "  Step 2: Create a system user named apachedev."
@@ -77,7 +76,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 3: remove expiration
   echo "  Step 3: Remove account expiration for user jane."
@@ -88,7 +86,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 4: create user with shell
   echo "  Step 4: Create user jack with login shell /bin/csh."
@@ -99,7 +96,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 5: delete user and home
   echo "  Step 5: Delete user jack and remove their home directory."
@@ -110,7 +106,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 6: force password change
   echo "  Step 6: Force user jane to change password at next login."
@@ -121,7 +116,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 7: add supplementary group
   echo "  Step 7: Add user jane to supplementary group developers."
@@ -132,7 +126,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 8: create group with GID
   echo "  Step 8: Create group cricket with GID 9875."
@@ -143,7 +136,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 9: rename group
   echo "  Step 9: Rename group cricket to soccer."
@@ -154,7 +146,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 10: create user with group and UID
   echo "  Step 10: Create user sam with UID 5322 and supplementary group soccer."
@@ -166,7 +157,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 11: change primary group
   echo "  Step 11: Change sam's primary group to rugby."
@@ -177,7 +167,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 12: lock user
   echo "  Step 12: Lock user sam's account."
@@ -188,7 +177,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 13: delete group
   echo "  Step 13: Delete group appdevs."
@@ -199,7 +187,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 14: set password warning days
   echo "  Step 14: Set password expiry warning to 2 days for user jane."
@@ -210,7 +197,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   print_success "Excellent work."
   print_info "You completed RHCSA user and group administration tasks on Rocky Linux 10:"
