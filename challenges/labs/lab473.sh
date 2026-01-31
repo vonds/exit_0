@@ -105,30 +105,45 @@ while true; do
   echo "  (vim opened)"
   echo
 
-  # STEP 5: uncomment pam_wheel required
-  echo "  Step 5: In the file, uncomment and ensure this line EXACTLY:"
+  # STEP 5: pam_wheel required (clear prompt, no answer given)
+  echo "  Step 5: In /etc/pam.d/su, enable the pam_wheel rule that:"
+  echo "          - is in the 'auth' stack"
+  echo "          - uses the 'required' control flag"
+  echo "          - enforces wheel-only su access"
+  echo "          - includes the option that checks the *calling* user identity"
+  echo "          Type the EXACT line you enabled:"
   read -p "  > " pam1
-  if [[ "$pam1" != "auth           required        pam_wheel.so use_uid" ]]; then
+  if [[ "$pam1" != "auth required pam_wheel.so use_uid" ]]; then
     print_error "Incorrect PAM line."
     read -p "Press Enter to retry..." _
     continue
   fi
   echo
 
-  # STEP 6: uncomment pam_wheel sufficient
-  echo "  Step 6: Also uncomment and ensure this line EXACTLY:"
+  # STEP 6: pam_wheel sufficient trust (clear prompt, no answer given)
+  echo "  Step 6: In /etc/pam.d/su, enable the second pam_wheel rule that:"
+  echo "          - is also in the 'auth' stack"
+  echo "          - uses the 'sufficient' control flag"
+  echo "          - trusts wheel members (so wheel users succeed immediately)"
+  echo "          - includes the same calling-user option as the previous rule"
+  echo "          Type the EXACT line you enabled:"
   read -p "  > " pam2
-  if [[ "$pam2" != "auth           sufficient      pam_wheel.so trust use_uid" ]]; then
+  if [[ "$pam2" != "auth sufficient pam_wheel.so trust use_uid" ]]; then
     print_error "Incorrect PAM line."
     read -p "Press Enter to retry..." _
     continue
   fi
   echo
 
-  # STEP 7: add pam_listfile line
-  echo "  Step 7: Add the following line at the END of the file:"
+  # STEP 7: pam_listfile deny (clear prompt, no answer given)
+  echo "  Step 7: Still in /etc/pam.d/su, add a new auth rule at the END of the file that:"
+  echo "          - uses pam_listfile.so"
+  echo "          - denies users listed in a file"
+  echo "          - checks by username"
+  echo "          - denies matches"
+  echo "          Type the EXACT line you added:"
   read -p "  > " pam3
-  if [[ "$pam3" != "auth    required       pam_listfile.so onerr=succeed  item=user  sense=deny  file=/etc/ssh/deniedusers" ]]; then
+  if [[ "$pam3" != "auth required pam_listfile.so onerr=succeed item=user sense=deny file=/etc/ssh/deniedusers" ]]; then
     print_error "Incorrect PAM listfile line."
     read -p "Press Enter to retry..." _
     continue
@@ -149,8 +164,11 @@ while true; do
   echo "  (vim opened)"
   echo
 
-  # STEP 9: add root to deniedusers
-  echo "  Step 9: In the file, add the following content EXACTLY:"
+  # STEP 9: add root to deniedusers (clear prompt, no answer given)
+  echo "  Step 9: In /etc/ssh/deniedusers, add ONE username on its own line that:"
+  echo "          - you want PAM to deny for su attempts via pam_listfile"
+  echo "          - specifically blocks the superuser account"
+  echo "          Type the EXACT single line you added:"
   read -p "  > " deny1
   if [[ "$deny1" != "root" ]]; then
     print_error "Incorrect file content."

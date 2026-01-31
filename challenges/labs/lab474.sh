@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Lab 474: Rocky Linux 10 — SSH & Squid Configuration Hardening (RHCSA Focus)
+# Lab 474: Rocky Linux 10 — SSH Port Migration + firewalld + SELinux (RHCSA)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab 474: SSH & Squid Configuration Hardening (Rocky 10)"
+LAB_NAME="Lab 474: SSH + firewalld + SELinux (Rocky 10 / RHCSA)"
 LAB_ID="lab474"
 LAB_XP=47400
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
@@ -33,32 +33,44 @@ get_lab_completion_count() {
   jq -r --arg lab "$LAB_ID" '.[$lab] // 0' "$LAB_TRACK_FILE"
 }
 
+require_exact_cmd() {
+  local user_input="$1"
+  shift
+  local ok=0
+  local expected
+  for expected in "$@"; do
+    if [[ "$user_input" == "$expected" ]]; then
+      ok=1
+      break
+    fi
+  done
+  [[ "$ok" -eq 1 ]]
+}
+
 while true; do
   draw_lab_ui
   center_title "$LAB_NAME"
   echo
   center_text "Scenario:"
-  center_text "You are hardening remote access and proxy behavior on a Rocky Linux 10 server."
-  center_text "You must update SSH daemon security settings and enforce Squid ACL rules."
+  center_text "You are administering a Rocky Linux 10 server and must secure SSH access."
+  center_text "You will migrate SSH to port 2222, open it in firewalld, and permit it in SELinux."
   echo
   center_text "Requirements (type commands and file entries EXACTLY):"
-  center_text "- Modify SSH authentication and connection limits"
-  center_text "- Restrict SSH root login behavior"
-  center_text "- Restart sshd to apply changes"
-  center_text "- Adjust Squid http_access rules"
-  center_text "- Create and apply ACLs with correct ordering"
+  center_text "- Update sshd_config (Port, PermitRootLogin, AllowUsers)"
+  center_text "- Validate sshd config syntax"
+  center_text "- Restart and verify sshd"
+  center_text "- Open port 2222/tcp in firewalld permanently"
+  center_text "- Allow SSH to bind to 2222 with SELinux semanage"
+  center_text "- Verify effective config + firewall + SELinux + listener"
   echo
   center_text "Press Enter to begin..."
   read _
   draw_lab_ui
 
-  # ---------- SSH SECTION ----------
-
-  # STEP 1: edit sshd_config
   echo "  Step 1: Open /etc/ssh/sshd_config using vim."
   read -p "$PROMPT" cmd1
   echo
-  if [[ "$cmd1" != "sudo vim /etc/ssh/sshd_config" && "$cmd1" != "sudo vi /etc/ssh/sshd_config" ]]; then
+  if ! require_exact_cmd "$cmd1" "sudo vim /etc/ssh/sshd_config" "sudo vi /etc/ssh/sshd_config"; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
@@ -66,50 +78,27 @@ while true; do
   echo "  (vim opened)"
   echo
 
-  # STEP 2: PasswordAuthentication yes
-  echo "  Step 2: Ensure the following line exists EXACTLY:"
+  echo "  Step 2: Configure SSH to listen on TCP port 2222 instead of the default port."
   read -p "  > " ssh1
-  if [[ "$ssh1" != "PasswordAuthentication yes" ]]; then
+  if [[ "$ssh1" != "Port 2222" ]]; then
     print_error "Incorrect SSH configuration line."
     read -p "Press Enter to retry..." _
     continue
   fi
   echo
 
-  # STEP 3: ForwardX11 yes
-  echo "  Step 3: Ensure the following line exists EXACTLY:"
+  echo "  Step 3: Prevent the root user from logging in over SSH."
   read -p "  > " ssh2
-  if [[ "$ssh2" != "ForwardX11 yes" ]]; then
+  if [[ "$ssh2" != "PermitRootLogin no" ]]; then
     print_error "Incorrect SSH configuration line."
     read -p "Press Enter to retry..." _
     continue
   fi
   echo
 
-  # STEP 4: AddressFamily inet
-  echo "  Step 4: Ensure the following line exists EXACTLY:"
+  echo "  Step 4: Allow SSH access only for the user named 'student'."
   read -p "  > " ssh3
-  if [[ "$ssh3" != "AddressFamily inet" ]]; then
-    print_error "Incorrect SSH configuration line."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo
-
-  # STEP 5: PermitRootLogin no
-  echo "  Step 5: Ensure the following line exists EXACTLY:"
-  read -p "  > " ssh4
-  if [[ "$ssh4" != "PermitRootLogin no" ]]; then
-    print_error "Incorrect SSH configuration line."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo
-
-  # STEP 6: MaxAuthTries 4
-  echo "  Step 6: Ensure the following line exists EXACTLY:"
-  read -p "  > " ssh5
-  if [[ "$ssh5" != "MaxAuthTries 4" ]]; then
+  if [[ "$ssh3" != "AllowUsers student" ]]; then
     print_error "Incorrect SSH configuration line."
     read -p "Press Enter to retry..." _
     continue
@@ -118,99 +107,127 @@ while true; do
   echo "  (save and exit the editor)"
   echo
 
-  # STEP 7: restart sshd
-  echo "  Step 7: Restart the sshd service."
+  echo "  Step 5: Validate the SSH daemon configuration syntax."
+  read -p "$PROMPT" cmd5
+  echo
+  if [[ "$cmd5" != "sudo sshd -t" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to retry..." _
+    continue
+  fi
+  echo "  (no output)"
+  echo
+
+  echo "  Step 6: Restart the sshd service."
+  read -p "$PROMPT" cmd6
+  echo
+  if [[ "$cmd6" != "sudo systemctl restart sshd" ]]; then
+    print_error "Incorrect."
+    read -p "Press Enter to retry..." _
+    continue
+  fi
+  echo "  (sshd restarted)"
+  echo
+
+  echo "  Step 7: Verify sshd is active."
   read -p "$PROMPT" cmd7
   echo
-  if [[ "$cmd7" != "sudo systemctl restart sshd" ]]; then
+  if [[ "$cmd7" != "sudo systemctl status sshd --no-pager" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
+  echo "● sshd.service - OpenSSH server daemon"
+  echo "   Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; vendor preset: enabled)"
+  echo "   Active: active (running)"
   echo
 
-  # ---------- SQUID SECTION ----------
-
-  # STEP 8: edit squid.conf
-  echo "  Step 8: Open /etc/squid/squid.conf using vim."
+  echo "  Step 8: Verify effective SSH settings (port/root/allowusers)."
   read -p "$PROMPT" cmd8
   echo
-  if [[ "$cmd8" != "sudo vim /etc/squid/squid.conf" && "$cmd8" != "sudo vi /etc/squid/squid.conf" ]]; then
+  if [[ "$cmd8" != "sudo sshd -T | grep -E 'port|permitrootlogin|allowusers'" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  (vim opened)"
+  echo "port 2222"
+  echo "permitrootlogin no"
+  echo "allowusers student"
   echo
 
-  # STEP 9: change localnet rule
-  echo "  Step 9: Change the localnet rule to EXACTLY:"
-  read -p "  > " squid1
-  if [[ "$squid1" != "http_access deny localnet" ]]; then
-    print_error "Incorrect Squid rule."
+  echo "  Step 9: Open TCP port 2222 permanently using firewalld."
+  read -p "$PROMPT" cmd9
+  echo
+  if [[ "$cmd9" != "sudo firewall-cmd --add-port=2222/tcp --permanent" ]]; then
+    print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
+  echo "success"
   echo
 
-  # STEP 10: add vpn ACL
-  echo "  Step 10: Add the following ACL line EXACTLY:"
-  read -p "  > " squid2
-  if [[ "$squid2" != "acl vpn src 203.0.110.5" ]]; then
-    print_error "Incorrect ACL line."
+  echo "  Step 10: Reload firewalld."
+  read -p "$PROMPT" cmd10
+  echo
+  if [[ "$cmd10" != "sudo firewall-cmd --reload" ]]; then
+    print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
+  echo "success"
   echo
 
-  # STEP 11: allow external
-  echo "  Step 11: Add the following line AFTER 'http_access allow localhost':"
-  read -p "  > " squid3
-  if [[ "$squid3" != "http_access allow external" ]]; then
-    print_error "Incorrect Squid rule."
+  echo "  Step 11: Verify the firewall port list includes 2222/tcp."
+  read -p "$PROMPT" cmd11
+  echo
+  if [[ "$cmd11" != "sudo firewall-cmd --list-ports" ]]; then
+    print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
+  echo "2222/tcp"
   echo
 
-  # STEP 12: allow vpn
-  echo "  Step 12: Add the following line BEFORE 'http_access deny all':"
-  read -p "  > " squid4
-  if [[ "$squid4" != "http_access allow vpn" ]]; then
-    print_error "Incorrect Squid rule."
+  echo "  Step 12: Add SELinux port label for SSH on 2222/tcp."
+  read -p "$PROMPT" cmd12
+  echo
+  if [[ "$cmd12" != "sudo semanage port -a -t ssh_port_t -p tcp 2222" ]]; then
+    print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
+  echo "  (policy updated)"
   echo
 
-  # STEP 13: facebook ACL
-  echo "  Step 13: Add the following ACL line EXACTLY:"
-  read -p "  > " squid5
-  if [[ "$squid5" != "acl facebook dstdomain .facebook.com" ]]; then
-    print_error "Incorrect ACL line."
+  echo "  Step 13: Verify SELinux port labeling includes 2222."
+  read -p "$PROMPT" cmd13
+  echo
+  if [[ "$cmd13" != "sudo semanage port -l | grep ssh_port_t" ]]; then
+    print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
+  echo "ssh_port_t                    tcp      2222"
   echo
 
-  # STEP 14: deny facebook
-  echo "  Step 14: Add the following line AFTER 'http_access allow localhost':"
-  read -p "  > " squid6
-  if [[ "$squid6" != "http_access deny facebook" ]]; then
-    print_error "Incorrect Squid rule."
+  echo "  Step 14: Verify sshd is listening on 2222."
+  read -p "$PROMPT" cmd14
+  echo
+  if [[ "$cmd14" != "sudo ss -tlnp | grep 2222" ]]; then
+    print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
-  echo "  (save and exit the editor)"
+  echo "LISTEN 0 128 0.0.0.0:2222 0.0.0.0:* users:((\"sshd\",pid=1234,fd=3))"
   echo
 
   print_success "Excellent work."
-  print_info "You completed RHCSA-relevant service hardening on Rocky Linux 10:"
-  print_info "- secured SSH authentication and access limits"
-  print_info "- enforced IPv4-only SSH connections"
-  print_info "- configured Squid ACLs with correct ordering"
-  print_info "- practiced precise vi-based configuration"
+  print_info "You completed a high-value RHCSA service + security workflow on Rocky Linux 10:"
+  print_info "- sshd_config change + syntax validation"
+  print_info "- systemd restart + service status verification"
+  print_info "- firewalld permanent rule + reload + verification"
+  print_info "- SELinux ssh_port_t labeling via semanage"
+  print_info "- listener verification with ss"
   print_info "You earned $LAB_XP XP."
   award_xp $LAB_XP
 

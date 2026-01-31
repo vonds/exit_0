@@ -1,20 +1,6 @@
 #!/bin/bash
 
 # Lab 498: LVM — Create and Remove Physical Volumes (pvcreate/pvs/pvdisplay/pvremove)
-# Focus: Initialize block devices as LVM PVs, inspect PVs, and safely wipe PV metadata.
-#
-# RHCSA Objective:
-# - Create and remove physical volumes
-#
-# Key skills validated:
-# - Identify candidate block devices for PV use
-# - Create PVs on whole disks and partitions (pvcreate)
-# - Verify PVs (pvs, pvdisplay)
-# - Confirm PV is not in a VG (vgs)
-# - Remove PV metadata safely (pvremove)
-#
-# Difficulty: Intermediate
-# XP: 49800
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

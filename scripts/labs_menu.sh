@@ -56,12 +56,12 @@ main_lab_menu() {
   draw_header
 
   while true; do
-    echo "     What would you like to do?"
+    center_menu "     What would you like to do?"
     echo
-    echo "       1) Run a lab by number"
-    echo "       2) Help / examples"
+    center_menu "       1) Run a lab by number"
+    center_menu "       2) Help / examples"
     echo
-    echo "     Press Enter 2x to return to main menu"
+    center_menu "     Press Enter 2x to return to main menu"
     echo
 
     drain_stdin
@@ -78,8 +78,8 @@ main_lab_menu() {
       1)
         while true; do
           echo
-          echo "     Enter a lab number (example: 148)"
-          echo "     Or type 'b' to go back."
+          center_menu "     Enter a lab number (example: 148)"
+          center_menu "     Or type 'b' to go back."
           echo
 
           drain_stdin
@@ -103,7 +103,7 @@ main_lab_menu() {
 
           if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
             echo
-            echo "     Invalid input. Please enter a number like 148."
+            center_menu "     Invalid input. Please enter a number like 148."
             echo
             pause
             draw_header
@@ -114,8 +114,8 @@ main_lab_menu() {
 
           if [ ! -f "$lab_file" ]; then
             echo
-            echo "     Lab not found: lab${choice}.sh"
-            echo "     Expected path: $lab_file"
+            center_menu "     Lab not found: lab${choice}.sh"
+            center_menu "     Expected path: $lab_file"
             echo
             pause
             draw_header
@@ -123,7 +123,7 @@ main_lab_menu() {
           fi
 
           echo
-          echo "     Launching: lab${choice}.sh"
+          center_menu "     Launching: lab${choice}.sh"
           echo
 
           bash "$lab_file"
@@ -135,18 +135,18 @@ main_lab_menu() {
         ;;
       2)
         echo
-        echo "     Help / examples"
+        center_menu "     Help / examples"
         echo
-        echo "       • Run lab 148: choose 1, then type 148"
-        echo "       • Back to this menu: type b (or press Enter at the lab # prompt)"
-        echo "       • Return to main menu: press Enter 2x"
+        center_menu "       • Run lab 148: choose 1, then type 148"
+        center_menu "       • Back to this menu: type b (or press Enter at the lab # prompt)"
+        center_menu "       • Return to main menu: press Enter 2x"
         echo
         pause
         draw_header
         ;;
       *)
         echo
-        echo "     Invalid selection. Choose 1 or 2, or press Enter 2x to return."
+        center_menu "     Invalid selection. Choose 1 or 2, or press Enter 2x to return."
         echo
         pause
         draw_header
