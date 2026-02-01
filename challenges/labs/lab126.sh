@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 126: alien, ldd, and the Dynamic Linker (ldconfig, ld.so.conf, ld.so.cache)
-# Focus: inspect shared library dependencies, manage dynamic linker paths, rebuild cache,
-# and perform basic package conversion with alien.
-# Key skills: ldd, ldconfig, ld.so.conf, ld.so.conf.d, tee, LD_LIBRARY_PATH, and alien.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

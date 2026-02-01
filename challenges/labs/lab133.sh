@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 133: Networking Fundamentals — Investigate Port 443 Failure (Path + Firewall + Service) (4–8 prompts)
-# Scenario: A web checkout endpoint is failing from this host only. DNS resolves, but TLS (443) won't connect.
-# You must confirm resolution, test TCP reachability, identify whether the block is local firewall or service down,
-# and fix the local firewall to allow outbound/inbound as needed for the test.
-# Key skills: dig/getent, ping, nc, ss, firewall-cmd, curl, verification workflow.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

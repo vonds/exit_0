@@ -1,11 +1,6 @@
 #!/bin/bash
 
 # Lab 135: Networking Fundamentals — Fix Wrong Static IP on eth0 (4–8 prompts)
-# Scenario: A VM was cloned and eth0 now has the WRONG static IPv4 address. SSH works only from the local console.
-# Your job: identify the current address, locate the NetworkManager connection, correct the IPv4 address/gateway/DNS,
-# bring the connection up, and verify you can reach the gateway and resolve DNS.
-#
-# Key skills: ip addr, ip route, nmcli con show, nmcli con mod, nmcli con down/up, ping, getent.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

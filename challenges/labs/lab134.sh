@@ -1,14 +1,9 @@
 #!/bin/bash
 
 # Lab 134: Networking Fundamentals — Fix DNS Failure Caused by Bad resolv.conf (4–8 prompts)
-# Scenario: This host can ping IPs, but name lookups fail. Applications using hostnames break.
-# You must prove it’s DNS (not routing), inspect resolver configuration, fix it, and verify.
-# Key skills: ip route, ping, getent, resolvectl (optional), /etc/resolv.conf inspection, nmcli,
-# restart NetworkManager (or reconnect), and verification workflow.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$(dirname "$SCRIPT_DIR/../..")" && pwd)"
-# (keeping your pattern consistent)
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }

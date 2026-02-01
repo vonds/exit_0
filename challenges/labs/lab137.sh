@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 137: RHCSA System Services — Time Sync + Logging Workflow (chrony + journald + rsyslog)
-# Workflow: verify time sync state, apply a safe chrony config change, restart/verify service,
-# inspect journald storage, query recent logs, and validate rsyslog is receiving messages.
-# RHCSA Focus: systemctl, timedatectl, chronyc, journalctl, rsyslog verification, realistic ops flow.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

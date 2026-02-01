@@ -1,15 +1,6 @@
 #!/bin/bash
 
 # Lab 136: System Services — Fix Logging + Time Sync Incident (4–8 prompts)
-# Scenario: After a hard reboot, a Rocky/RHEL host shows two problems:
-# 1) Your app team says "logs aren't showing up" in the journal when they run their service.
-# 2) TLS checks are failing because the system clock is drifting.
-#
-# Your job: verify journald is running, inspect logs for a service unit, restart journald,
-# check time sync status, enable NTP with chronyd (or timedatectl), and verify time is synced.
-#
-# Key skills: systemctl status/restart, journalctl -u, journalctl -b, systemd-journald,
-# timedatectl, chronyc tracking/sources, systemctl enable --now chronyd.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

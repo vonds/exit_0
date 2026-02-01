@@ -1,20 +1,20 @@
 #!/bin/bash
 
-# Lab 465: Rocky Linux 10 — SELinux Contexts & sysctl Management (RHCSA Focus)
+# Lab 475: Rocky Linux 10 — SELinux & sysctl Tasks (RHCSA-Style)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab 465: SELinux Contexts & sysctl Configuration (Rocky 10)"
-LAB_ID="lab465"
+LAB_NAME="Lab 475: SELinux & sysctl Tasks (Rocky 10, RHCSA-Style)"
+LAB_ID="lab475"
 LAB_XP=46500
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
 
 [ ! -f "$LAB_TRACK_FILE" ] && echo '{}' > "$LAB_TRACK_FILE"
 
-PROMPT="  lab@rhel-lab465:~$ "
+PROMPT="  lab@rhel-lab475:~$ "
 
 draw_lab_ui() {
   clear
@@ -38,205 +38,222 @@ while true; do
   center_title "$LAB_NAME"
   echo
   center_text "Scenario:"
-  center_text "You are auditing SELinux behavior and kernel parameters on a Rocky Linux 10 system."
-  center_text "You must inspect SELinux contexts, save specific values to files,"
-  center_text "and safely modify runtime and persistent sysctl settings."
+  center_text "A web app was deployed to /srv/web, and access is failing under SELinux."
+  center_text "You must verify contexts, set a persistent file context rule, apply it,"
+  center_text "check and set a required SELinux boolean persistently, and apply a persistent"
+  center_text "sysctl change using /etc/sysctl.d with sysctl --system."
   echo
   center_text "Press Enter to begin..."
   read _
   draw_lab_ui
 
-  # STEP 1: ps auxZ | grep sshd
-  echo "  Step 1: Display SELinux context for sshd processes."
+  # STEP 1: SELinux mode
+  echo "  Step 1: Confirm SELinux is enabled and report the current SELinux mode."
   read -p "$PROMPT" cmd1
   echo
-  if [[ "$cmd1" != "ps auxZ | grep sshd" ]]; then
+  if [[ "$cmd1" == "getenforce" ]]; then
+    echo "  Enforcing"
+    echo
+  elif [[ "$cmd1" == "sestatus" ]]; then
+    echo "  SELinux status:                 enabled"
+    echo "  SELinuxfs mount:                /sys/fs/selinux"
+    echo "  SELinux root directory:         /etc/selinux"
+    echo "  Loaded policy name:             targeted"
+    echo "  Current mode:                   enforcing"
+    echo "  Mode from config file:          enforcing"
+    echo "  Policy MLS status:              enabled"
+    echo "  Policy deny_unknown status:     allowed"
+    echo "  Memory protection checking:     actual (secure)"
+    echo "  Max kernel policy version:      33"
+    echo
+  else
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  system_u:system_r:sshd_t:s0    root     1023  0.0  sshd"
-  echo
 
-  # STEP 2: edit /home/student/sshd
-  echo "  Step 2: Open /home/student/sshd using vi."
+  # STEP 2: httpd process context
+  echo "  Step 2: Show the SELinux context for the running web server process (httpd)."
   read -p "$PROMPT" cmd2
   echo
-  if [[ "$cmd2" != "vi /home/student/sshd" && "$cmd2" != "vim /home/student/sshd" ]]; then
+  if [[ "$cmd2" != "ps -eZ | grep httpd" && "$cmd2" != "ps auxZ | grep httpd" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  (vim opened)"
+  echo "  system_u:system_r:httpd_t:s0     1042 ?        00:00:00 httpd"
+  echo "  system_u:system_r:httpd_t:s0     1043 ?        00:00:00 httpd"
+  echo "  system_u:system_r:httpd_t:s0     1044 ?        00:00:00 httpd"
   echo
 
-  echo "  Step 3: Paste the SELinux context EXACTLY as seen (single line):"
-  read -p "  > " sshdctx
-  if [[ "$sshdctx" != "system_u:system_r:sshd_t:s0" ]]; then
-    print_error "Incorrect SELinux context."
+  # STEP 3: directory context
+  echo "  Step 3: Show the SELinux context for the web content directory /srv/web."
+  read -p "$PROMPT" cmd3
+  echo
+  if [[ "$cmd3" != "ls -Zd /srv/web" ]]; then
+    print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
-  echo "  (save and exit the editor)"
+  echo "  unconfined_u:object_r:default_t:s0 /srv/web"
   echo
 
-  # STEP 4: disable kernel modules
-  echo "  Step 4: Disable kernel module loading at runtime."
+  # STEP 4: file context
+  echo "  Step 4: Show the SELinux context for the file /srv/web/index.html."
   read -p "$PROMPT" cmd4
   echo
-  if [[ "$cmd4" != "sudo sysctl -w kernel.modules_disabled=1" ]]; then
+  if [[ "$cmd4" != "ls -Z /srv/web/index.html" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  kernel.modules_disabled = 1"
+  echo "  unconfined_u:object_r:default_t:s0 /srv/web/index.html"
   echo
 
-  # STEP 5: ls -Z /bin/sudo
-  echo "  Step 5: Display SELinux context of /bin/sudo."
+  # STEP 5: semanage fcontext
+  echo "  Step 5: Add a persistent SELinux file context rule so ALL files under /srv/web use the httpd_sys_content_t type."
   read -p "$PROMPT" cmd5
   echo
-  if [[ "$cmd5" != "ls -Z /bin/sudo" ]]; then
+  if [[ "$cmd5" != "sudo semanage fcontext -a -t httpd_sys_content_t '/srv/web(/.*)?'" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  system_u:object_r:sudo_exec_t:s0 /bin/sudo"
-  echo
 
-  # STEP 6: edit /home/student/selabel
-  echo "  Step 6: Open /home/student/selabel using vi."
+  # STEP 6: restorecon apply
+  echo "  Step 6: Apply the persistent SELinux file context mapping to /srv/web and its contents."
   read -p "$PROMPT" cmd6
   echo
-  if [[ "$cmd6" != "vi /home/student/selabel" && "$cmd6" != "vim /home/student/selabel" ]]; then
+  if [[ "$cmd6" == "sudo restorecon -Rv /srv/web" ]]; then
+    echo "  Relabeled /srv/web from unconfined_u:object_r:default_t:s0 to unconfined_u:object_r:httpd_sys_content_t:s0"
+    echo "  Relabeled /srv/web/index.html from unconfined_u:object_r:default_t:s0 to unconfined_u:object_r:httpd_sys_content_t:s0"
+    echo
+  elif [[ "$cmd6" == "sudo restorecon -RFv /srv/web" ]]; then
+    echo "  Relabeled /srv/web from unconfined_u:object_r:default_t:s0 to unconfined_u:object_r:httpd_sys_content_t:s0"
+    echo "  Relabeled /srv/web/index.html from unconfined_u:object_r:default_t:s0 to unconfined_u:object_r:httpd_sys_content_t:s0"
+    echo
+  else
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  (vi opened)"
-  echo
 
-  echo "  Step 7: Enter ONLY the SELinux type from the output:"
-  read -p "  > " selabel
-  if [[ "$selabel" != "sudo_exec_t" ]]; then
-    print_error "Incorrect SELinux label."
+  # STEP 7: verify file context
+  echo "  Step 7: Verify the new SELinux type is now applied to /srv/web/index.html."
+  read -p "$PROMPT" cmd7
+  echo
+  if [[ "$cmd7" != "ls -Z /srv/web/index.html" ]]; then
+    print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
-  echo "  (save and exit the editor)"
+  echo "  unconfined_u:object_r:httpd_sys_content_t:s0 /srv/web/index.html"
   echo
 
-  # STEP 8: enable IPv6 seg6
-  echo "  Step 8: Enable IPv6 segment routing on loopback."
+  # STEP 8: check boolean
+  echo "  Step 8: Check whether the SELinux boolean that allows httpd to initiate outbound network connections is enabled."
   read -p "$PROMPT" cmd8
   echo
-  if [[ "$cmd8" != "sudo sysctl -w net.ipv6.conf.lo.seg6_enabled=1" ]]; then
+  if [[ "$cmd8" != "getsebool httpd_can_network_connect" && "$cmd8" != "sudo getsebool httpd_can_network_connect" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
+  echo "  httpd_can_network_connect --> off"
   echo
 
-  # STEP 9: edit sysctl.conf
-  echo "  Step 9: Open /etc/sysctl.conf using vi."
+  # STEP 9: enable boolean persistently
+  echo "  Step 9: Enable that SELinux boolean persistently (so it survives reboot)."
   read -p "$PROMPT" cmd9
   echo
-  if [[ "$cmd9" != "sudo vi /etc/sysctl.conf" && "$cmd9" != "sudo vim /etc/sysctl.conf" ]]; then
+  if [[ "$cmd9" != "sudo setsebool -P httpd_can_network_connect on" && "$cmd9" != "sudo setsebool -P httpd_can_network_connect 1" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  (vim opened)"
-  echo
 
-  echo "  Step 10: Add the following line EXACTLY:"
-  read -p "  > " sysctl_line
-  if [[ "$sysctl_line" != "vm.swappiness=10" ]]; then
-    print_error "Incorrect sysctl configuration."
+  # STEP 10: verify boolean
+  echo "  Step 10: Verify the boolean is now on."
+  read -p "$PROMPT" cmd10
+  echo
+  if [[ "$cmd10" != "getsebool httpd_can_network_connect" && "$cmd10" != "sudo getsebool httpd_can_network_connect" ]]; then
+    print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
-  echo "  (save and exit the editor)"
+  echo "  httpd_can_network_connect --> on"
   echo
 
-  # STEP 11: apply sysctl
-  echo "  Step 11: Apply sysctl configuration."
+  # STEP 11: sysctl runtime
+  echo "  Step 11: Set IPv4 forwarding at runtime using sysctl."
   read -p "$PROMPT" cmd11
   echo
-  if [[ "$cmd11" != "sudo sysctl -p" ]]; then
+  if [[ "$cmd11" != "sudo sysctl -w net.ipv4.ip_forward=1" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  vm.swappiness = 10"
+  echo "  net.ipv4.ip_forward = 1"
   echo
 
-  # STEP 12: chcon
-  echo "  Step 12: Change SELinux type of /var/index.html."
+  # STEP 12: create sysctl.d file via tee
+  echo "  Step 12: Create a persistent sysctl setting file at /etc/sysctl.d/99-lab465.conf using a single command that writes net.ipv4.ip_forward=1."
   read -p "$PROMPT" cmd12
   echo
-  if [[ "$cmd12" != "sudo chcon -t httpd_sys_content_t /var/index.html" ]]; then
+  if [[ "$cmd12" != "echo 'net.ipv4.ip_forward=1' | sudo tee /etc/sysctl.d/99-lab465.conf" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
+  echo "  net.ipv4.ip_forward=1"
   echo
 
-  # STEP 13: setenforce 0
-  echo "  Step 13: Set SELinux to permissive mode."
+  # STEP 13: apply sysctl --system
+  echo "  Step 13: Apply all persistent sysctl settings using the correct system-wide reload command."
   read -p "$PROMPT" cmd13
   echo
-  if [[ "$cmd13" != "sudo setenforce 0" ]]; then
+  if [[ "$cmd13" != "sudo sysctl --system" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
+  echo "  * Applying /usr/lib/sysctl.d/00-system.conf ..."
+  echo "  * Applying /usr/lib/sysctl.d/10-default-yama-scope.conf ..."
+  echo "  * Applying /usr/lib/sysctl.d/50-default.conf ..."
+  echo "  * Applying /etc/sysctl.d/99-lab465.conf ..."
+  echo "  net.ipv4.ip_forward = 1"
+  echo "  * Applying /etc/sysctl.conf ..."
   echo
 
-  # STEP 14: semanage user -l
-  echo "  Step 14: List SELinux users."
+  # STEP 14: verify sysctl value
+  echo "  Step 14: Verify net.ipv4.ip_forward is set to 1."
   read -p "$PROMPT" cmd14
   echo
-  if [[ "$cmd14" != "sudo semanage user -l" ]]; then
+  if [[ "$cmd14" != "sysctl net.ipv4.ip_forward" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  xguest_u  s0  s0:c0.c1023  user_r user_home_t"
+  echo "  net.ipv4.ip_forward = 1"
   echo
 
-  # STEP 15: edit /home/student/serole
-  echo "  Step 15: Open /home/student/serole using vi."
+  # STEP 15: record value to file
+  echo "  Step 15: Record the current value of net.ipv4.ip_forward to /home/student/ip_forward.txt using a single command."
   read -p "$PROMPT" cmd15
   echo
-  if [[ "$cmd15" != "vi /home/student/serole" && "$cmd15" != "vim /home/student/serole" ]]; then
+  if [[ "$cmd15" != "sysctl net.ipv4.ip_forward > /home/student/ip_forward.txt" && \
+        "$cmd15" != "sysctl net.ipv4.ip_forward | tee /home/student/ip_forward.txt > /dev/null" ]]; then
     print_error "Incorrect."
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  (vim opened)"
-  echo
-
-  echo "  Step 16: Enter the SELinux ROLES value for xguest_u:"
-  read -p "  > " serole
-  if [[ "$serole" != "user_r" ]]; then
-    print_error "Incorrect SELinux role."
-    read -p "Press Enter to retry..." _
-    continue
-  fi
-  echo
-  echo "  (save and exit the editor)"
-  echo
 
   print_success "Excellent work."
-  print_info "You completed RHCSA-level SELinux and sysctl tasks on Rocky Linux 10:"
-  print_info "- inspected and recorded SELinux process and file contexts"
-  print_info "- modified kernel parameters at runtime and persistently"
-  print_info "- adjusted SELinux enforcing mode and file labels"
-  print_info "- queried SELinux users and roles"
+  print_info "You completed RHCSA-style SELinux + sysctl tasks on Rocky Linux 10:"
+  print_info "- verified SELinux mode and inspected process/file contexts"
+  print_info "- set persistent SELinux file context with semanage fcontext + restorecon"
+  print_info "- enabled and verified a required SELinux boolean persistently"
+  print_info "- applied runtime and persistent sysctl using /etc/sysctl.d + sysctl --system"
   print_info "You earned $LAB_XP XP."
   award_xp $LAB_XP
 

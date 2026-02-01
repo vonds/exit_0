@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # Lab 128: Networking Troubleshooting — Fix "Service Port Closed" (Firewall Blocking SSH)
-# Focus: diagnose and fix a real outage where the host is reachable by IP, but a service port is blocked.
-# Key skills: ss, firewall-cmd, and verification workflow.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 145: RHCSA Administrative Tasks — Permissions + Scheduled Jobs + Time Zone + Account Aging Workflow
-# Workflow: set up a shared web content directory safely with group ownership + setgid,
-# add a recurring cron job (user must type the crontab line themselves),
-# schedule a one-time at job, verify timezone config, and remove account expiration.
-# RHCSA Focus: chmod/chgrp, setgid dirs, ls -ld, crontab -e/-l, at/atq, ls -l /etc/localtime, chage.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 141: RHCSA System Services — Mail Alias + Postfix Queue + Time/Journal Workflow
-# Workflow: configure a root alias, rebuild aliases, verify Postfix, inspect queue,
-# view a queued message with postcat, verify time zone state, and review kernel logs in journald.
-# RHCSA Focus: /etc/aliases + newaliases, systemctl, mailq/postqueue, postcat, timedatectl, date, journalctl.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

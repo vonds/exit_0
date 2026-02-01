@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 132: Networking Fundamentals — Fix Slow Hostname Lookups (Reverse DNS) (4–8 prompts)
-# Scenario: SSH logins and simple tools (sudo, ss, last) feel "laggy" because the host is doing reverse DNS lookups.
-# The primary issue: /etc/nsswitch.conf is configured to try DNS for hosts before files, and the resolver is slow/unreachable.
-# You must confirm the symptom, confirm the resolver behavior, adjust host lookup order, and verify the slowdown is gone.
-# Key skills: time, getent, dig, cat/grep, sudoedit/vim, resolvectl (or /etc/resolv.conf), verification workflow.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

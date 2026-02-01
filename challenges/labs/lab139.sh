@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 139: RHCSA System Services — Remote Syslog Reception + Log Rotation Workflow
-# Workflow: enable rsyslog UDP reception, open firewall, restart/verify,
-# generate a test message, confirm it lands in logs, then set up logrotate for a custom app log.
-# RHCSA Focus: rsyslog config drop-ins, firewall-cmd, systemctl, ss, logger, tail, logrotate test.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

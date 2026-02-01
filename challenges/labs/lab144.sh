@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 144: RHCSA System Services — journald Persistence + rsyslog Remote Forward + Postfix + Chrony Workflow
-# Workflow: confirm journald storage mode and disk use, enable persistent journal storage (via drop-in),
-# restart journald, verify persistence, configure rsyslog to forward to a remote collector via TCP,
-# restart/verify rsyslog, check Postfix queue, and verify chrony sync state.
-# RHCSA Focus: journalctl/journald config, systemctl, rsyslog drop-ins, basic mail queue checks, chronyc.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -62,7 +58,7 @@ while true; do
 
     # STEP 2: Create journald drop-in for persistence (terminal command)
     echo "  Step 2: Create a journald config drop-in to enable persistent storage."
-    echo "          (Edit /etc/systemd/journald.conf.d/10-persistent.conf)"
+    echo "          Edit /etc/systemd/journald.conf.d/10-persistent.conf"
     read -p "$PROMPT" cmd2
     echo
     if [[ "$cmd2" != "sudo nano /etc/systemd/journald.conf.d/10-persistent.conf" && \
@@ -105,7 +101,7 @@ while true; do
 
     # STEP 5: Create rsyslog forwarder drop-in to central collector via TCP
     echo "  Step 5: Create an rsyslog drop-in to forward all logs to 192.0.2.10 over TCP/514."
-    echo "          (Edit /etc/rsyslog.d/90-forward.conf)"
+    echo "          Edit /etc/rsyslog.d/90-forward.conf"
     read -p "$PROMPT" cmd5
     echo
     if [[ "$cmd5" != "sudo nano /etc/rsyslog.d/90-forward.conf" && \
@@ -150,7 +146,7 @@ while true; do
     echo "  Step 8: Generate a test log message (facility local0.notice)."
     read -p "$PROMPT" cmd8
     echo
-    if [[ "$cmd8" != "logger -p local0.notice 'RHCSA-LAB144 test: forwarding enabled'" ]]; then
+    if [[ "$cmd8" != "logger -p local0.notice 'test: forwarding enabled'" ]]; then
         print_error "Incorrect. Use logger with local0.notice."
         read -p "Press Enter to retry..." _
         continue
@@ -165,7 +161,7 @@ while true; do
         continue
     fi
     echo "  Jan 25 07:36:18 lab144 rsyslogd[1043]: [origin software=\"rsyslogd\" swVersion=\"8.2310.0\" x-pid=\"1043\" x-info=\"https://www.rsyslog.com\"] start"
-    echo "  Jan 25 07:36:25 lab144 lab[pts/0]: RHCSA-LAB144 test: forwarding enabled"
+    echo "  Jan 25 07:36:25 lab144 lab[pts/0]: test: forwarding enabled"
     echo
 
     # STEP 10: Check chrony sync and sources

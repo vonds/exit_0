@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 130: Networking Fundamentals — Restore Connectivity (Route + DNS) (4–8 prompts)
-# Scenario: A small lab VM can reach its gateway but cannot reach the internet by name.
-# You must identify whether the issue is routing or DNS, fix it, and verify end-to-end.
-# Key skills: ip addr, ip route, ping, resolvectl (or cat /etc/resolv.conf), dig/getent, curl.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

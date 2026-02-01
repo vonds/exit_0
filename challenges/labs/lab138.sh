@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 138: RHCSA System Services — Printing + Mail Queue Triage Workflow (CUPS + Postfix + journald)
-# Workflow: verify CUPS service + default printer, submit a test print, confirm in CUPS,
-# then triage Postfix queue, flush, delete a stuck message, and confirm logs in journald.
-# RHCSA Focus: systemctl, lpstat/lp/lpr/lpoptions, journalctl, postqueue/mailq/postsupers/postcat.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

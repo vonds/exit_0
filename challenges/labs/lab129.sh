@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # Lab 129: Networking Troubleshooting — Fix "Intermittent Connectivity" (Bad MTU)
-# Focus: diagnose and fix packet loss caused by an incorrect MTU setting.
-# Key skills: ip link, ping with DF flag, MTU adjustment, verification workflow.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

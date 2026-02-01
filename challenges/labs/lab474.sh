@@ -115,8 +115,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  (no output)"
-  echo
 
   echo "  Step 6: Restart the sshd service."
   read -p "$PROMPT" cmd6
@@ -126,8 +124,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  (sshd restarted)"
-  echo
 
   echo "  Step 7: Verify sshd is active."
   read -p "$PROMPT" cmd7
@@ -137,9 +133,9 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "● sshd.service - OpenSSH server daemon"
-  echo "   Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; vendor preset: enabled)"
-  echo "   Active: active (running)"
+  echo "  ● sshd.service - OpenSSH server daemon"
+  echo "     Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; vendor preset: enabled)"
+  echo "     Active: active (running)"
   echo
 
   echo "  Step 8: Verify effective SSH settings (port/root/allowusers)."
@@ -150,9 +146,9 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "port 2222"
-  echo "permitrootlogin no"
-  echo "allowusers student"
+  echo "  port 2222"
+  echo "  permitrootlogin no"
+  echo "  allowusers student"
   echo
 
   echo "  Step 9: Open TCP port 2222 permanently using firewalld."
@@ -163,7 +159,7 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "success"
+  echo "  success"
   echo
 
   echo "  Step 10: Reload firewalld."
@@ -174,7 +170,7 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "success"
+  echo "  success"
   echo
 
   echo "  Step 11: Verify the firewall port list includes 2222/tcp."
@@ -185,7 +181,7 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "2222/tcp"
+  echo "  2222/tcp"
   echo
 
   echo "  Step 12: Add SELinux port label for SSH on 2222/tcp."
@@ -196,8 +192,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "  (policy updated)"
-  echo
 
   echo "  Step 13: Verify SELinux port labeling includes 2222."
   read -p "$PROMPT" cmd13
@@ -207,7 +201,7 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "ssh_port_t                    tcp      2222"
+  echo "  ssh_port_t                    tcp      2222"
   echo
 
   echo "  Step 14: Verify sshd is listening on 2222."
@@ -218,7 +212,7 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo "LISTEN 0 128 0.0.0.0:2222 0.0.0.0:* users:((\"sshd\",pid=1234,fd=3))"
+  echo "  LISTEN 0 128 0.0.0.0:2222 0.0.0.0:* users:((\"sshd\",pid=1234,fd=3))"
   echo
 
   print_success "Excellent work."

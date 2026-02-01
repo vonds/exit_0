@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lab 142: RHCSA System Services — Journald + Aliases + Printing + Time Workflow
-# Workflow: rebuild aliases, write evidence into journald, verify it, clear a stuck print job,
-# submit a test print, check queue, and set time in a controlled way, then verify time state.
-# RHCSA Focus: newaliases, systemd-cat, journalctl, lp/lpstat/cancel, timedatectl/date.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

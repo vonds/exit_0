@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 143: RHCSA System Services — Journal Cleanup + Postfix Queue + Printing Workflow
-# Workflow: vacuum journal to a target size, filter logs for today's window,
-# verify journald config key, inspect Postfix queue and spool path using terminal commands,
-# submit a print job, and verify the queue.
-# RHCSA Focus: journalctl (vacuum/filter/unit), basic Postfix queue inspection, printing tools (lp/lpstat).
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

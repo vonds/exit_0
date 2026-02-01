@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Lab 131: Networking Fundamentals — Fix Hostname Override + Verify DNS Path (4–8 prompts)
-# Scenario: A developer hardcoded a hostname override months ago. Now the app is hitting the wrong server.
-# You must identify where the override is coming from (/etc/hosts vs DNS), remove the bad override,
-# confirm correct DNS resolution, and verify the service is reachable.
-# Key skills: getent hosts, grep, sudoedit/vim, resolvectl (or cat /etc/resolv.conf), dig, curl.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
