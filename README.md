@@ -1,4 +1,4 @@
-# exit_0 — A Terminal-Based Linux Learning RPG
+# exit_0: A Terminal-Based Linux Learning RPG
 
 exit_0 is a terminal-based learning game designed to teach Linux through hands-on practice, repetition, and realism. I originally built this project as a way to teach myself Linux in a way that mirrored how systems administrators actually learn: by working directly in the terminal, making mistakes, fixing them, and repeating that process until commands and concepts became second nature. Over time, the project evolved into a structured, RPG-inspired lab environment that blends technical accuracy with motivation, progression, and measurable skill growth.
 
