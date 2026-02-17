@@ -39,8 +39,6 @@ exit_0 is intentionally built using Bash and standard Unix tools rather than hig
 
 In the interest of building a functional learning tool quickly, I made deliberate use of AI-assisted development for parts of the system I was less familiar with and to accelerate the creation of lab content. The goal was not to outsource understanding, but to remove friction so I could focus on learning Linux itself while still shipping a usable tool. All AI-assisted scripts and labs were reviewed, tested, and refined through hands-on use in the terminal, and many were modified or rewritten as my understanding deepened.
 
-This reflects a realistic engineering workflow: identifying gaps, using available tools to unblock progress, and validating solutions through direct interaction with the system. The codebase captures not just a finished product, but an authentic learning process and an iterative approach to problem-solving.
-
 # Intended Audience
 
 exit_0 is designed for learners who want to move beyond surface-level Linux familiarity and for engineers who value depth through hands-on practice. It is particularly useful for those preparing for roles in system administration, DevOps, site reliability, or infrastructure engineering. At the same time, the project is structured cleanly enough that experienced engineers can quickly understand the codebase and extend it without unnecessary complexity.
