@@ -190,7 +190,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 10: persist route via NM
   echo "  Step 10: Persist that route with NetworkManager on connection 'System eth1'."
@@ -201,7 +200,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 11: reapply
   echo "  Step 11: Reapply eth1 connection settings to the device."
@@ -241,7 +239,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 14: list timezones America
   echo "  Step 14: List timezones that contain 'America'."
@@ -268,7 +265,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 16: install chrony (realistic yum/dnf summary)
   echo "  Step 16: Install chrony."
@@ -316,7 +312,6 @@ while true; do
     read -p "Press Enter to retry..." _
     continue
   fi
-  echo
 
   # STEP 18: enable chronyd
   echo "  Step 18: Enable chronyd."

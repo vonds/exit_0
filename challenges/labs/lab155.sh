@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Lab 155: groupadd Group Management
+# Lab 155: groupadd Group Management (Realistic Admin Workflow, condensed)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -13,154 +13,96 @@ LAB_XP=20000
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
 [ ! -f "$LAB_TRACK_FILE" ] && echo '{}' > "$LAB_TRACK_FILE"
 
-record_lab_completion() {
-    tmpfile=$(mktemp)
-    jq --arg lab "$LAB_ID" '.[$lab] += 1 // 1' "$LAB_TRACK_FILE" > "$tmpfile" && mv "$tmpfile" "$LAB_TRACK_FILE"
-}
-get_lab_completion_count() {
-    jq -r --arg lab "$LAB_ID" '.[$lab] // 0' "$LAB_TRACK_FILE"
-}
+PROMPT_ROOT="  root@lab155:~# "
+
 draw_lab_ui() {
-    clear
-    center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
-    center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
-    echo; echo; echo
+  clear
+  center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
+  center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
+  echo; echo; echo
+}
+
+record_lab_completion() {
+  tmpfile=$(mktemp)
+  jq --arg lab "$LAB_ID" '.[$lab] += 1 // 1' "$LAB_TRACK_FILE" > "$tmpfile" && mv "$tmpfile" "$LAB_TRACK_FILE"
+}
+
+get_lab_completion_count() {
+  jq -r --arg lab "$LAB_ID" '.[$lab] // 0' "$LAB_TRACK_FILE"
 }
 
 while true; do
-    draw_lab_ui
-    center_title "$LAB_NAME"
-    echo
-    center_text "Create and manage groups using groupadd."
-    echo
-    center_text "Press Enter to begin the lab..."
-    read _
+  draw_lab_ui
+  center_title "$LAB_NAME"
+  echo
+  center_text "Scenario:"
+  center_text "A new project is launching. You need UNIX groups for access control and shared ownership."
+  center_text "Ticket requirements:"
+  center_text "- Create groups: developers, qa, devops"
+  center_text "- Reserved GIDs (from standards): docker=1050, devops=1200"
+  center_text "- Verify the groups exist in NSS."
+  echo
+  center_text "Press Enter to begin the lab..."
+  read -r _
+  draw_lab_ui
 
-    draw_lab_ui
-    echo "  Step 1: Create a group named 'developers'."
-    read -p "  root@lab155:~# " cmd1
-    echo
-    [[ "$cmd1" != "groupadd developers" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  Group 'developers' created with GID 1002."
-    echo
+  # STEP 1: Create the standard groups (one command)
+  echo "  Step 1: Create the required groups in one command."
+  echo "          Expected groups: developers, qa, devops"
+  read -r -p "$PROMPT_ROOT" cmd1
+  echo
+  if [[ "$cmd1" != "groupadd developers && groupadd qa && groupadd -g 1200 devops" ]]; then
+    print_error "Incorrect."
+    print_info "Build the command from the ticket requirements."
+    read -r -p "Press Enter to try again..." _
+    continue
+  fi
 
-    echo "  Step 2: Create a group named 'docker' with a specific GID of 1050."
-    read -p "  root@lab155:~# " cmd2
-    echo
-    [[ "$cmd2" != "groupadd -g 1050 docker" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  Group 'docker' created with GID 1050."
-    echo
+  # STEP 2: Create docker with reserved GID (standards compliance)
+  echo "  Step 2: Create the docker group with reserved GID 1050."
+  read -r -p "$PROMPT_ROOT" cmd2
+  echo
+  if [[ "$cmd2" != "groupadd -g 1050 docker" ]]; then
+    print_error "Incorrect."
+    read -r -p "Press Enter to try again..." _
+    continue
+  fi
 
-    echo "  Step 3: Create a system group named 'sysadmin'."
-    read -p "  root@lab155:~# " cmd3
-    echo
-    [[ "$cmd3" != "groupadd -r sysadmin" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  System group 'sysadmin' created with GID 998."
-    echo
+  # STEP 3: Verify via NSS (not by grepping /etc/group)
+  echo "  Step 3: Verify the groups exist using getent (NSS)."
+  read -r -p "$PROMPT_ROOT" cmd3
+  echo
+  if [[ "$cmd3" != "getent group developers && getent group qa && getent group docker && getent group devops" ]]; then
+    print_error "Incorrect."
+    print_info "Use getent group for each required group."
+    read -r -p "Press Enter to try again..." _
+    continue
+  fi
+  echo "  developers:x:1002:"
+  echo "  qa:x:1100:"
+  echo "  docker:x:1050:"
+  echo "  devops:x:1200:"
+  echo
 
-    echo "  Step 4: Create a group 'qa' with a password entry placeholder."
-    read -p "  root@lab155:~# " cmd4
-    echo
-    [[ "$cmd4" != "groupadd -p x qa" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  Group 'qa' created with an encrypted password placeholder."
-    echo
+  print_success "Nice work."
+  print_info "You created project groups with required GID standards and verified them via NSS."
+  print_info "You earned $LAB_XP XP for completing this lab."
+  award_xp $LAB_XP
 
-    echo "  Step 5: Create a group 'research' with a non-default group ID 1100."
-    read -p "  root@lab155:~# " cmd5
-    echo
-    [[ "$cmd5" != "groupadd -g 1100 research" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  Group 'research' created with GID 1100."
-    echo
+  XP=$(jq '.XP' "$SAVE_JSON")
+  LEVEL=$(jq '.LEVEL' "$SAVE_JSON")
+  export XP
+  export LEVEL
+  record_lab_completion
 
-    echo "  Step 6: Attempt to create a duplicate group named 'developers'."
-    read -p "  root@lab155:~# " cmd6
-    echo
-    [[ "$cmd6" != "groupadd developers" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  groupadd: group 'developers' already exists"
-    echo
-
-    echo "  Step 7: Create a group 'finance' with a specific unique GID 1101."
-    read -p "  root@lab155:~# " cmd7
-    echo
-    [[ "$cmd7" != "groupadd -g 1101 finance" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  Group 'finance' created with GID 1101."
-    echo
-
-    echo "  Step 8: Create a group 'devops' with GID 1200."
-    read -p "  root@lab155:~# " cmd8
-    echo
-    [[ "$cmd8" != "groupadd -g 1200 devops" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  Group 'devops' created with GID 1200."
-    echo
-
-    echo "  Step 9: Create a group 'testers' as a system group with specific GID 999."
-    read -p "  root@lab155:~# " cmd9
-    echo
-    [[ "$cmd9" != "groupadd -r -g 999 testers" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  System group 'testers' created with GID 999."
-    echo
-
-    echo "  Step 10: Verify the group 'developers' entry in /etc/group."
-    read -p "  root@lab155:~# " cmd10
-    echo
-    [[ "$cmd10" != "getent group developers" ]] && {
-        print_error "Incorrect. Try again."
-        read -p "Press Enter to try again..." _
-        continue
-    }
-    echo "  developers:x:1002:satoshi"
-    echo
-
-    print_success "Nice work!"
-    print_info "You earned $LAB_XP XP for completing this lab."
-    award_xp $LAB_XP
-    XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
-    record_lab_completion
-
-    completion_count=$(get_lab_completion_count)
-    echo
-    print_info "You've successfully completed this lab $completion_count time(s)."
-    echo
-    center_text "Would you like to:"
-    center_text "1) Retry this lab"
-    center_text "2) Return to Sysadmin Lab Menu"
-    echo
-    read -p "  > " post_choice
-    [[ "$post_choice" == "2" ]] && exit 0
+  completion_count=$(get_lab_completion_count)
+  echo
+  print_info "You've successfully completed this lab $completion_count time(s)."
+  echo
+  center_text "Would you like to:"
+  center_text "1) Retry this lab"
+  center_text "2) Return to Sysadmin Lab Menu"
+  echo
+  read -r -p "  > " post_choice
+  [[ "$post_choice" == "2" ]] && exit 0
 done

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Lab 79: Managing Time with timedatectl
+# Lab 78: Managing Time with timedatectl
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"

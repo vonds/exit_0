@@ -29,8 +29,6 @@ get_lab_completion_count() {
     jq -r --arg lab "$LAB_ID" '.[$lab] // 0' "$LAB_TRACK_FILE"
 }
 
-SERVICE_NAME="ssh"
-
 while true; do
     draw_lab_ui
     center_title "$LAB_NAME"
@@ -68,11 +66,11 @@ while true; do
     echo "  ... (truncated)"
     echo
 
-    echo "  Step 3: Check the status of the '$SERVICE_NAME' service."
+    echo "  Step 3: Check the status of the 'ssh' service."
     read -p "  lab@lpic-lab36:~\$ " cmd3
     echo
-    [[ "$cmd3" != "systemctl status $SERVICE_NAME" ]] && {
-        print_error "Incorrect. Use: systemctl status $SERVICE_NAME"
+    [[ "$cmd3" != "systemctl status ssh" ]] && {
+        print_error "Incorrect. Use: systemctl status ssh"
         read -p "Press Enter to try again..." _
         continue
     }
@@ -83,15 +81,15 @@ while true; do
     echo "           man:sshd_config(5)"
     echo
 
-    echo "  Step 4: Restart the '$SERVICE_NAME' service."
+    echo "  Step 4: Restart the 'ssh' service."
     read -p "  lab@lpic-lab36:~\$ " cmd4
     echo
-    [[ "$cmd4" != "sudo systemctl restart $SERVICE_NAME" && "$cmd4" != "systemctl restart $SERVICE_NAME" ]] && {
-        print_error "Incorrect. Use: systemctl restart $SERVICE_NAME"
+    [[ "$cmd4" != "sudo systemctl restart ssh" && "$cmd4" != "systemctl restart ssh" ]] && {
+        print_error "Incorrect. Use: systemctl restart ssh"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  Service '$SERVICE_NAME' restarted successfully."
+    echo "  Service 'ssh' restarted successfully."
     echo
 
     echo "  Step 5: Disable a service from starting on boot. Disable 'apache2'."

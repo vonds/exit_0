@@ -1,19 +1,19 @@
 #!/bin/bash
 
-# Lab 150: RHCSA useradd — Defaults + Realistic Provisioning Workflow
+# Lab 140: RHCSA useradd — Defaults + Realistic Provisioning Workflow
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab 150: RHCSA useradd — Defaults + Realistic Provisioning Workflow"
-LAB_ID="lab150"
+LAB_NAME="Lab 140: RHCSA useradd — Defaults + Realistic Provisioning Workflow"
+LAB_ID="lab140"
 LAB_XP=20000
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
 [ ! -f "$LAB_TRACK_FILE" ] && echo '{}' > "$LAB_TRACK_FILE"
 
-PROMPT="  lab@lab150:~$ "
+PROMPT="  lab@lab140:~$ "
 
 record_lab_completion() {
     tmpfile=$(mktemp)
@@ -35,7 +35,7 @@ while true; do
     center_title "$LAB_NAME"
     echo
     center_text "Scenario:"
-    center_text "Ticket INC-150: Onboard a contractor account (satoshi) for a short change window."
+    center_text "Ticket INC-140: Onboard a contractor account (satoshi) for a short change window."
     center_text "Requirements:"
     center_text "- UID 1055, home /home/satoshi, shell /bin/bash"
     center_text "- Primary group developers, supplementary groups wheel,docker"
