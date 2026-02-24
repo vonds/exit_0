@@ -78,7 +78,7 @@ main_lab_menu() {
       1)
         while true; do
           echo
-          center_menu "     Enter a lab number (example: 148)"
+          center_menu "     Enter a lab number (example: 1, 16, or 148)"
           center_menu "     Or type 'b' to go back."
           echo
 
