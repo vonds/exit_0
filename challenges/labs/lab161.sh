@@ -150,8 +150,6 @@ while true; do
     read -r -p "Press Enter to try again..." _
     continue
   fi
-  echo "  (removed)"
-  echo
 
   print_success "Nice work."
   print_info "You added a Dockerfile HEALTHCHECK, ran the container, and verified it self-reports as healthy via docker ps."

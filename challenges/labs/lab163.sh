@@ -7,7 +7,7 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab Security 1: Flatpak Trust, Remotes & Permissions (1)"
+LAB_NAME="Lab 163: Flatpak Trust, Remotes & Permissions (1)"
 LAB_ID="lab163"
 LAB_XP=28600
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
