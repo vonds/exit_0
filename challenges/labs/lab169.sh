@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Lab 21b: SSH Host Security & Key-Based Auth
+# Lab 169: SSH Host Security & Key-Based Auth
 
 # Dynamically locate root directory and source core scripts
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -8,8 +8,8 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab 21b: SSH Host Security & Key-Based Auth"
-LAB_ID="lab21b"
+LAB_NAME="Lab 169: SSH Host Security & Key-Based Auth"
+LAB_ID="lab169"
 LAB_XP=3200
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
 
@@ -70,9 +70,6 @@ while true; do
         continue
     fi
 
-    echo "  Key copied successfully. Alice can now log in without a password."
-    echo
-
     echo "  Step 3: What sshd_config option disables root logins?"
     read -p "  lab@lpic-lab21b:~$ > " cmd3
     echo
@@ -83,9 +80,6 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-
-    echo "  Root logins disabled."
-    echo
 
     echo "  Step 4: What sshd_config options disable password logins and allow only user alice?"
     read -p "  lab@lpic-lab21b:~$ > " cmd4
@@ -98,22 +92,16 @@ while true; do
         continue
     fi
 
-    echo "  Password authentication disabled, only alice allowed."
-    echo
-
-    echo "  Step 5: What commands set SSH port 2222, reload sshd, and verify PermitRootLogin?"
+    echo "  Step 5: Reload sshd"
     read -p "  lab@lpic-lab21b:~$ > " cmd5
     echo
 
-    if [[ "$cmd5" != "Port 2222" && "$cmd5" != "sudo systemctl reload sshd" && "$cmd5" != "sshd -T | grep permitrootlogin" ]]; then
+    if [[ "$cmd5" != "sudo systemctl reload sshd" ]]; then
         print_error "Expected sequence: Port 2222, then sudo systemctl reload sshd, then sshd -T | grep permitrootlogin"
         echo
         read -p "Press Enter to try again..." _
         continue
     fi
-
-    echo "  Port set to 2222, sshd reloaded, verified permitrootlogin=no."
-    echo
 
     print_success "Excellent!"
     print_info "You configured SSH for key-only access, disabled root and password logins,"
