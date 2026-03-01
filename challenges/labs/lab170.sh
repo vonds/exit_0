@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Lab 170: APT & dpkg Open-Ended Commands
+# Lab 170: Practical Local Accounts with Ansible (No Directory Sync)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab 170: APT & dpkg Open-Ended Commands"
+LAB_NAME="Lab 170: Practical Local Accounts with Ansible"
 LAB_ID="lab170"
 LAB_XP=42000
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
@@ -15,263 +15,231 @@ LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
 
 record_lab_completion() {
     tmpfile=$(mktemp)
-    jq --arg lab "$LAB_ID" '.[$lab] += 1 // 1' "$LAB_TRACK_FILE" > "$tmpfile" && mv "$tmpfile" "$LAB_TRACK_FILE"
+    jq --arg lab "$LAB_ID" '.[$lab] = ((.[$lab] // 0) + 1)' "$LAB_TRACK_FILE" > "$tmpfile" && mv "$tmpfile" "$LAB_TRACK_FILE"
 }
+
 get_lab_completion_count() {
     jq -r --arg lab "$LAB_ID" '.[$lab] // 0' "$LAB_TRACK_FILE"
 }
+
 draw_lab_ui() {
     clear
     center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
     center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
-    echo; echo; echo
+    echo
+    echo
 }
+
+PROMPT="  lab@lab170:~$ "
 
 while true; do
     draw_lab_ui
     center_title "$LAB_NAME"
     echo
-    center_text "Practice core APT and dpkg commands (one-line, open-ended inputs)."
+    center_text "Scenario: Instead of building LDAP/AD sync for external servers,"
+    center_text "you manage local accounts consistently using Ansible."
     echo
     center_text "Press Enter to begin the lab..."
     read _
 
     draw_lab_ui
-    echo "  Step 1: Update the local APT package index from configured repositories."
-    read -p "  lab@lab170:~$ " cmd1
+
+    echo "  Step 1: Confirm Ansible is installed and show the version."
+    read -p "$PROMPT" cmd1
     echo
-    if [[ "$cmd1" != "apt-get update" && "$cmd1" != "apt update" ]]; then
+    if [[ "$cmd1" != "ansible --version" ]]; then
         print_error "Incorrect. Try again."
+        print_info "Expected: ansible --version"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Hit:1 http://deb.debian.org/debian bookworm InRelease"
-    echo "  Get:2 http://security.debian.org/debian-security bookworm-security InRelease [48.0 kB]"
-    echo "  Fetched 48.0 kB in 1s (52.3 kB/s)"
-    echo "  Reading package lists... Done"
+    echo "  ansible [core 2.16.3]"
+    echo "  python version = 3.11.2"
+    echo "  jinja version = 3.1.2"
+    echo "  libyaml = True"
     echo
 
-    echo "  Step 2: Install the package 'htop' from repositories (dependency-resolving)."
-    read -p "  lab@lab170:~$ " cmd2
+    echo "  Step 2: Create a minimal inventory file named hosts.ini."
+    echo "          Use an editor (nano/vim/vi) or redirect with cat."
+    read -p "$PROMPT" cmd2
     echo
-    if [[ "$cmd2" != "apt-get install htop" && "$cmd2" != "apt install htop" && "$cmd2" != "apt-get install -y htop" && "$cmd2" != "apt install -y htop" ]]; then
-        print_error "Incorrect. Try again. (Use apt-get install htop or apt install htop)"
+    if [[ "$cmd2" != "nano hosts.ini" && "$cmd2" != "vim hosts.ini" && "$cmd2" != "vi hosts.ini" && "$cmd2" != "cat > hosts.ini" ]]; then
+        print_error "Incorrect. Try again."
+        print_info "Expected: nano hosts.ini  (or vim/vi hosts.ini, or cat > hosts.ini)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Reading package lists... Done"
-    echo "  Building dependency tree... Done"
-    echo "  Reading state information... Done"
-    echo "  The following NEW packages will be installed:"
-    echo "    htop"
-    echo "  0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded."
-    echo "  Need to get 100 kB of archives."
-    echo "  After this operation, 300 kB of additional disk space will be used."
-    echo "  Do you want to continue? [Y/n] y"
-    echo "  Get:1 http://deb.debian.org/debian bookworm/main amd64 htop amd64 3.2.2-1 [100 kB]"
-    echo "  Fetched 100 kB in 0s (420 kB/s)"
-    echo "  Selecting previously unselected package htop."
-    echo "  (Reading database ... 120000 files and directories currently installed.)"
-    echo "  Preparing to unpack .../archives/htop_3.2.2-1_amd64.deb ..."
-    echo "  Unpacking htop (3.2.2-1) ..."
-    echo "  Setting up htop (3.2.2-1) ..."
-    echo "  Processing triggers for man-db (2.11.2-2) ..."
+
+    echo "  Step 3: Test connectivity to all hosts with the ping module."
+    read -p "$PROMPT" cmd3
+    echo
+    if [[ "$cmd3" != "ansible all -i hosts.ini -m ping" && "$cmd3" != "ansible -i hosts.ini all -m ping" ]]; then
+        print_error "Incorrect. Try again."
+        print_info "Expected: ansible all -i hosts.ini -m ping"
+        read -p "Press Enter to try again..." _
+        continue
+    fi
+    echo "  ext1 | SUCCESS => {\"changed\": false, \"ping\": \"pong\"}"
+    echo "  ext2 | SUCCESS => {\"changed\": false, \"ping\": \"pong\"}"
     echo
 
-    echo "  Step 3: Remove the package 'htop' using APT."
-    read -p "  lab@lab170:~$ " cmd3
+    echo "  Step 4: Create a playbook named users.yml to manage local users and groups."
+    read -p "$PROMPT" cmd4
     echo
-    if [[ "$cmd3" != "apt-get remove htop" && "$cmd3" != "apt remove htop" && "$cmd3" != "apt-get remove -y htop" && "$cmd3" != "apt remove -y htop" ]]; then
-        print_error "Incorrect. Try again. (Use apt-get remove htop or apt remove htop)"
+    if [[ "$cmd4" != "nano users.yml" && "$cmd4" != "vim users.yml" && "$cmd4" != "vi users.yml" && "$cmd4" != "cat > users.yml" ]]; then
+        print_error "Incorrect. Try again."
+        print_info "Expected: nano users.yml  (or vim/vi users.yml, or cat > users.yml)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Reading package lists... Done"
-    echo "  Building dependency tree... Done"
-    echo "  Reading state information... Done"
-    echo "  The following packages will be REMOVED:"
-    echo "    htop"
-    echo "  0 upgraded, 0 newly installed, 1 to remove and 0 not upgraded."
-    echo "  After this operation, 300 kB disk space will be freed."
-    echo "  Do you want to continue? [Y/n] y"
-    echo "  (Reading database ... 120050 files and directories currently installed.)"
-    echo "  Removing htop (3.2.2-1) ..."
-    echo "  Processing triggers for man-db (2.11.2-2) ..."
+
+    echo "  --- users.yml ---"
+    echo "  ---"
+    echo "  - name: Manage local users on external systems"
+    echo "    hosts: external"
+    echo "    become: true"
+    echo
+    echo "    tasks:"
+    echo "      - name: Ensure ops group exists"
+    echo "        group:"
+    echo "          name: ops"
+    echo "          state: present"
+    echo
+    echo "      - name: Ensure dev1 user exists"
+    echo "        user:"
+    echo "          name: dev1"
+    echo "          groups: ops"
+    echo "          append: yes"
+    echo "          shell: /bin/bash"
+    echo "          state: present"
+    echo "          create_home: yes"
+    echo
+    echo "      - name: Ensure dev2 user exists"
+    echo "        user:"
+    echo "          name: dev2"
+    echo "          groups: ops"
+    echo "          append: yes"
+    echo "          shell: /bin/bash"
+    echo "          state: present"
+    echo "          create_home: yes"
     echo
 
-    echo "  Step 4: Show metadata/details for the package 'htop' using APT."
-    read -p "  lab@lab170:~$ " cmd4
+    echo "  Step 5: Syntax-check the playbook."
+    read -p "$PROMPT" cmd5
     echo
-    if [[ "$cmd4" != "apt-cache show htop" && "$cmd4" != "apt show htop" ]]; then
-        print_error "Incorrect. Try again. (Use apt-cache show htop or apt show htop)"
+    if [[ "$cmd5" != "ansible-playbook -i hosts.ini users.yml --syntax-check" && \
+          "$cmd5" != "ansible-playbook --syntax-check -i hosts.ini users.yml" ]]; then
+        print_error "Incorrect. Try again."
+        print_info "Expected: ansible-playbook -i hosts.ini users.yml --syntax-check"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Package: htop"
-    echo "  Version: 3.2.2-1"
-    echo "  Architecture: amd64"
-    echo "  Maintainer: Debian QA Group <packages@qa.debian.org>"
-    echo "  Depends: libc6 (>= 2.34), libncursesw6 (>= 6), libtinfo6 (>= 6)"
-    echo "  Description: interactive processes viewer"
-    echo "   htop is an ncurses-based process viewer for Linux. It aims to be a better 'top'."
+    echo "  playbook: users.yml"
     echo
 
-    echo "  Step 5: Search the APT cache for packages related to 'zsh'."
-    read -p "  lab@lab170:~$ " cmd5
+    echo "  Step 6: Run the playbook using privilege escalation."
+    read -p "$PROMPT" cmd6
     echo
-    if [[ "$cmd5" != "apt-cache search zsh" && "$cmd5" != "apt search zsh" ]]; then
-        print_error "Incorrect. Try again. (Use apt-cache search zsh or apt search zsh)"
+    if [[ "$cmd6" != "ansible-playbook -i hosts.ini users.yml -b" && \
+          "$cmd6" != "ansible-playbook -i hosts.ini users.yml --become" && \
+          "$cmd6" != "sudo ansible-playbook -i hosts.ini users.yml" ]]; then
+        print_error "Incorrect. Try again."
+        print_info "Expected: ansible-playbook -i hosts.ini users.yml -b"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  zsh - shell with lots of features"
-    echo "  zsh-common - architecture independent files for Zsh"
-    echo "  zsh-doc - Zsh documentation"
-    echo "  zsh-autosuggestions - Fish-like autosuggestions for Zsh"
+    echo "  PLAY [external] ********************************************************************"
+    echo
+    echo "  TASK [Gathering Facts] **************************************************************"
+    echo "  ok: [ext1]"
+    echo "  ok: [ext2]"
+    echo
+    echo "  TASK [Ensure ops group exists] ******************************************************"
+    echo "  changed: [ext1]"
+    echo "  changed: [ext2]"
+    echo
+    echo "  TASK [Ensure dev1 exists] ***********************************************************"
+    echo "  changed: [ext1]"
+    echo "  changed: [ext2]"
+    echo
+    echo "  TASK [Ensure dev2 exists] ***********************************************************"
+    echo "  changed: [ext1]"
+    echo "  changed: [ext2]"
+    echo
+    echo "  TASK [Ensure ops group membership] **************************************************"
+    echo "  changed: [ext1]"
+    echo "  changed: [ext2]"
+    echo
+    echo "  PLAY RECAP ***************************************************************************"
+    echo "  ext1 : ok=5 changed=4 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0"
+    echo "  ext2 : ok=5 changed=4 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0"
     echo
 
-    echo "  Step 6: Update the apt-file contents index (for file→package lookups)."
-    read -p "  lab@lab170:~$ " cmd6
+    echo "  Step 7: Re-run the playbook to confirm idempotency (should show mostly ok= and changed=0)."
+    read -p "$PROMPT" cmd7
     echo
-    if [[ "$cmd6" != "apt-file update" ]]; then
-        print_error "Incorrect. Try again. (Use apt-file update)"
+    if [[ "$cmd7" != "ansible-playbook -i hosts.ini users.yml -b" && \
+          "$cmd7" != "ansible-playbook -i hosts.ini users.yml --become" && \
+          "$cmd7" != "sudo ansible-playbook -i hosts.ini users.yml" ]]; then
+        print_error "Incorrect. Try again."
+        print_info "Expected: ansible-playbook -i hosts.ini users.yml -b"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Updating apt-file cache..."
-    echo "  Downloading indexes: done."
+    echo "  PLAY [external] ********************************************************************"
+    echo
+    echo "  TASK [Gathering Facts] **************************************************************"
+    echo "  ok: [ext1]"
+    echo "  ok: [ext2]"
+    echo
+    echo "  TASK [Ensure ops group exists] ******************************************************"
+    echo "  ok: [ext1]"
+    echo "  ok: [ext2]"
+    echo
+    echo "  TASK [Ensure dev1 exists] ***********************************************************"
+    echo "  ok: [ext1]"
+    echo "  ok: [ext2]"
+    echo
+    echo "  TASK [Ensure dev2 exists] ***********************************************************"
+    echo "  ok: [ext1]"
+    echo "  ok: [ext2]"
+    echo
+    echo "  TASK [Ensure ops group membership] **************************************************"
+    echo "  ok: [ext1]"
+    echo "  ok: [ext2]"
+    echo
+    echo "  PLAY RECAP ***************************************************************************"
+    echo "  ext1 : ok=5 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0"
+    echo "  ext2 : ok=5 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0"
     echo
 
-    echo "  Step 7: Find which package provides the path '/bin/ls' using apt-file."
-    read -p "  lab@lab170:~$ " cmd7
+    echo "  Step 8: Verify on one host that users and group exist."
+    read -p "$PROMPT" cmd8
     echo
-    if [[ "$cmd7" != "apt-file search /bin/ls" ]]; then
-        print_error "Incorrect. Try again. (Use apt-file search /bin/ls)"
+    if [[ "$cmd8" != "ansible ext1 -i hosts.ini -b -m command -a 'id dev1'" && \
+          "$cmd8" != "ansible ext1 -i hosts.ini --become -m command -a 'id dev1'" && \
+          "$cmd8" != "ansible ext2 -i hosts.ini -b -m command -a 'getent group ops'" && \
+          "$cmd8" != "ansible ext2 -i hosts.ini --become -m command -a 'getent group ops'" ]]; then
+        print_error "Incorrect. Try again."
+        print_info "Expected one of the example ad-hoc commands."
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  coreutils: /bin/ls"
-    echo
-
-    echo "  Step 8: List the contents of the package 'bash' (works even if not installed)."
-    read -p "  lab@lab170:~$ " cmd8
-    echo
-    if [[ "$cmd8" != "apt-file list bash" ]]; then
-        print_error "Incorrect. Try again. (Use apt-file list bash)"
-        read -p "Press Enter to try again..." _
-        continue
+    if [[ "$cmd8" == *"id dev1"* ]]; then
+        echo "  ext1 | CHANGED | rc=0 >>"
+        echo "  uid=1001(dev1) gid=1001(dev1) groups=1001(dev1),1003(ops)"
+    else
+        echo "  ext2 | CHANGED | rc=0 >>"
+        echo "  ops:x:1003:dev1,dev2"
     fi
-    echo "  bash: /bin/bash"
-    echo "  bash: /etc/skel/.bashrc"
-    echo "  bash: /usr/share/doc/bash/changelog.Debian.gz"
-    echo "  bash: /usr/share/man/man1/bash.1.gz"
-    echo
-
-    echo "  Step 9: Install a local Debian package at '/tmp/sample.deb' with the low-level tool."
-    read -p "  lab@lab170:~$ " cmd9
-    echo
-    if [[ "$cmd9" != "dpkg -i /tmp/sample.deb" ]]; then
-        print_error "Incorrect. Try again. (Use dpkg -i /tmp/sample.deb)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  (Reading database ... 120100 files and directories currently installed.)"
-    echo "  Preparing to unpack /tmp/sample.deb ..."
-    echo "  Unpacking sample (1.0-1) over (none) ..."
-    echo "  Setting up sample (1.0-1) ..."
-    echo "  Processing triggers for man-db (2.11.2-2) ..."
-    echo
-
-    echo "  Step 10: Remove the package 'htop' with the low-level tool."
-    read -p "  lab@lab170:~$ " cmd10
-    echo
-    if [[ "$cmd10" != "dpkg -r htop" ]]; then
-        print_error "Incorrect. Try again. (Use dpkg -r htop)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  (Reading database ... 120120 files and directories currently installed.)"
-    echo "  Removing htop (3.2.2-1) ..."
-    echo "  Processing triggers for man-db (2.11.2-2) ..."
-    echo
-
-    echo "  Step 11: Inspect the local archive '/tmp/sample.deb' to view metadata and dependencies."
-    read -p "  lab@lab170:~$ " cmd11
-    echo
-    if [[ "$cmd11" != "dpkg -I /tmp/sample.deb" ]]; then
-        print_error "Incorrect. Try again. (Use dpkg -I /tmp/sample.deb)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "   new Debian package, version 2.0."
-    echo "   size 12345 bytes: control archive=tar.xz."
-    echo "  Package: sample"
-    echo "  Version: 1.0-1"
-    echo "  Architecture: amd64"
-    echo "  Depends: libc6 (>= 2.34)"
-    echo "  Maintainer: Example Maintainer <maint@example.com>"
-    echo "  Description: Sample package for lab"
-    echo "   A simple package used for demonstration and testing in Lab 170."
-    echo
-
-    echo "  Step 12: List all packages and their selection states on this system with the low-level tool."
-    read -p "  lab@lab170:~$ " cmd12
-    echo
-    if [[ "$cmd12" != "dpkg --get-selections" ]]; then
-        print_error "Incorrect. Try again. (Use dpkg --get-selections)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  adduser                                   install"
-    echo "  apt                                       install"
-    echo "  bash                                      install"
-    echo "  coreutils                                 install"
-    echo "  htop                                      deinstall"
-    echo
-
-    echo "  Step 13: List every file installed by the package 'bash' (installed package → files)."
-    read -p "  lab@lab170:~$ " cmd13
-    echo
-    if [[ "$cmd13" != "dpkg -L bash" ]]; then
-        print_error "Incorrect. Try again. (Use dpkg -L bash)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  /."
-    echo "  /bin"
-    echo "  /bin/bash"
-    echo "  /etc/skel/.bashrc"
-    echo "  /usr/share/doc/bash/changelog.Debian.gz"
-    echo "  /usr/share/man/man1/bash.1.gz"
-    echo
-
-    echo "  Step 14: Given the path '/bin/ls', show which installed package owns that file."
-    read -p "  lab@lab170:~$ " cmd14
-    echo
-    if [[ "$cmd14" != "dpkg -S /bin/ls" && "$cmd14" != "dpkg-query -S /bin/ls" ]]; then
-        print_error "Incorrect. Try again. (Use dpkg -S /bin/ls or dpkg-query -S /bin/ls)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  coreutils: /bin/ls"
-    echo
-
-    echo "  Step 15: Re-run configuration for the package 'tzdata'."
-    read -p "  lab@lab170:~$ " cmd15
-    echo
-    if [[ "$cmd15" != "dpkg-reconfigure tzdata" ]]; then
-        print_error "Incorrect. Try again. (Use dpkg-reconfigure tzdata)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  Current default time zone: 'Etc/UTC'"
-    echo "  Local time is now:      Sun Sep 14 12:34:56 UTC 2025."
-    echo "  Universal Time is now:  Sun Sep 14 12:34:56 UTC 2025."
     echo
 
     print_success "Nice work!"
+    print_info "You built an inventory, validated connectivity, wrote a user-management playbook,"
+    print_info "ran it with privilege escalation, and confirmed idempotency."
     print_info "You earned $LAB_XP XP for completing this lab."
     award_xp $LAB_XP
+
     XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
     record_lab_completion
 
