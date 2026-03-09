@@ -1,13 +1,15 @@
 #!/bin/bash
 
-# Lab 176: GRUB Rescue → Normal Boot (set root/prefix, insmod normal, normal/configfile)
+# Lab 176: firewalld — Publish HTTPS and Allow App Port
+# SAFETY: This lab is simulated. It only validates typed commands and prints canned outputs.
+#         No real firewall changes are made on your system.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab 176: GRUB Rescue → Normal Boot"
+LAB_NAME="Lab 176: firewalld — Publish HTTPS and Allow App Port"
 LAB_ID="lab176"
 LAB_XP=50000
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
@@ -24,174 +26,143 @@ draw_lab_ui() {
     clear
     center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
     center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
-    echo; echo; echo
+    echo
+    echo
+    echo
 }
 
 while true; do
     draw_lab_ui
     center_title "$LAB_NAME"
     echo
-    center_text "Scenario: System dropped to 'grub rescue>' due to a bad prefix/boot path."
-    center_text "Goal: Find the right partition, set root/prefix, load 'normal', and boot."
+    center_text "Scenario: A web application is moving into production."
+    center_text "You need to verify firewalld, confirm the active zone,"
+    center_text "then allow HTTPS and TCP/8443 for the application."
     echo
     center_text "Press Enter to begin the lab..."
     read _
 
-    # --- In GRUB rescue mode ---
     draw_lab_ui
-    echo "  You are at the minimal GRUB environment:"
-    echo "  grub rescue> "
+    echo "  Step 1: Confirm that firewalld is running."
+    read -p "  lab@lab176:~$ " cmd1
     echo
-
-    echo "  Step 1: List available disks/partitions."
-    read -p "  grub rescue> " cmd1
-    echo
-    if [[ "$cmd1" != "ls" ]]; then
-        print_error "Incorrect. Try again. (Use: ls)"
+    if [[ "$cmd1" != "systemctl status firewalld" ]]; then
+        print_error "Incorrect. Try again. (Use: systemctl status firewalld)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  (hd0) (hd0,gpt1) (hd0,gpt2) (hd1) (hd1,gpt1)"
+    echo "  ● firewalld.service - firewalld - dynamic firewall daemon"
+    echo "       Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; preset: enabled)"
+    echo "       Active: active (running) since Tue 2026-03-03 08:14:19 EST; 2h 11min ago"
+    echo "         Docs: man:firewalld(1)"
+    echo "     Main PID: 812 (firewalld)"
+    echo "        Tasks: 2 (limit: 23156)"
+    echo "       Memory: 31.4M"
+    echo "          CPU: 1.203s"
+    echo "       CGroup: /system.slice/firewalld.service"
+    echo "               └─812 /usr/bin/python3 -s /usr/sbin/firewalld --nofork --nopid"
     echo
 
-    echo "  Step 2: Probe a candidate partition (expect failure)."
-    echo "          (Try listing the root of (hd0,gpt1).)"
-    read -p "  grub rescue> " cmd2
+    echo "  Step 2: Identify the active zone."
+    read -p "  lab@lab176:~$ " cmd2
     echo
-    if [[ "$cmd2" != "ls (hd0,gpt1)/" ]]; then
-        print_error "Incorrect. Try again. (Use: ls (hd0,gpt1)/ )"
+    if [[ "$cmd2" != "firewall-cmd --get-active-zones" ]]; then
+        print_error "Incorrect. Try again. (Use: firewall-cmd --get-active-zones)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Filesystem is unknown."
+    echo "  public"
+    echo "    interfaces: ens160"
     echo
 
-    echo "  Step 3: Probe the next partition and look for /boot/grub2."
-    read -p "  grub rescue> " cmd3
+    echo "  Step 3: Review the current rules in the public zone."
+    read -p "  lab@lab176:~$ " cmd3
     echo
-    if [[ "$cmd3" != "ls (hd0,gpt2)/" ]]; then
-        print_error "Incorrect. Try again. (Use: ls (hd0,gpt2)/ )"
+    if [[ "$cmd3" != "firewall-cmd --zone=public --list-all" ]]; then
+        print_error "Incorrect. Try again. (Use: firewall-cmd --zone=public --list-all)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  ./  ../  boot/  etc/  lost+found/  usr/  var/"
+    echo "  public (active)"
+    echo "    target: default"
+    echo "    icmp-block-inversion: no"
+    echo "    interfaces: ens160"
+    echo "    sources:"
+    echo "    services: cockpit dhcpv6-client ssh"
+    echo "    ports:"
+    echo "    protocols:"
+    echo "    forward: no"
+    echo "    masquerade: no"
+    echo "    forward-ports:"
+    echo "    source-ports:"
+    echo "    icmp-blocks:"
+    echo "    rich rules:"
     echo
 
-    echo "  Step 4: Confirm GRUB assets exist."
-    read -p "  grub rescue> " cmd4
+    echo "  Step 4: Permanently allow HTTPS in the public zone."
+    read -p "  lab@lab176:~$ " cmd4
     echo
-    if [[ "$cmd4" != "ls (hd0,gpt2)/boot/grub2" && "$cmd4" != "ls (hd0,gpt2)/boot/grub2/" ]]; then
-        print_error "Incorrect. Try again. (Use: ls (hd0,gpt2)/boot/grub2 )"
+    if [[ "$cmd4" != "firewall-cmd --permanent --zone=public --add-service=https" ]]; then
+        print_error "Incorrect. Try again. (Use: firewall-cmd --permanent --zone=public --add-service=https)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  grub.cfg  fonts/  locale/  themes/  x86_64-efi/  i386-pc/  modules/"
+    echo "  success"
     echo
 
-    echo "  Step 5: Set GRUB's root to the discovered partition."
-    read -p "  grub rescue> " cmd5
+    echo "  Step 5: Permanently allow the application listener on TCP/8443."
+    read -p "  lab@lab176:~$ " cmd5
     echo
-    if [[ "$cmd5" != "set root=(hd0,gpt2)" ]]; then
-        print_error "Incorrect. Try again. (Use: set root=(hd0,gpt2))"
+    if [[ "$cmd5" != "firewall-cmd --permanent --zone=public --add-port=8443/tcp" ]]; then
+        print_error "Incorrect. Try again. (Use: firewall-cmd --permanent --zone=public --add-port=8443/tcp)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    # (no output on success)
+    echo "  success"
     echo
 
-    echo "  Step 6: Set the prefix to the GRUB directory."
-    read -p "  grub rescue> " cmd6
+    echo "  Step 6: Reload firewalld so the permanent changes become active."
+    read -p "  lab@lab176:~$ " cmd6
     echo
-    if [[ "$cmd6" != "set prefix=(hd0,gpt2)/boot/grub2" ]]; then
-        print_error "Incorrect. Try again. (Use: set prefix=(hd0,gpt2)/boot/grub2)"
+    if [[ "$cmd6" != "firewall-cmd --reload" ]]; then
+        print_error "Incorrect. Try again. (Use: firewall-cmd --reload)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    # (no output on success)
+    echo "  success"
     echo
 
-    echo "  Step 7: Load the 'normal' module."
-    read -p "  grub rescue> " cmd7
+    echo "  Step 7: Verify the public zone now includes HTTPS and port 8443/tcp."
+    read -p "  lab@lab176:~$ " cmd7
     echo
-    if [[ "$cmd7" != "insmod normal" ]]; then
-        print_error "Incorrect. Try again. (Use: insmod normal)"
+    if [[ "$cmd7" != "firewall-cmd --zone=public --list-all" ]]; then
+        print_error "Incorrect. Try again. (Use: firewall-cmd --zone=public --list-all)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    # (no output on success)
-    echo
-
-    echo "  Step 8: (Optional) Verify your variables."
-    read -p "  grub rescue> " cmd8
-    echo
-    if [[ "$cmd8" != "set" ]]; then
-        print_error "Incorrect. Try again. (Use: set)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  prefix=(hd0,gpt2)/boot/grub2"
-    echo "  root=(hd0,gpt2)"
-    echo
-
-    echo "  Step 9: Switch from rescue to the full GRUB menu."
-    read -p "  grub rescue> " cmd9
-    echo
-    if [[ "$cmd9" != "normal" ]]; then
-        print_error "Incorrect. Try again. (Use: normal)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  GRUB menu loaded (simulated). Use arrow keys to select, Enter to boot."
-    echo "  Example entries:"
-    echo "    * Red Hat Enterprise Linux (KERNEL-<VERSION>)"
-    echo "      Advanced options for Red Hat Enterprise Linux"
-    echo
-
-    echo "  Step 10: Practice the alternate method: open GRUB console and load the config directly."
-    echo "           (First, open the GRUB command line.)"
-    read -p "  grub> " cmd10
-    echo
-    if [[ "$cmd10" != "configfile (hd0,gpt2)/boot/grub2/grub.cfg" && "$cmd10" != "configfile (hd0,gpt2)/boot/grub2/grub.cfg " ]]; then
-        print_error "Incorrect. Try again. (Use: configfile (hd0,gpt2)/boot/grub2/grub.cfg)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  Loading configuration file..."
-    echo "  GRUB menu reloaded (simulated)."
-    echo
-
-    echo "  Step 11: Boot the default entry."
-    echo "           (Simulate by typing: Enter)"
-    read -p "  grub menu> " cmd11
-    echo
-    if [[ "$cmd11" != "Enter" && "$cmd11" != "enter" ]]; then
-        print_error "Incorrect. Try again. (Type: Enter)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  Loading Linux kernel ..."
-    echo "  Loading initial ramdisk ..."
-    echo "  Boot successful (simulated)."
-    echo
-
-    echo "  Step 12: (After boot) Optionally regenerate the GRUB config to prevent recurrence."
-    read -p "  lab@lab176:~$ " cmd12
-    echo
-    if [[ "$cmd12" != "grub2-mkconfig -o /boot/grub2/grub.cfg" ]]; then
-        print_error "Incorrect. Try again. (Use: grub2-mkconfig -o /boot/grub2/grub.cfg)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  Generating grub configuration file ..."
-    echo "  Found linux image: /boot/vmlinuz-<KERNEL-VERSION>"
-    echo "  Found initrd image: /boot/initramfs-<KERNEL-VERSION>.img"
-    echo "  done"
+    echo "  public (active)"
+    echo "    target: default"
+    echo "    icmp-block-inversion: no"
+    echo "    interfaces: ens160"
+    echo "    sources:"
+    echo "    services: cockpit dhcpv6-client https ssh"
+    echo "    ports: 8443/tcp"
+    echo "    protocols:"
+    echo "    forward: no"
+    echo "    masquerade: no"
+    echo "    forward-ports:"
+    echo "    source-ports:"
+    echo "    icmp-blocks:"
+    echo "    rich rules:"
     echo
 
     print_success "Nice work!"
     print_info "You earned $LAB_XP XP for completing this lab."
     award_xp $LAB_XP
-    XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
+    XP=$(jq '.XP' "$SAVE_JSON")
+    LEVEL=$(jq '.LEVEL' "$SAVE_JSON")
+    export XP
+    export LEVEL
     record_lab_completion
 
     completion_count=$(get_lab_completion_count)

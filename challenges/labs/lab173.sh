@@ -1,13 +1,12 @@
 #!/bin/bash
-
-# Lab 173: dnf Package Management
+# Lab 173: systemd Targets + Boot-Time Recovery (RHCSA High-Signal)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab 173: dnf Package Management"
+LAB_NAME="Lab 173: Systemd Targets And Boot Recovery"
 LAB_ID="lab173"
 LAB_XP=20000
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
@@ -31,279 +30,148 @@ while true; do
     draw_lab_ui
     center_title "$LAB_NAME"
     echo
-    center_text "Practice common DNF queries, installs, removals, groups, and history."
+    center_text "System boots into rescue because a critical unit failed."
+    center_text "Recover service health, restore normal boot target, and validate."
     echo
     center_text "Press Enter to begin the lab..."
     read _
 
     draw_lab_ui
-    echo "  Step 1: Show enabled repositories."
+    echo "  Step 1: Show the current default target."
     read -p "  lab@lab173:~$ " cmd1
     echo
-    if [[ "$cmd1" != "dnf repolist" && "$cmd1" != "dnf repolist --enabled" ]]; then
-        print_error "Incorrect. Try again. (Use dnf repolist or dnf repolist --enabled)"
+    if [[ "$cmd1" != "systemctl get-default" ]]; then
+        print_error "Incorrect. Try again. (Use systemctl get-default)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  repo id                           repo name                                   status"
-    echo "  fedora                            Fedora 40 - x86_64                          71,234"
-    echo "  updates                           Fedora 40 - x86_64 - Updates                12,987"
-    echo "  repolist: 84,221"
+    echo "  rescue.target"
     echo
 
-    echo "  Step 2: Check for available package updates."
+    echo "  Step 2: List failed units."
     read -p "  lab@lab173:~$ " cmd2
     echo
-    if [[ "$cmd2" != "dnf check-update" ]]; then
-        print_error "Incorrect. Try again. (Use dnf check-update)"
+    if [[ "$cmd2" != "systemctl --failed" ]]; then
+        print_error "Incorrect. Try again. (Use systemctl --failed)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Last metadata expiration check: 0:05:12 ago on Sun Sep 14 12:30:00 2025."
-    echo "  kernel.x86_64                 6.10.7-200.fc40                    updates"
-    echo "  openssl-libs.x86_64           3.2.2-4.fc40                       updates"
-    echo "  vim-enhanced.x86_64           2:9.0.XXXX-1.fc40                  updates"
+    echo "  UNIT                 LOAD   ACTIVE SUB    DESCRIPTION"
+    echo "  webapp.service       loaded failed failed Internal Web Application"
+    echo
+    echo "  LOAD   = Reflects whether the unit definition was properly loaded."
+    echo "  ACTIVE = The high-level unit activation state."
+    echo "  SUB    = The low-level unit activation state."
     echo
 
-    echo "  Step 3: Install the package 'htop'."
+    echo "  Step 3: Inspect the failure status of webapp.service."
     read -p "  lab@lab173:~$ " cmd3
     echo
-    if [[ "$cmd3" != "dnf install htop" && "$cmd3" != "dnf install -y htop" ]]; then
-        print_error "Incorrect. Try again. (Use dnf install htop)"
+    if [[ "$cmd3" != "systemctl status webapp.service" ]]; then
+        print_error "Incorrect. Try again. (Use systemctl status webapp.service)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Last metadata expiration check: 0:06:01 ago on Sun Sep 14 12:30:00 2025."
-    echo "  Dependencies resolved."
-    echo "  =============================================================================="
-    echo "   Package      Arch     Version            Repository                      Size"
-    echo "  =============================================================================="
-    echo "  Installing:"
-    echo "   htop         x86_64   3.3.0-1.fc40      fedora                          120 k"
-    echo "  Transaction Summary"
-    echo "  =============================================================================="
-    echo "  Install  1 Package"
-    echo
-    echo "  Total download size: 120 k"
-    echo "  Installed size: 320 k"
-    echo "  Is this ok [y/N]: y"
-    echo "  Downloading Packages:"
-    echo "  htop-3.3.0-1.fc40.x86_64.rpm                               120 kB/s | 120 kB  00:01"
-    echo "  Running transaction check"
-    echo "  Running transaction test"
-    echo "  Transaction test succeeded."
-    echo "  Running transaction"
-    echo "    Preparing        :                                                        1/1"
-    echo "    Installing       : htop-3.3.0-1.fc40.x86_64                               1/1"
-    echo "    Verifying        : htop-3.3.0-1.fc40.x86_64                               1/1"
-    echo
-    echo "  Installed:"
-    echo "    htop-3.3.0-1.fc40.x86_64"
+    echo "  ● webapp.service - Internal Web Application"
+    echo "     Loaded: loaded (/usr/lib/systemd/system/webapp.service; enabled)"
+    echo "     Active: failed (Result: exit-code)"
+    echo "     Process: ExecStart=/usr/bin/webapp (code=exited, status=1/FAILURE)"
     echo
 
-    echo "  Step 4: Show detailed package info for 'bash'."
+    echo "  Step 4: View recent logs and identify why it failed."
     read -p "  lab@lab173:~$ " cmd4
     echo
-    if [[ "$cmd4" != "dnf info bash" ]]; then
-        print_error "Incorrect. Try again. (Use dnf info bash)"
+    if [[ "$cmd4" != "journalctl -u webapp.service -n 30" ]]; then
+        print_error "Incorrect. Try again. (Use journalctl -u webapp.service -n 30)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Last metadata expiration check: 0:06:30 ago on Sun Sep 14 12:30:00 2025."
-    echo "  Installed Packages"
-    echo "  Name         : bash"
-    echo "  Version      : 5.2.26"
-    echo "  Release      : 1.fc40"
-    echo "  Architecture : x86_64"
-    echo "  Size         : 4.0 M"
-    echo "  Source       : bash-5.2.26-1.fc40.src.rpm"
-    echo "  Repository   : @System"
-    echo "  From repo    : fedora"
-    echo "  Summary      : The GNU Bourne Again shell"
-    echo "  License      : GPLv3+"
-    echo "  Description  : Bash is the GNU Project's shell—an sh-compatible shell with useful improvements."
+    echo "  webapp[982]: ERROR: Config file missing: /etc/webapp/webapp.conf"
+    echo "  systemd[1]: webapp.service: Main process exited, code=exited, status=1/FAILURE"
     echo
 
-    echo "  Step 5: Search for packages related to 'zsh'."
+    echo "  Step 5: Create the missing config directory and config file."
     read -p "  lab@lab173:~$ " cmd5
     echo
-    if [[ "$cmd5" != "dnf search zsh" ]]; then
-        print_error "Incorrect. Try again. (Use dnf search zsh)"
+    if [[ "$cmd5" != "mkdir -p /etc/webapp && touch /etc/webapp/webapp.conf" ]]; then
+        print_error "Incorrect. Try again. (Use mkdir -p /etc/webapp && touch /etc/webapp/webapp.conf)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Last metadata expiration check: 0:07:01 ago on Sun Sep 14 12:30:00 2025."
-    echo "  ========================= Name Exactly Matched: zsh ========================="
-    echo "  zsh.x86_64 : Powerful shell for interactive use"
-    echo "  =============================== Name Matched ================================"
-    echo "  zsh-html.noarch : HTML documentation for Zsh"
-    echo "  zsh-autosuggestions.noarch : Fish-like autosuggestions for Zsh"
-    echo
 
-    echo "  Step 6: List whether 'httpd' is installed."
+    echo "  Step 6: Restart the service and confirm it's active."
     read -p "  lab@lab173:~$ " cmd6
     echo
-    if [[ "$cmd6" != "dnf list installed httpd" ]]; then
-        print_error "Incorrect. Try again. (Use dnf list installed httpd)"
+    if [[ "$cmd6" != "systemctl restart webapp.service" ]]; then
+        print_error "Incorrect. Try again. (Use systemctl restart webapp.service)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Installed Packages"
-    echo "  httpd.x86_64                      2.4.59-1.fc40                    @updates"
-    echo
 
-    echo "  Step 7: List available packages matching 'openssl*'."
+    echo "  Step 7: Verify webapp.service is running."
     read -p "  lab@lab173:~$ " cmd7
     echo
-    if [[ "$cmd7" != "dnf list available 'openssl*'" && "$cmd7" != "dnf list available openssl*" ]]; then
-        print_error "Incorrect. Try again. (Use dnf list available 'openssl*')"
+    if [[ "$cmd7" != "systemctl is-active webapp.service" ]]; then
+        print_error "Incorrect. Try again. (Use systemctl is-active webapp.service)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Available Packages"
-    echo "  openssl.x86_64                    3.2.2-4.fc40                     updates"
-    echo "  openssl-libs.x86_64               3.2.2-4.fc40                     updates"
+    echo "  active"
     echo
 
-    echo "  Step 8: Identify which package provides '/bin/ls'."
+    echo "  Step 8: Reset failed state so units no longer appear failed."
     read -p "  lab@lab173:~$ " cmd8
     echo
-    if [[ "$cmd8" != "dnf provides /bin/ls" && "$cmd8" != "dnf whatprovides /bin/ls" ]]; then
-        print_error "Incorrect. Try again. (Use dnf provides /bin/ls)"
+    if [[ "$cmd8" != "systemctl reset-failed" ]]; then
+        print_error "Incorrect. Try again. (Use systemctl reset-failed)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Last metadata expiration check: 0:07:45 ago on Sun Sep 14 12:30:00 2025."
-    echo "  coreutils-9.4-2.fc40.x86_64 : A set of basic GNU tools including ls"
-    echo "  Repo        : fedora"
-    echo "  Matched from:"
-    echo "  Filename    : /bin/ls"
-    echo
 
-    echo "  Step 9: Show runtime dependencies for 'httpd'."
+    echo "  Step 9: Set the default target back to multi-user."
     read -p "  lab@lab173:~$ " cmd9
     echo
-    if [[ "$cmd9" != "dnf repoquery --requires httpd" && "$cmd9" != "dnf repoquery --qf '%{name} %{requires}' --requires httpd" ]]; then
-        print_error "Incorrect. Try again. (Use dnf repoquery --requires httpd)"
+    if [[ "$cmd9" != "systemctl set-default multi-user.target" ]]; then
+        print_error "Incorrect. Try again. (Use systemctl set-default multi-user.target)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  httpd-mmn = 20120211x8664"
-    echo "  httpd-filesystem"
-    echo "  systemd"
-    echo "  libapr-1.so.0()(64bit)"
-    echo "  libaprutil-1.so.0()(64bit)"
-    echo "  libpcre.so.1()(64bit)"
+    echo "  Removed /etc/systemd/system/default.target."
+    echo "  Created symlink /etc/systemd/system/default.target → /usr/lib/systemd/system/multi-user.target."
     echo
 
-    echo "  Step 10: Remove the package 'htop'."
+    echo "  Step 10: Switch to the multi-user target now (without reboot)."
     read -p "  lab@lab173:~$ " cmd10
     echo
-    if [[ "$cmd10" != "dnf remove htop" && "$cmd10" != "dnf remove -y htop" ]]; then
-        print_error "Incorrect. Try again. (Use dnf remove htop)"
+    if [[ "$cmd10" != "systemctl isolate multi-user.target" ]]; then
+        print_error "Incorrect. Try again. (Use systemctl isolate multi-user.target)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Dependencies resolved."
-    echo "  =============================================================================="
-    echo "   Package  Arch   Version         Repository                               Size"
-    echo "  =============================================================================="
-    echo "  Removing:"
-    echo "   htop     x86_64 3.3.0-1.fc40   @System                                  320 k"
-    echo "  Transaction Summary"
-    echo "  =============================================================================="
-    echo "  Remove  1 Package"
-    echo
-    echo "  Is this ok [y/N]: y"
-    echo "  Running transaction"
-    echo "    Preparing        :                                                        1/1"
-    echo "    Erasing          : htop-3.3.0-1.fc40.x86_64                               1/1"
-    echo "    Verifying        : htop-3.3.0-1.fc40.x86_64                               1/1"
-    echo
-    echo "  Removed:"
-    echo "    htop-3.3.0-1.fc40.x86_64"
-    echo
 
-    echo "  Step 11: Show DNF transaction history."
+    echo "  Step 11: Confirm the current default target is multi-user.target."
     read -p "  lab@lab173:~$ " cmd11
     echo
-    if [[ "$cmd11" != "dnf history" ]]; then
-        print_error "Incorrect. Try again. (Use dnf history)"
+    if [[ "$cmd11" != "systemctl get-default" ]]; then
+        print_error "Incorrect. Try again. (Use systemctl get-default)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  ID     | Command line        | Date and time         | Action(s)    | Altered"
-    echo "  --------------------------------------------------------------------------------"
-    echo "     7   | remove htop         | 2025-09-14 12:45      | Removed      |       1"
-    echo "     6   | install htop        | 2025-09-14 12:40      | Install      |       1"
-    echo "     5   | upgrade             | 2025-09-10 09:02      | Upgrade      |       4"
+    echo "  multi-user.target"
     echo
 
-    echo "  Step 12: Show details for transaction ID 6."
+    echo "  Step 12: Confirm webapp.service is enabled (will start at boot)."
     read -p "  lab@lab173:~$ " cmd12
     echo
-    if [[ "$cmd12" != "dnf history info 6" ]]; then
-        print_error "Incorrect. Try again. (Use dnf history info 6)"
+    if [[ "$cmd12" != "systemctl is-enabled webapp.service" ]]; then
+        print_error "Incorrect. Try again. (Use systemctl is-enabled webapp.service)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Transaction ID : 6"
-    echo "  Begin time     : Sun Sep 14 12:40:05 2025"
-    echo "  Command line   : install htop"
-    echo "  Packages Altered: 1"
-    echo "      Install htop-3.3.0-1.fc40.x86_64 @fedora"
-    echo "  Return-Code    : Success"
+    echo "  enabled"
     echo
 
-    echo "  Step 13: Clean all cached metadata and packages."
-    read -p "  lab@lab173:~$ " cmd13
-    echo
-    if [[ "$cmd13" != "dnf clean all" ]]; then
-        print_error "Incorrect. Try again. (Use dnf clean all)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  0 files removed"
-    echo "  Cache cleared."
-    echo
-
-    echo "  Step 14: List package groups."
-    read -p "  lab@lab173:~$ " cmd14
-    echo
-    if [[ "$cmd14" != "dnf group list" ]]; then
-        print_error "Incorrect. Try again. (Use dnf group list)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  Available Environment Groups:"
-    echo "     Minimal Install"
-    echo "     Workstation"
-    echo "  Installed Groups:"
-    echo "     Base"
-    echo "  Available Groups:"
-    echo "     Development Tools"
-    echo "     Administration Tools"
-    echo
-
-    echo "  Step 15: Show info for the 'Development Tools' group."
-    read -p "  lab@lab173:~$ " cmd15
-    echo
-    if [[ "$cmd15" != "dnf group info 'Development Tools'" && "$cmd15" != 'dnf group info "Development Tools"' && "$cmd15" != "dnf groupinfo 'Development Tools'" && "$cmd15" != 'dnf groupinfo "Development Tools"' ]]; then
-        print_error "Incorrect. Try again. (Use dnf group info 'Development Tools')"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  Group: Development Tools"
-    echo "   Description: A basic development environment."
-    echo "   Mandatory Packages:"
-    echo "     = gcc"
-    echo "     = make"
-    echo "     = automake"
-    echo "     = autoconf"
-    echo "     = kernel-headers"
-    echo
-
-    print_success "Nice work!"
+    print_success "Nice work! You recovered from rescue-mode conditions and restored normal boot."
     print_info "You earned $LAB_XP XP for completing this lab."
     award_xp $LAB_XP
     XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL

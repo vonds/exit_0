@@ -31,7 +31,7 @@ while true; do
     draw_lab_ui
     center_title "$LAB_NAME"
     echo
-    center_text "Goal: Edit GRUB temporarily (rd.break), reset root password, trigger SELinux relabel, verify."
+    center_text "Goal: Edit GRUB temporarily, reset root password, trigger SELinux relabel, verify."
     echo
     center_text "Press Enter to begin the lab..."
     read _
@@ -39,7 +39,6 @@ while true; do
     # --- Enter GRUB edit mode ---
     draw_lab_ui
     echo "  Step 1: At the GRUB menu, enter edit mode for the selected boot entry."
-    echo "          (Simulate by typing the key you would press.)"
     read -p "  lab@lab175:~$ " cmd1
     echo
     if [[ "$cmd1" != "e" && "$cmd1" != "E" ]]; then
@@ -53,7 +52,6 @@ while true; do
     echo
 
     echo "  Step 2: Append the kernel argument that breaks into the initramfs shell before switch_root."
-    echo "          (Type exactly the argument you would add to the linux line.)"
     read -p "  lab@lab175:~$ " cmd2
     echo
     if [[ "$cmd2" != "rd.break" ]]; then
@@ -61,11 +59,10 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  linux ... ro rhgb quiet rd.break     # (argument appended)"
+    echo "  linux ... ro rhgb quiet rd.break"
     echo
 
     echo "  Step 3: Boot the modified entry."
-    echo "          (Simulate by typing the key you would press to boot edited entry.)"
     read -p "  lab@lab175:~$ " cmd3
     echo
     if [[ "$cmd3" != "Ctrl+x" && "$cmd3" != "ctrl+x" && "$cmd3" != "F10" && "$cmd3" != "f10" ]]; then
@@ -98,7 +95,6 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo
 
     echo "  Step 6: Chroot into the real root filesystem."
     read -p "  dracut:/# " cmd6
@@ -135,7 +131,6 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo
 
     echo "  Step 9: Exit the chroot to return to the dracut shell."
     read -p "  sh-<MAJOR.MINOR># " cmd9
@@ -160,10 +155,10 @@ while true; do
     echo
 
     # --- First boot after reset: SELinux relabel simulation ---
-    echo "  Step 11: (Boot) SELinux is relabeling the filesystem. No action required. (simulated)"
+    echo "  Step 11: (Boot) SELinux is relabeling the filesystem. No action required."
     echo "  SELinux: Relabeling filesystem..."
     echo "  Relabeling complete."
-    echo "  System will reboot automatically. (simulated)"
+    echo "  System will reboot automatically."
     echo
 
     # --- Post-boot verification ---
@@ -175,7 +170,7 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  systemd: Filesystem relabel complete (simulated entry)"
+    echo "  systemd: Filesystem relabel complete"
     echo
 
     echo "  Step 13: Confirm the relabel marker file was consumed."
@@ -189,7 +184,7 @@ while true; do
     echo "  ls: cannot access '/.autorelabel': No such file or directory"
     echo
 
-    echo "  Step 14: Show the shadow file timestamp changed (indicative of password reset)."
+    echo "  Step 14: Show the shadow file timestamp changed."
     read -p "  lab@lab175:~$ " cmd14
     echo
     if [[ "$cmd14" != "ls -l /etc/shadow" ]]; then

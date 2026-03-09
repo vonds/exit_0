@@ -66,8 +66,6 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    # (mount success typically has no output)
-    echo
 
     echo "  Step 3: Mount the separate /boot partition inside the sysroot."
     read -p "  rescue# " cmd3
@@ -77,7 +75,7 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo
+
 
     echo "  Step 4: Bind-mount /dev into the chroot."
     read -p "  rescue# " cmd4
@@ -87,7 +85,6 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo
 
     echo "  Step 5: Bind-mount /proc and /sys into the chroot."
     read -p "  rescue# " cmd5
@@ -97,8 +94,7 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  (proc bound)"
-    echo
+
 
     echo "  Step 6: Bind-mount /sys and /run into the chroot."
     read -p "  rescue# " cmd6
@@ -108,8 +104,6 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  (sys and run bound)"
-    echo
 
     echo "  Step 7: Chroot into the installed system."
     read -p "  rescue# " cmd7
@@ -159,7 +153,7 @@ while true; do
     echo "  -rw------- 1 root root <SIZE> <DATE> /boot/grub2/grub.cfg"
     echo
 
-    echo "  Step 11: (Optional) Set the first menu entry as default for next boots."
+    echo "  Step 11: Set the first menu entry as default for next boots."
     read -p "  chroot# " cmd11
     echo
     if [[ "$cmd11" != "grub2-set-default 0" ]]; then
@@ -189,7 +183,6 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo
 
     echo "  Step 14: Unmount /boot and the root mountpoint."
     read -p "  rescue# " cmd14
@@ -199,7 +192,6 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo
 
     echo "  Step 15: Reboot to test the repaired bootloader."
     read -p "  rescue# " cmd15

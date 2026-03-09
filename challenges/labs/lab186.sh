@@ -8,7 +8,7 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab 186: Home Dir Archives (gzip & bzip2)"
+LAB_NAME="Lab 186: Home Dir Archives"
 LAB_ID="lab186"
 LAB_XP=24000
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"

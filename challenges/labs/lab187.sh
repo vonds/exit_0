@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Lab 187: Hard & Soft Links (Essential Tools) — Realistic Output Edition
-# Objective: Create hard and soft links, observe behavior after editing and removal, with simulated outputs.
+# Lab 187: Hard & Soft Links (Essential Tools) — Simulated RHCSA Edition
+# Objective: Practice hard links and symbolic links using fully simulated output.
+# NOTE: This lab is fully simulated and does not modify the real filesystem.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -14,22 +15,18 @@ LAB_XP=24000
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
 [ ! -f "$LAB_TRACK_FILE" ] && echo '{}' > "$LAB_TRACK_FILE"
 
-# Simulated constants (stable "inode" and sizes to make output coherent)
-SIM_INODE=2893475
-SIM_UID=$(id -un)
-SIM_GID=$(id -gn)
-SIM_MODE="-rw-r--r--"
-SIM_MODE_LINK="-rw-r--r--"
-SIM_MODE_SYM="lrwxrwxrwx"
-SIM_SIZE_EMPTY=0
-SIM_SIZE_AFTER_E1=8          # len("test123\n") ≈ 8
-SIM_SIZE_AFTER_E2=21         # + len("via_softlink\n") ≈ 13 -> total ~21
+SIM_LINK_COUNT=1
+SIM_SIZE=0
+SIM_CONTENT=""
+SOFTLINK_TARGET_EXISTS=1
 
 draw_lab_ui() {
     clear
     center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
     center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
-    echo; echo; echo
+    echo
+    echo
+    echo
 }
 
 record_lab_completion() {
@@ -42,19 +39,22 @@ get_lab_completion_count() {
 }
 
 while true; do
+    SIM_LINK_COUNT=1
+    SIM_SIZE=0
+    SIM_CONTENT=""
+    SOFTLINK_TARGET_EXISTS=1
+
     draw_lab_ui
     center_title "$LAB_NAME"
     echo
-    center_text "Goal: Practice creating and testing hard/soft links under /tmp."
-    center_text "Focus: ls -li to compare inode numbers and behavior after deletion."
+    center_text "Goal: Practice creating and testing hard and soft links with simulated output."
+    center_text "Focus: inode behavior, link counts, shared data, and broken symlinks."
     echo
     center_text "Press Enter to begin the lab..."
     read _
 
-    # Step 1: Create file hard1
     draw_lab_ui
-    echo "  Step 1: Create an empty file /tmp/hard1."
-    echo "          Expected: touch /tmp/hard1"
+    echo "  Step 1: Create the original file."
     read -p "  lab@lab187:~$ " cmd1
     echo
     [[ "$cmd1" != "touch /tmp/hard1" ]] && {
@@ -62,144 +62,194 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  (created /tmp/hard1)"
+
+    SIM_LINK_COUNT=1
+    SIM_SIZE=0
+    SIM_CONTENT=""
+
+    echo "  File created."
     echo
 
-    # Step 2: Create hard links
-    echo "  Step 2: Create hard links hard2 and hard3 pointing to hard1."
-    echo "          Expected: ln /tmp/hard1 /tmp/hard2 && ln /tmp/hard1 /tmp/hard3"
+    echo "  Step 2: Create a hard link named /tmp/hard2."
     read -p "  lab@lab187:~$ " cmd2
     echo
-    [[ "$cmd2" != "ln /tmp/hard1 /tmp/hard2 && ln /tmp/hard1 /tmp/hard3" ]] && {
-        print_error "Use: ln /tmp/hard1 /tmp/hard2 && ln /tmp/hard1 /tmp/hard3"
+    [[ "$cmd2" != "ln /tmp/hard1 /tmp/hard2" ]] && {
+        print_error "Use: ln /tmp/hard1 /tmp/hard2"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  (hard2 and hard3 created)"
+
+    SIM_LINK_COUNT=2
+
+    echo "  Hard link created."
     echo
 
-    # Step 3: Show inode numbers (simulate ls -li)
-    echo "  Step 3: List inode numbers of the three files to confirm they match."
-    echo "          Expected: ls -li /tmp/hard1 /tmp/hard2 /tmp/hard3"
+    echo "  Step 3: Create another hard link named /tmp/hard3."
     read -p "  lab@lab187:~$ " cmd3
     echo
-    [[ "$cmd3" != "ls -li /tmp/hard1 /tmp/hard2 /tmp/hard3" ]] && {
+    [[ "$cmd3" != "ln /tmp/hard1 /tmp/hard3" ]] && {
+        print_error "Use: ln /tmp/hard1 /tmp/hard3"
+        read -p "Press Enter to try again..." _
+        continue
+    }
+
+    SIM_LINK_COUNT=3
+
+    echo "  Hard link created."
+    echo
+
+    echo "  Step 4: List the three files with inode numbers."
+    read -p "  lab@lab187:~$ " cmd4
+    echo
+    [[ "$cmd4" != "ls -li /tmp/hard1 /tmp/hard2 /tmp/hard3" ]] && {
         print_error "Use: ls -li /tmp/hard1 /tmp/hard2 /tmp/hard3"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "total 0"
-    printf "%-9s %s 1 %-8s %-8s %4d %s %2d %02d:%02d /tmp/hard1\n" \
-        "$SIM_INODE" "$SIM_MODE" "$SIM_UID" "$SIM_GID" "$SIM_SIZE_EMPTY" "$(date +%b)" "$(date +%d)" "$(date +%H)" "$(date +%M)"
-    printf "%-9s %s 1 %-8s %-8s %4d %s %2d %02d:%02d /tmp/hard2\n" \
-        "$SIM_INODE" "$SIM_MODE_LINK" "$SIM_UID" "$SIM_GID" "$SIM_SIZE_EMPTY" "$(date +%b)" "$(date +%d)" "$(date +%H)" "$(date +%M)"
-    printf "%-9s %s 1 %-8s %-8s %4d %s %2d %02d:%02d /tmp/hard3\n" \
-        "$SIM_INODE" "$SIM_MODE_LINK" "$SIM_UID" "$SIM_GID" "$SIM_SIZE_EMPTY" "$(date +%b)" "$(date +%d)" "$(date +%H)" "$(date +%M)"
+
+    echo "  total 0"
+    if [[ "$SIM_SIZE" -eq 0 ]]; then
+        echo "  2893475 -rw-r--r-- 3 student student 0 Mar 08 12:00 /tmp/hard1"
+        echo "  2893475 -rw-r--r-- 3 student student 0 Mar 08 12:00 /tmp/hard2"
+        echo "  2893475 -rw-r--r-- 3 student student 0 Mar 08 12:00 /tmp/hard3"
+    else
+        echo "  2893475 -rw-r--r-- 3 student student $SIM_SIZE Mar 08 12:00 /tmp/hard1"
+        echo "  2893475 -rw-r--r-- 3 student student $SIM_SIZE Mar 08 12:00 /tmp/hard2"
+        echo "  2893475 -rw-r--r-- 3 student student $SIM_SIZE Mar 08 12:00 /tmp/hard3"
+    fi
     echo
 
-    # Step 4: Edit hard2
-    echo "  Step 4: Append a test string into hard2."
-    echo "          Expected: echo 'test123' >> /tmp/hard2"
-    read -p "  lab@lab187:~$ " cmd4
+    echo "  Step 5: Append text through /tmp/hard2."
+    read -p "  lab@lab187:~$ " cmd5
     echo
-    [[ "$cmd4" != "echo 'test123' >> /tmp/hard2" ]] && {
-        print_error "Use: echo 'test123' >> /tmp/hard2"
+    [[ "$cmd5" != "echo test123 >> /tmp/hard2" ]] && {
+        print_error "Use: echo test123 >> /tmp/hard2"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  (appended to /tmp/hard2)"
-    echo "  Simulated: file grew to $SIM_SIZE_AFTER_E1 bytes (all hard links see the change)."
+
+    SIM_CONTENT="test123"
+    SIM_SIZE=8
+
+    echo "  File updated."
     echo
 
-    # Step 5: Show contents of hard1 (simulated cat)
-    echo "  Step 5: Display contents of hard1 to observe shared data."
-    echo "          Expected: cat /tmp/hard1"
-    read -p "  lab@lab187:~$ " cmd5
+    echo "  Step 6: Read the content through /tmp/hard1."
+    read -p "  lab@lab187:~$ " cmd6
     echo
-    [[ "$cmd5" != "cat /tmp/hard1" ]] && {
+    [[ "$cmd6" != "cat /tmp/hard1" ]] && {
         print_error "Use: cat /tmp/hard1"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "test123"
+
+    echo "  test123"
     echo
 
-    # Step 6: Remove original and one link
-    echo "  Step 6: Remove hard1 and hard3."
-    echo "          Expected: rm /tmp/hard1 /tmp/hard3"
-    read -p "  lab@lab187:~$ " cmd6
+    echo "  Step 7: Remove /tmp/hard1 and /tmp/hard3."
+    read -p "  lab@lab187:~$ " cmd7
     echo
-    [[ "$cmd6" != "rm /tmp/hard1 /tmp/hard3" ]] && {
+    [[ "$cmd7" != "rm /tmp/hard1 /tmp/hard3" ]] && {
         print_error "Use: rm /tmp/hard1 /tmp/hard3"
         read -p "Press Enter to try again..." _
         continue
     }
+
+    SIM_LINK_COUNT=1
+
     echo "  removed '/tmp/hard1'"
     echo "  removed '/tmp/hard3'"
     echo
 
-    # Step 7: Check hard2 still intact (simulated cat)
-    echo "  Step 7: Verify that hard2 still exists and shows the content."
-    echo "          Expected: cat /tmp/hard2"
-    read -p "  lab@lab187:~$ " cmd7
+    echo "  Step 8: Confirm /tmp/hard2 still has the data."
+    read -p "  lab@lab187:~$ " cmd8
     echo
-    [[ "$cmd7" != "cat /tmp/hard2" ]] && {
+    [[ "$cmd8" != "cat /tmp/hard2" ]] && {
         print_error "Use: cat /tmp/hard2"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "test123"
+
+    echo "  test123"
     echo
 
-    # Step 8: Create soft link
-    echo "  Step 8: Create a symbolic link soft1 pointing to /tmp/hard2."
-    echo "          Expected: ln -s /tmp/hard2 /tmp/soft1"
-    read -p "  lab@lab187:~$ " cmd8
+    echo "  Step 9: Create a symbolic link named /tmp/soft1 pointing to /tmp/hard2."
+    read -p "  lab@lab187:~$ " cmd9
     echo
-    [[ "$cmd8" != "ln -s /tmp/hard2 /tmp/soft1" ]] && {
+    [[ "$cmd9" != "ln -s /tmp/hard2 /tmp/soft1" ]] && {
         print_error "Use: ln -s /tmp/hard2 /tmp/soft1"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  (created symlink /tmp/soft1 -> /tmp/hard2)"
+
+    echo "  Symlink created."
     echo
 
-    # Step 9: Edit soft1 (simulated append)
-    echo "  Step 9: Append text via soft1."
-    echo "          Expected: echo 'via_softlink' >> /tmp/soft1"
-    read -p "  lab@lab187:~$ " cmd9
+    echo "  Step 10: Append text through the symbolic link."
+    read -p "  lab@lab187:~$ " cmd10
     echo
-    [[ "$cmd9" != "echo 'via_softlink' >> /tmp/soft1" ]] && {
-        print_error "Use: echo 'via_softlink' >> /tmp/soft1"
+    [[ "$cmd10" != "echo via_softlink >> /tmp/soft1" ]] && {
+        print_error "Use: echo via_softlink >> /tmp/soft1"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  (appended to /tmp/soft1 which targets /tmp/hard2)"
-    echo "  Simulated: file grew to ~$SIM_SIZE_AFTER_E2 bytes."
+
+    SIM_CONTENT=$'test123\nvia_softlink'
+    SIM_SIZE=21
+
+    echo "  File updated."
     echo
 
-    # Step 10: Remove hard2, test soft1 (simulated ls -l broken link)
-    echo "  Step 10: Remove hard2 and then try to list soft1."
-    echo "           Expected: rm /tmp/hard2 && ls -l /tmp/soft1"
-    read -p "  lab@lab187:~$ " cmd10
+    echo "  Step 11: Read the content through /tmp/hard2."
+    read -p "  lab@lab187:~$ " cmd11
     echo
-    [[ "$cmd10" != "rm /tmp/hard2 && ls -l /tmp/soft1" ]] && {
+    [[ "$cmd11" != "cat /tmp/hard2" ]] && {
+        print_error "Use: cat /tmp/hard2"
+        read -p "Press Enter to try again..." _
+        continue
+    }
+
+    echo "  test123"
+    echo "  via_softlink"
+    echo
+
+    echo "  Step 12: Remove /tmp/hard2 and inspect the symlink."
+    read -p "  lab@lab187:~$ " cmd12
+    echo
+    [[ "$cmd12" != "rm /tmp/hard2 && ls -l /tmp/soft1" ]] && {
         print_error "Use: rm /tmp/hard2 && ls -l /tmp/soft1"
         read -p "Press Enter to try again..." _
         continue
     }
+
+    SOFTLINK_TARGET_EXISTS=0
+
     echo "  removed '/tmp/hard2'"
-    # Simulate a dangling symlink output
-    printf "%s %-8s %-8s %4d %s %2d %02d:%02d /tmp/soft1 -> /tmp/hard2\n" \
-        "$SIM_MODE_SYM" "$SIM_UID" "$SIM_GID" 9 "$(date +%b)" "$(date +%d)" "$(date +%H)" "$(date +%M)"
-    echo "  Note: /tmp/soft1 is now a broken symlink (target missing)."
-    echo "  (If you run: cat /tmp/soft1, you'd get: 'No such file or directory')"
+    echo "  lrwxrwxrwx 1 student student 10 Mar 08 12:00 /tmp/soft1 -> /tmp/hard2"
+    echo "  Note: /tmp/soft1 is now a broken symlink."
+    echo
+
+    echo "  Step 13: Try to read the broken symlink."
+    read -p "  lab@lab187:~$ " cmd13
+    echo
+    [[ "$cmd13" != "cat /tmp/soft1" ]] && {
+        print_error "Use: cat /tmp/soft1"
+        read -p "Press Enter to try again..." _
+        continue
+    }
+
+    if [[ "$SOFTLINK_TARGET_EXISTS" -eq 0 ]]; then
+        echo "  cat: /tmp/soft1: No such file or directory"
+    fi
     echo
 
     print_success "Nice work!"
     print_info "You earned $LAB_XP XP for completing this lab."
-    award_xp $LAB_XP
-    XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
+    award_xp "$LAB_XP"
+    XP=$(jq '.XP' "$SAVE_JSON")
+    LEVEL=$(jq '.LEVEL' "$SAVE_JSON")
+    export XP
+    export LEVEL
     record_lab_completion
 
     completion_count=$(get_lab_completion_count)

@@ -92,7 +92,7 @@ while true; do
   echo
 
   # Step 4: Add HTTP and HTTPS to the runtime configuration
-  echo "  Step 4: Add HTTP (runtime)."
+  echo "  Step 4a: Add HTTP (runtime)."
   read -p "  lab@lab242:~$ " cmd4a
   [[ "$cmd4a" != "firewall-cmd --add-service=http" ]] && {
     print_error "Hint: firewall-cmd --add-service=http"
@@ -101,7 +101,7 @@ while true; do
   }
   echo "  success"
   echo
-  echo "  Step 4 (cont.): Add HTTPS (runtime)."
+  echo "  Step 4b: Add HTTPS (runtime)."
   read -p "  lab@lab242:~$ " cmd4b
   [[ "$cmd4b" != "firewall-cmd --add-service=https" ]] && {
     print_error "Hint: firewall-cmd --add-service=https"
