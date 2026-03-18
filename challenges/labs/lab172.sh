@@ -95,7 +95,6 @@ while true; do
         continue
     fi
     echo "  (Editing /etc/systemd/system/webapp.service.d/override.conf)"
-Asswe
     echo "  Step 5: In the drop-in, set WEBAPP_PORT=8080 using an Environment= line."
     echo "          Then save/quit the editor."
     read -p "  Type the exact line you added: " cmd5

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Lab 183: Recover from a Bad Kernel — Boot Older Kernel & Set It as Default (grubby)
+# Lab 183: Fix Broken /etc/fstab Entry Causing Boot Failure
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab 183: Recover from a Bad Kernel — Boot Older Kernel & Set It as Default"
+LAB_NAME="Lab 183: Recover System from Broken /etc/fstab Entry"
 LAB_ID="lab183"
 LAB_XP=50000
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
@@ -31,191 +31,125 @@ while true; do
     draw_lab_ui
     center_title "$LAB_NAME"
     echo
-    center_text "Scenario: The newest kernel fails to boot. You must boot an older kernel, make it default,"
-    center_text "then optionally remove the bad kernel so it won't be selected again."
+    center_text "Scenario: The system failed to boot"
+    center_text "because /etc/fstab contains an invalid mount entry."
+    center_text "Goal: Identify the problem, correct the entry,"
+    center_text "verify mounts, and return the system to normal boot."
     echo
     center_text "Press Enter to begin the lab..."
     read _
 
-    # --- Simulate choosing an older kernel from GRUB Advanced options ---
     draw_lab_ui
-    echo "  GRUB menu (simulated)."
-    echo "    Red Hat Enterprise Linux (KERNEL-<BAD-VERSION>)"
-    echo "    Advanced options for Red Hat Enterprise Linux  →"
+    echo "  Step 1: View recent boot errors."
+    read -p "  emergency@lab183:~# " cmd1
     echo
-
-    echo "  Step 1: Open 'Advanced options for Red Hat Enterprise Linux'."
-    echo "          (Simulate selection by typing: Enter)"
-    read -p "  grub menu> " cmd1
-    echo
-    if [[ "$cmd1" != "Enter" && "$cmd1" != "enter" ]]; then
-        print_error "Incorrect. Try again. (Type: Enter)"
+    if [[ "$cmd1" != "journalctl -xb" ]]; then
+        print_error "Incorrect. Try again. (Use: journalctl -xb)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Advanced options opened (simulated)."
-    echo "    * Red Hat Enterprise Linux (KERNEL-<GOOD-VERSION>)"
-    echo "      Red Hat Enterprise Linux (KERNEL-<BAD-VERSION>)"
+    echo "  Failed to mount /data."
+    echo "  Dependency failed for Local File Systems."
     echo
 
-    echo "  Step 2: Select the older, known-good kernel entry."
-    echo "          (Simulate selection by typing: Enter)"
-    read -p "  grub advanced> " cmd2
+    echo "  Step 2: Inspect the filesystem table."
+    read -p "  emergency@lab183:~# " cmd2
     echo
-    if [[ "$cmd2" != "Enter" && "$cmd2" != "enter" ]]; then
-        print_error "Incorrect. Try again. (Type: Enter)"
+    if [[ "$cmd2" != "cat /etc/fstab" ]]; then
+        print_error "Incorrect. Try again. (Use: cat /etc/fstab)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Loading Linux kernel (KERNEL-<GOOD-VERSION>) ..."
-    echo "  Loading initial ramdisk ..."
-    echo "  Boot successful (simulated)."
+    echo "  UUID=xxxx / xfs defaults 0 1"
+    echo "  /dev/sdb1 /data xfs defaults 0 0"
+    echo "  (Device /dev/sdb1 does not exist)"
     echo
 
-    # --- In the running system: verify kernel, set good kernel as default with grubby ---
-    echo "  Step 3: Verify the currently running kernel version."
-    read -p "  lab@lab183:~$ " cmd3
+    echo "  Step 3: Comment out the bad entry."
+    read -p "  emergency@lab183:~# " cmd3
     echo
-    if [[ "$cmd3" != "uname -r" ]]; then
-        print_error "Incorrect. Try again. (Use: uname -r)"
+    if [[ "$cmd3" != "sed -i 's|/dev/sdb1 /data xfs defaults 0 0|#/dev/sdb1 /data xfs defaults 0 0|' /etc/fstab" ]]; then
+        print_error "Incorrect. Try again."
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  <GOOD-VERSION>"
-    echo
 
-    echo "  Step 4: List installed kernel packages."
-    read -p "  lab@lab183:~$ " cmd4
+    echo "  Step 4: Create a corrected mount entry."
+    read -p "  emergency@lab183:~# " cmd4
     echo
-    if [[ "$cmd4" != "rpm -q kernel" ]]; then
-        print_error "Incorrect. Try again. (Use: rpm -q kernel)"
+    if [[ "$cmd4" != "echo '/dev/sdb2 /data xfs defaults 0 0' | tee -a /etc/fstab" ]]; then
+        print_error "Incorrect. Try again."
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  kernel-<GOOD-VERSION>"
-    echo "  kernel-<BAD-VERSION>"
+    echo "  /dev/sdb2 /data xfs defaults 0 0"
     echo
 
-    echo "  Step 5: Show the current default kernel path."
-    read -p "  lab@lab183:~$ " cmd5
+    echo "  Step 5: Attempt to mount all filesystems."
+    read -p "  emergency@lab183:~# " cmd5
     echo
-    if [[ "$cmd5" != "grubby --default-kernel" ]]; then
-        print_error "Incorrect. Try again. (Use: grubby --default-kernel)"
+    if [[ "$cmd5" != "mount -a" ]]; then
+        print_error "Incorrect. Try again. (Use: mount -a)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  /boot/vmlinuz-<BAD-VERSION>"
-    echo
 
-    echo "  Step 6: Inspect all kernel entries known to grubby (truncated)."
-    read -p "  lab@lab183:~$ " cmd6
+    echo "  Step 6: Verify the new mount."
+    read -p "  emergency@lab183:~# " cmd6
     echo
-    if [[ "$cmd6" != "grubby --info=ALL" ]]; then
-        print_error "Incorrect. Try again. (Use: grubby --info=ALL)"
+    if [[ "$cmd6" != "findmnt /data" ]]; then
+        print_error "Incorrect. Try again. (Use: findmnt /data)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  index=0"
-    echo "  kernel=\"/boot/vmlinuz-<BAD-VERSION>\""
-    echo "  initrd=\"/boot/initramfs-<BAD-VERSION>.img\""
-    echo "  title=\"Red Hat Enterprise Linux (<BAD-VERSION>)\""
-    echo "  index=1"
-    echo "  kernel=\"/boot/vmlinuz-<GOOD-VERSION>\""
-    echo "  initrd=\"/boot/initramfs-<GOOD-VERSION>.img\""
-    echo "  title=\"Red Hat Enterprise Linux (<GOOD-VERSION>)\""
+    echo "  TARGET SOURCE     FSTYPE OPTIONS"
+    echo "  /data  /dev/sdb2  xfs    rw,relatime"
     echo
 
-    echo "  Step 7: Set the known-good kernel as the default for future boots."
-    read -p "  lab@lab183:~$ " cmd7
+    echo "  Step 7: Exit emergency mode to resume boot."
+    read -p "  emergency@lab183:~# " cmd7
     echo
-    if [[ "$cmd7" != "grubby --set-default /boot/vmlinuz-<GOOD-VERSION>" ]]; then
-        print_error "Incorrect. Try again. (Use: grubby --set-default /boot/vmlinuz-<GOOD-VERSION>)"
+    if [[ "$cmd7" != "exit" ]]; then
+        print_error "Incorrect. Try again. (Use: exit)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    # (no output on success)
+    echo "  systemd: Resuming normal boot (simulated)"
     echo
 
-    echo "  Step 8: Verify the default kernel changed."
-    read -p "  lab@lab183:~$ " cmd8
+    echo "  Step 8: Confirm the system reached the default target."
+    read -p "  rhel@lab183:~$ " cmd8
     echo
-    if [[ "$cmd8" != "grubby --default-kernel" ]]; then
-        print_error "Incorrect. Try again. (Use: grubby --default-kernel)"
+    if [[ "$cmd8" != "systemctl get-default" ]]; then
+        print_error "Incorrect. Try again. (Use: systemctl get-default)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  /boot/vmlinuz-<GOOD-VERSION>"
-    echo
-
-    echo "  Step 9: (Optional) Regenerate GRUB configuration file."
-    read -p "  lab@lab183:~$ " cmd9
-    echo
-    if [[ "$cmd9" != "grub2-mkconfig -o /boot/grub2/grub.cfg" ]]; then
-        print_error "Incorrect. Try again. (Use: grub2-mkconfig -o /boot/grub2/grub.cfg)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  Generating grub configuration file ..."
-    echo "  Found linux image: /boot/vmlinuz-<GOOD-VERSION>"
-    echo "  Found initrd image: /boot/initramfs-<GOOD-VERSION>.img"
-    echo "  Found linux image: /boot/vmlinuz-<BAD-VERSION>"
-    echo "  Found initrd image: /boot/initramfs-<BAD-VERSION>.img"
-    echo "  done"
-    echo
-
-    echo "  Step 10: (Optional) Remove the bad kernel package to prevent accidental use."
-    read -p "  lab@lab183:~$ " cmd10
-    echo
-    if [[ "$cmd10" != "dnf remove kernel-<BAD-VERSION>" && "$cmd10" != "yum remove kernel-<BAD-VERSION>" ]]; then
-        print_error "Incorrect. Try again. (Use: dnf remove kernel-<BAD-VERSION>)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  Dependencies resolved."
-    echo "  ================================================================="
-    echo "   Removing: kernel-<BAD-VERSION>"
-    echo "  ================================================================="
-    echo "  Is this ok [y/N]:"
-    echo
-
-    echo "  Step 11: Confirm only the good kernel remains installed."
-    read -p "  lab@lab183:~$ " cmd11
-    echo
-    if [[ "$cmd11" != "rpm -q kernel" ]]; then
-        print_error "Incorrect. Try again. (Use: rpm -q kernel)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  kernel-<GOOD-VERSION>"
-    echo
-
-    echo "  Step 12: Reboot to validate that the system now boots the good kernel by default."
-    read -p "  lab@lab183:~$ " cmd12
-    echo
-    if [[ "$cmd12" != "reboot" && "$cmd12" != "reboot -f" ]]; then
-        print_error "Incorrect. Try again. (Use: reboot)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  Rebooting (simulated)."
-    echo "  GRUB selects default kernel: /boot/vmlinuz-<GOOD-VERSION> (simulated)."
-    echo "  System boot successful."
+    echo "  multi-user.target"
     echo
 
     print_success "Nice work!"
+    print_info "You fixed a boot failure caused by a bad /etc/fstab entry."
     print_info "You earned $LAB_XP XP for completing this lab."
-    award_xp $LAB_XP
-    XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
-    record_lab_completion
 
+    award_xp $LAB_XP
+    XP=$(jq '.XP' "$SAVE_JSON")
+    LEVEL=$(jq '.LEVEL' "$SAVE_JSON")
+    export XP
+    export LEVEL
+
+    record_lab_completion
     completion_count=$(get_lab_completion_count)
+
     echo
     print_info "You've successfully completed this lab $completion_count time(s)."
     echo
+
     center_text "Would you like to:"
     center_text "1) Retry this lab"
     center_text "2) Return to Sysadmin Lab Menu"
     echo
+
     read -p "  > " post_choice
     [[ "$post_choice" == "2" ]] && exit 0
 done

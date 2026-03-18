@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Lab 184: Find and Save Setuid Files (Essential Tools)
-# Objective: Locate all setuid binaries on local filesystems, save a sorted list, validate, and compare scope.
+# Objective: Locate setuid binaries on local filesystems, save a sorted list, validate results, and compare scope.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -21,7 +21,9 @@ draw_lab_ui() {
     clear
     center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
     center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
-    echo; echo; echo
+    echo
+    echo
+    echo
 }
 
 record_lab_completion() {
@@ -37,99 +39,105 @@ while true; do
     draw_lab_ui
     center_title "$LAB_NAME"
     echo
-    center_text "Goal: Find all setuid files on local filesystems and save them for audit."
-    center_text "Tip: Use -perm -4000 and avoid crossing devices with -xdev."
+    center_text "Audit setuid binaries, save the results, and verify what was found."
     echo
     center_text "Press Enter to begin the lab..."
     read _
 
     # Step 1
     draw_lab_ui
-    echo "  Step 1: Find all setuid files on local filesystems and save a sorted list to $TARGET_ALL."
-    echo "          (Ignore errors from unreadable paths.)"
+    echo "  Step 1: Find all setuid files on the local filesystem and save them to $TARGET_ALL."
+    read -p "  root@servera:~# " cmd1
     echo
-    echo "  Expected pattern:"
-    echo "    find / -xdev -type f -perm -4000 -print 2>/dev/null | sort > $TARGET_ALL"
-    echo
-    read -p "  lab@lab184:~$ " cmd1
-    echo
-    [[ "$cmd1" != "find / -xdev -type f -perm -4000 -print 2>/dev/null | sort > /root/setuid_files.txt" ]] && {
-        print_error "Use: find / -xdev -type f -perm -4000 -print 2>/dev/null | sort > /root/setuid_files.txt"
+    [[ "$cmd1" != "find / -xdev -type f -perm /4000 2>/dev/null | sort > /root/setuid_files.txt" ]] && {
+        print_error "Use: find / -xdev -type f -perm /4000 2>/dev/null | sort > /root/setuid_files.txt"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  (setuid search saved to $TARGET_ALL)"
+    echo "  root@servera:~# wc -l /root/setuid_files.txt"
+    echo "  18 /root/setuid_files.txt"
+    echo
+    echo "  Search complete. Results saved to $TARGET_ALL."
     echo
 
     # Step 2
-    echo "  Step 2: Show the first 5 lines of the saved list to verify content."
-    read -p "  lab@lab184:~$ " cmd2
+    echo "  Step 2: Display the first 5 lines of the saved list."
+    read -p "  root@servera:~# " cmd2
     echo
     [[ "$cmd2" != "head -n 5 /root/setuid_files.txt" ]] && {
         print_error "Use: head -n 5 /root/setuid_files.txt"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  (displayed first 5 lines)"
+    echo "  /usr/bin/chage"
+    echo "  /usr/bin/chfn"
+    echo "  /usr/bin/chsh"
+    echo "  /usr/bin/gpasswd"
+    echo "  /usr/bin/mount"
     echo
 
     # Step 3
-    echo "  Step 3: Print the total count of setuid files found."
-    read -p "  lab@lab184:~$ " cmd3
+    echo "  Step 3: Show how many setuid files were found."
+    read -p "  root@servera:~# " cmd3
     echo
     [[ "$cmd3" != "wc -l /root/setuid_files.txt" ]] && {
         print_error "Use: wc -l /root/setuid_files.txt"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  (displayed total count)"
+    echo "  18 /root/setuid_files.txt"
     echo
 
     # Step 4
-    echo "  Step 4: Repeat the search but restrict scope to /usr and save to $TARGET_USR."
+    echo "  Step 4: Repeat the search only under /usr and save it to $TARGET_USR."
+    read -p "  root@servera:~# " cmd4
     echo
-    echo "  Expected pattern:"
-    echo "    find /usr -xdev -type f -perm -4000 -print 2>/dev/null | sort > $TARGET_USR"
-    echo
-    read -p "  lab@lab184:~$ " cmd4
-    echo
-    [[ "$cmd4" != "find /usr -xdev -type f -perm -4000 -print 2>/dev/null | sort > /root/setuid_usr.txt" ]] && {
-        print_error "Use: find /usr -xdev -type f -perm -4000 -print 2>/dev/null | sort > /root/setuid_usr.txt"
+    [[ "$cmd4" != "find /usr -type f -perm /4000 2>/dev/null | sort > /root/setuid_usr.txt" ]] && {
+        print_error "Use: find /usr -type f -perm /4000 2>/dev/null | sort > /root/setuid_usr.txt"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  (setuid search in /usr saved to $TARGET_USR)"
+    echo "  root@servera:~# wc -l /root/setuid_usr.txt"
+    echo "  14 /root/setuid_usr.txt"
+    echo
+    echo "  Search complete. Results saved to $TARGET_USR."
     echo
 
     # Step 5
-    echo "  Step 5: Compare the two lists to see differences (unified diff)."
-    read -p "  lab@lab184:~$ " cmd5
+    echo "  Step 5: Compare how many entries are in each saved file."
+    read -p "  root@servera:~# " cmd5
     echo
-    [[ "$cmd5" != "diff -u /root/setuid_usr.txt /root/setuid_files.txt" ]] && {
-        print_error "Use: diff -u /root/setuid_usr.txt /root/setuid_files.txt"
+    [[ "$cmd5" != "wc -l /root/setuid_files.txt /root/setuid_usr.txt" ]] && {
+        print_error "Use: wc -l /root/setuid_files.txt /root/setuid_usr.txt"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  (differences displayed)"
+    echo "  18 /root/setuid_files.txt"
+    echo "  14 /root/setuid_usr.txt"
+    echo "  32 total"
     echo
 
     # Step 6
-    echo "  Step 6: Show one example file's permission bits with ls -l (use the first entry from the main list)."
-    echo "          (Hint: head -n1 with command substitution.)"
-    read -p "  lab@lab184:~$ " cmd6
+    echo "  Step 6: Check the permissions of one known setuid binary."
+    read -p "  root@servera:~# " cmd6
     echo
-    [[ "$cmd6" != "ls -l \"$(head -n1 /root/setuid_files.txt)\"" ]] && {
-        print_error 'Use: ls -l "$(head -n1 /root/setuid_files.txt)"'
+    [[ "$cmd6" != "ls -l /usr/bin/passwd" ]] && {
+        print_error "Use: ls -l /usr/bin/passwd"
         read -p "Press Enter to try again..." _
         continue
     }
-    echo "  (example file permissions shown)"
+    echo "  -rwsr-xr-x. 1 root root 33544 Jan 12 08:14 /usr/bin/passwd"
+    echo
+    echo "  The 's' in the owner's execute field confirms the setuid bit is set."
     echo
 
     print_success "Nice work!"
     print_info "You earned $LAB_XP XP for completing this lab."
     award_xp $LAB_XP
-    XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
+    XP=$(jq '.XP' "$SAVE_JSON")
+    LEVEL=$(jq '.LEVEL' "$SAVE_JSON")
+    export XP
+    export LEVEL
     record_lab_completion
 
     completion_count=$(get_lab_completion_count)

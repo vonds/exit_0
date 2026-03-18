@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Lab 179: Fix Wrong Root Mapping (root=/ rd.lvm.lv=, /etc/fstab UUID)
+# Lab 179: Restore Service Access by Opening Firewall
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ROOT_DIR/scripts/ui.sh" || { echo "Failed to source ui.sh"; exit 1; }
 source "$ROOT_DIR/scripts/xp.sh" || { echo "Failed to source xp.sh"; exit 1; }
 
-LAB_NAME="Lab 179: Fix Wrong Root Mapping"
+LAB_NAME="Lab 179: Restore Service Access by Opening Firewall"
 LAB_ID="lab179"
 LAB_XP=50000
 LAB_TRACK_FILE="$ROOT_DIR/data/.lab_completions.json"
@@ -17,226 +17,146 @@ record_lab_completion() {
     tmpfile=$(mktemp)
     jq --arg lab "$LAB_ID" '.[$lab] += 1 // 1' "$LAB_TRACK_FILE" > "$tmpfile" && mv "$tmpfile" "$LAB_TRACK_FILE"
 }
+
 get_lab_completion_count() {
     jq -r --arg lab "$LAB_ID" '.[$lab] // 0' "$LAB_TRACK_FILE"
 }
+
 draw_lab_ui() {
     clear
     center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
     center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
-    echo; echo; echo
+    echo
+    echo
+    echo
 }
 
 while true; do
     draw_lab_ui
     center_title "$LAB_NAME"
     echo
-    center_text "Scenario: System fails to boot because the kernel cmdline points to the wrong root device."
-    center_text "Goal: Discover the correct LVM root, boot by fixing GRUB args (rd.lvm.lv & root=), then fix /etc/fstab."
+    center_text "Scenario: A web server is running but users cannot reach the website."
     echo
     center_text "Press Enter to begin the lab..."
     read _
 
-    # --- Boot failure lands in dracut emergency shell ---
     draw_lab_ui
-    echo "  The system has dropped to the initramfs emergency shell (simulated)."
-    echo "  dracut:/#"
+    echo "  Step 1: Verify the web server service is running."
+    read -p "  root@server:~# " cmd1
     echo
-
-    echo "  Step 1: Show the current kernel command line to confirm the wrong root mapping."
-    read -p "  dracut:/# " cmd1
-    echo
-    if [[ "$cmd1" != "cat /proc/cmdline" ]]; then
-        print_error "Incorrect. Try again. (Use: cat /proc/cmdline)"
+    if [[ "$cmd1" != "systemctl status httpd" ]]; then
+        print_error "Incorrect. Try again. (Use: systemctl status httpd)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  BOOT_IMAGE=/vmlinuz-<KERNEL> root=/dev/sda2 ro rhgb quiet"
-    echo "  (Problem: root points to /dev/sda2 but this system uses LVM.)"
+    echo "  ● httpd.service - The Apache HTTP Server"
+    echo "       Loaded: loaded (/usr/lib/systemd/system/httpd.service; enabled; preset: disabled)"
+    echo "       Active: active (running) since Tue 2026-03-10 09:14:22 EDT; 12min ago"
+    echo "         Docs: man:httpd.service(8)"
+    echo "     Main PID: 1432 (httpd)"
+    echo "       Status: \"Started, listening on: port 80\""
+    echo "        Tasks: 177 (limit: 23176)"
+    echo "       Memory: 29.4M"
+    echo "          CPU: 412ms"
+    echo "       CGroup: /system.slice/httpd.service"
+    echo "               ├─1432 /usr/sbin/httpd -DFOREGROUND"
+    echo "               ├─1433 /usr/sbin/httpd -DFOREGROUND"
+    echo "               ├─1434 /usr/sbin/httpd -DFOREGROUND"
+    echo "               ├─1435 /usr/sbin/httpd -DFOREGROUND"
+    echo "               └─1436 /usr/sbin/httpd -DFOREGROUND"
     echo
 
-    echo "  Step 2: Activate LVM volumes."
-    read -p "  dracut:/# " cmd2
+    echo "  Step 2: Verify the server is listening on port 80."
+    read -p "  root@server:~# " cmd2
     echo
-    if [[ "$cmd2" != "vgchange -ay" ]]; then
-        print_error "Incorrect. Try again. (Use: vgchange -ay)"
+    if [[ "$cmd2" != "ss -tuln | grep :80" ]]; then
+        print_error "Incorrect. Try again. (Use: ss -tuln | grep :80)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  2 logical volume(s) in volume group \"rhel\" now active"
+    echo "  tcp   LISTEN 0      511                 *:80               *:*"
+    echo "  tcp   LISTEN 0      511              [::]:80            [::]:*"
     echo
 
-    echo "  Step 3: List logical volumes to identify the root LV."
-    read -p "  dracut:/# " cmd3
+    echo "  Step 3: Inspect the current firewall configuration."
+    read -p "  root@server:~# " cmd3
     echo
-    if [[ "$cmd3" != "lvs" ]]; then
-        print_error "Incorrect. Try again. (Use: lvs)"
+    if [[ "$cmd3" != "firewall-cmd --list-all" ]]; then
+        print_error "Incorrect. Try again. (Use: firewall-cmd --list-all)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  LV    VG   Attr       LSize  Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert"
-    echo "  root  rhel -wi-ao----  20.0g"
-    echo "  swap  rhel -wi-ao----   2.0g"
+    echo "  public (active)"
+    echo "    target: default"
+    echo "    icmp-block-inversion: no"
+    echo "    interfaces: ens160"
+    echo "    sources:"
+    echo "    services: cockpit dhcpv6-client ssh"
+    echo "    ports:"
+    echo "    protocols:"
+    echo "    forward: yes"
+    echo "    masquerade: no"
+    echo "    forward-ports:"
+    echo "    source-ports:"
+    echo "    icmp-blocks:"
+    echo "    rich rules:"
+    echo
+    echo "  http is not currently allowed through the active zone."
     echo
 
-    echo "  Step 4: Mount the suspected root LV to verify it contains the OS."
-    read -p "  dracut:/# " cmd4
+    echo "  Step 4: Allow HTTP traffic through the firewall."
+    read -p "  root@server:~# " cmd4
     echo
-    if [[ "$cmd4" != "mount /dev/mapper/rhel-root /mnt" ]]; then
-        print_error "Incorrect. Try again. (Use: mount /dev/mapper/rhel-root /mnt)"
+    if [[ "$cmd4" != "firewall-cmd --add-service=http" ]]; then
+        print_error "Incorrect. Try again. (Use: firewall-cmd --add-service=http)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo
 
-    echo "  Step 5: Confirm standard directories exist on the mounted root."
-    read -p "  dracut:/# " cmd5
+
+    echo "  Step 5: Make the firewall rule persistent."
+    read -p "  root@server:~# " cmd5
     echo
-    if [[ "$cmd5" != "ls /mnt" ]]; then
-        print_error "Incorrect. Try again. (Use: ls /mnt)"
+    if [[ "$cmd5" != "firewall-cmd --runtime-to-permanent" ]]; then
+        print_error "Incorrect. Try again. (Use: firewall-cmd --runtime-to-permanent)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  bin  boot  etc  home  lib  lib64  root  sbin  usr  var"
-    echo
 
-    echo "  Step 6: Reboot to the GRUB menu so we can fix kernel args (temporary)."
-    read -p "  dracut:/# " cmd6
+
+    echo "  Step 6: Verify the website is now reachable locally."
+    read -p "  root@server:~# " cmd6
     echo
-    if [[ "$cmd6" != "reboot -f" && "$cmd6" != "reboot" ]]; then
-        print_error "Incorrect. Try again. (Use: reboot -f)"
+    if [[ "$cmd6" != "curl http://localhost" ]]; then
+        print_error "Incorrect. Try again. (Use: curl http://localhost)"
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  Rebooting (simulated) to GRUB menu..."
-    echo
-
-    # --- GRUB menu edit to boot successfully ---
-    echo "  Step 7: At the GRUB menu, enter edit mode for the selected entry."
-    read -p "  grub menu> " cmd7
-    echo
-    if [[ "$cmd7" != "e" && "$cmd7" != "E" ]]; then
-        print_error "Incorrect. Try again. (Press: e)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  GRUB editor opened. Locate the 'linux' line."
-    echo "    linux /vmlinuz-<KERNEL> root=/dev/sda2 ro rhgb quiet"
-    echo
-
-    echo "  Step 8: Add the LVM hint so initramfs can find the root LV."
-    echo "          (Type exactly the argument to add.)"
-    read -p "  grub edit> " cmd8
-    echo
-    if [[ "$cmd8" != "rd.lvm.lv=rhel/root" ]]; then
-        print_error "Incorrect. Try again. (Use: rd.lvm.lv=rhel/root)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  linux ... root=/dev/sda2 ro rhgb quiet rd.lvm.lv=rhel/root"
-    echo
-
-    echo "  Step 9: Replace the incorrect root device with the LVM mapper path."
-    echo "          (Type exactly the new root= value.)"
-    read -p "  grub edit> " cmd9
-    echo
-    if [[ "$cmd9" != "root=/dev/mapper/rhel-root" ]]; then
-        print_error "Incorrect. Try again. (Use: root=/dev/mapper/rhel-root)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  linux ... root=/dev/mapper/rhel-root ro rhgb quiet rd.lvm.lv=rhel/root"
-    echo
-
-    echo "  Step 10: Boot the edited entry."
-    read -p "  grub edit> " cmd10
-    echo
-    if [[ "$cmd10" != "Ctrl+x" && "$cmd10" != "ctrl+x" && "$cmd10" != "F10" && "$cmd10" != "f10" ]]; then
-        print_error "Incorrect. Try again. (Use: Ctrl+x or F10)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  Loading Linux kernel ..."
-    echo "  Loading initial ramdisk ..."
-    echo "  System booted successfully (simulated)."
-    echo
-
-    # --- Persistently fix /etc/fstab so future boots work without edits ---
-    echo "  Step 11: Get the UUID of the root LV to use in /etc/fstab."
-    read -p "  lab@lab179:~$ " cmd11
-    echo
-    if [[ "$cmd11" != "blkid -s UUID -o value /dev/mapper/rhel-root" ]]; then
-        print_error "Incorrect. Try again. (Use: blkid -s UUID -o value /dev/mapper/rhel-root)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  UUID-ROOT-PLACEHOLDER"
-    echo
-
-    echo "  Step 12: Back up the current /etc/fstab."
-    read -p "  lab@lab179:~$ " cmd12
-    echo
-    if [[ "$cmd12" != "cp /etc/fstab /etc/fstab.bak" ]]; then
-        print_error "Incorrect. Try again. (Use: cp /etc/fstab /etc/fstab.bak)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo
-
-    echo "  Step 13: Replace the wrong root UUID in /etc/fstab with the correct one."
-    echo "           (Simulated wrong ID: WRONG-UUID; correct: UUID-ROOT-PLACEHOLDER)"
-    read -p "  lab@lab179:~$ " cmd13
-    echo
-    if [[ "$cmd13" != "sed -i 's/WRONG-UUID/UUID-ROOT-PLACEHOLDER/' /etc/fstab" ]]; then
-        print_error "Incorrect. Try again. (Use: sed -i 's/WRONG-UUID/UUID-ROOT-PLACEHOLDER/' /etc/fstab)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo
-
-    echo "  Step 14: Show the root (/) line in /etc/fstab to confirm it uses the new UUID."
-    read -p "  lab@lab179:~$ " cmd14
-    echo
-    if [[ "$cmd14" != "grep -E '^[^#].*\\s/\\s' /etc/fstab" ]]; then
-        print_error "Incorrect. Try again. (Use: grep -E '^[^#].*\\s/\\s' /etc/fstab )"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  UUID=UUID-ROOT-PLACEHOLDER  /  xfs  defaults  0  1"
-    echo
-
-    echo "  Step 15: Regenerate GRUB configuration (good practice after boot fixes)."
-    read -p "  lab@lab179:~$ " cmd15
-    echo
-    if [[ "$cmd15" != "grub2-mkconfig -o /boot/grub2/grub.cfg" ]]; then
-        print_error "Incorrect. Try again. (Use: grub2-mkconfig -o /boot/grub2/grub.cfg)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  Generating grub configuration file ..."
-    echo "  Found linux image: /boot/vmlinuz-<KERNEL>"
-    echo "  Found initrd image: /boot/initramfs-<KERNEL>.img"
-    echo "  done"
-    echo
-
-    echo "  Step 16: Reboot to verify the system now boots cleanly without GRUB edits."
-    read -p "  lab@lab179:~$ " cmd16
-    echo
-    if [[ "$cmd16" != "reboot" && "$cmd16" != "reboot -f" ]]; then
-        print_error "Incorrect. Try again. (Use: reboot)"
-        read -p "Press Enter to try again..." _
-        continue
-    fi
-    echo "  Rebooting (simulated). System boots normally with correct root mapping."
+    echo "  <!DOCTYPE html>"
+    echo "  <html lang=\"en\">"
+    echo "  <head>"
+    echo "    <meta charset=\"UTF-8\">"
+    echo "    <title>Test Page</title>"
+    echo "  </head>"
+    echo "  <body>"
+    echo "    <h1>It works!</h1>"
+    echo "    <p>Apache HTTP Server is serving content on port 80.</p>"
+    echo "  </body>"
+    echo "  </html>"
     echo
 
     print_success "Nice work!"
     print_info "You earned $LAB_XP XP for completing this lab."
-    award_xp $LAB_XP
-    XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
-    record_lab_completion
+    award_xp "$LAB_XP"
 
+    XP=$(jq '.XP' "$SAVE_JSON")
+    LEVEL=$(jq '.LEVEL' "$SAVE_JSON")
+    export XP
+    export LEVEL
+
+    record_lab_completion
     completion_count=$(get_lab_completion_count)
+
     echo
     print_info "You've successfully completed this lab $completion_count time(s)."
     echo

@@ -54,7 +54,7 @@ while true; do
     read _
 
     draw_lab_ui
-    echo "  Step 1: Create the original file."
+    echo "  Step 1: Create an empty file at /tmp/hard1 to use as the original file for the link tests."
     read -p "  lab@lab187:~$ " cmd1
     echo
     [[ "$cmd1" != "touch /tmp/hard1" ]] && {
@@ -70,7 +70,7 @@ while true; do
     echo "  File created."
     echo
 
-    echo "  Step 2: Create a hard link named /tmp/hard2."
+    echo "  Step 2: Create a hard link named /tmp/hard2 that points to the existing file /tmp/hard1."
     read -p "  lab@lab187:~$ " cmd2
     echo
     [[ "$cmd2" != "ln /tmp/hard1 /tmp/hard2" ]] && {
@@ -84,7 +84,7 @@ while true; do
     echo "  Hard link created."
     echo
 
-    echo "  Step 3: Create another hard link named /tmp/hard3."
+    echo "  Step 3: Create a second hard link named /tmp/hard3 that also points to /tmp/hard1."
     read -p "  lab@lab187:~$ " cmd3
     echo
     [[ "$cmd3" != "ln /tmp/hard1 /tmp/hard3" ]] && {
@@ -98,7 +98,7 @@ while true; do
     echo "  Hard link created."
     echo
 
-    echo "  Step 4: List the three files with inode numbers."
+    echo "  Step 4: Display /tmp/hard1, /tmp/hard2, and /tmp/hard3 in long format with inode numbers so you can compare them."
     read -p "  lab@lab187:~$ " cmd4
     echo
     [[ "$cmd4" != "ls -li /tmp/hard1 /tmp/hard2 /tmp/hard3" ]] && {
@@ -119,7 +119,7 @@ while true; do
     fi
     echo
 
-    echo "  Step 5: Append text through /tmp/hard2."
+    echo "  Step 5: Append the text test123 to the file by writing through the hard link /tmp/hard2."
     read -p "  lab@lab187:~$ " cmd5
     echo
     [[ "$cmd5" != "echo test123 >> /tmp/hard2" ]] && {
@@ -134,7 +134,7 @@ while true; do
     echo "  File updated."
     echo
 
-    echo "  Step 6: Read the content through /tmp/hard1."
+    echo "  Step 6: Read the contents of /tmp/hard1 to verify the data written through /tmp/hard2 is visible there too."
     read -p "  lab@lab187:~$ " cmd6
     echo
     [[ "$cmd6" != "cat /tmp/hard1" ]] && {
@@ -146,7 +146,7 @@ while true; do
     echo "  test123"
     echo
 
-    echo "  Step 7: Remove /tmp/hard1 and /tmp/hard3."
+    echo "  Step 7: Remove the files /tmp/hard1 and /tmp/hard3, leaving only /tmp/hard2 behind."
     read -p "  lab@lab187:~$ " cmd7
     echo
     [[ "$cmd7" != "rm /tmp/hard1 /tmp/hard3" ]] && {
@@ -161,7 +161,7 @@ while true; do
     echo "  removed '/tmp/hard3'"
     echo
 
-    echo "  Step 8: Confirm /tmp/hard2 still has the data."
+    echo "  Step 8: Read /tmp/hard2 to confirm the file still exists and still contains the data after the other hard links were removed."
     read -p "  lab@lab187:~$ " cmd8
     echo
     [[ "$cmd8" != "cat /tmp/hard2" ]] && {
@@ -173,7 +173,7 @@ while true; do
     echo "  test123"
     echo
 
-    echo "  Step 9: Create a symbolic link named /tmp/soft1 pointing to /tmp/hard2."
+    echo "  Step 9: Create a symbolic link named /tmp/soft1 that points to /tmp/hard2."
     read -p "  lab@lab187:~$ " cmd9
     echo
     [[ "$cmd9" != "ln -s /tmp/hard2 /tmp/soft1" ]] && {
@@ -185,7 +185,7 @@ while true; do
     echo "  Symlink created."
     echo
 
-    echo "  Step 10: Append text through the symbolic link."
+    echo "  Step 10: Append the text via_softlink by writing through the symbolic link /tmp/soft1."
     read -p "  lab@lab187:~$ " cmd10
     echo
     [[ "$cmd10" != "echo via_softlink >> /tmp/soft1" ]] && {
@@ -200,7 +200,7 @@ while true; do
     echo "  File updated."
     echo
 
-    echo "  Step 11: Read the content through /tmp/hard2."
+    echo "  Step 11: Read /tmp/hard2 to verify the data written through the symbolic link reached the target file."
     read -p "  lab@lab187:~$ " cmd11
     echo
     [[ "$cmd11" != "cat /tmp/hard2" ]] && {
@@ -213,7 +213,7 @@ while true; do
     echo "  via_softlink"
     echo
 
-    echo "  Step 12: Remove /tmp/hard2 and inspect the symlink."
+    echo "  Step 12: Remove /tmp/hard2, then list /tmp/soft1 in long format so you can inspect what happened to the symlink."
     read -p "  lab@lab187:~$ " cmd12
     echo
     [[ "$cmd12" != "rm /tmp/hard2 && ls -l /tmp/soft1" ]] && {
@@ -229,7 +229,7 @@ while true; do
     echo "  Note: /tmp/soft1 is now a broken symlink."
     echo
 
-    echo "  Step 13: Try to read the broken symlink."
+    echo "  Step 13: Try to read /tmp/soft1 after its target has been removed so you can observe the broken symlink behavior."
     read -p "  lab@lab187:~$ " cmd13
     echo
     [[ "$cmd13" != "cat /tmp/soft1" ]] && {

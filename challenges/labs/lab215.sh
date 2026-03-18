@@ -53,9 +53,9 @@ while true; do
   # Step 1: Baseline — show current LV size and filesystem usage (SIMULATED)
   draw_lab_ui
   echo "  Step 1: Check the current size of $LV_EXT_PATH."
-  echo "          Expected: lvs $LV_EXT_PATH"
   read -p "  lab@lab215:~$ " cmd1a
   [[ "$cmd1a" != "lvs /dev/vgdata/lvext4" ]] && { print_error "Use: lvs /dev/vgdata/lvext4"; read -p "Press Enter to try again..." _; continue; }
+  echo
   echo "  LV     VG     Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert"
   echo "  lvext4 vgdata -wi-ao---- 300.00m"
   echo
@@ -69,43 +69,43 @@ while true; do
 
   # Step 2: Prepare the new PV (SIMULATED)
   echo "  Step 2: Initialize $NEW_PV as a physical volume."
-  echo "          Expected: pvcreate $NEW_PV"
   read -p "  lab@lab215:~$ " cmd2
   [[ "$cmd2" != "pvcreate /dev/sdf" ]] && { print_error "Use: pvcreate /dev/sdf"; read -p "Press Enter to try again..." _; continue; }
+  echo
   echo "  Physical volume \"/dev/sdf\" successfully created."
   echo
 
   # Step 3: Extend the VG (SIMULATED)
   echo "  Step 3: Add the new PV to $VG."
-  echo "          Expected: vgextend $VG $NEW_PV"
   read -p "  lab@lab215:~$ " cmd3
   [[ "$cmd3" != "vgextend vgdata /dev/sdf" ]] && { print_error "Use: vgextend vgdata /dev/sdf"; read -p "Press Enter to try again..." _; continue; }
+  echo
   echo "  Volume group \"vgdata\" successfully extended"
   echo
 
   # Step 4: (Optional) Inspect VG free space (SIMULATED)
   echo "  Step 4: Show VG summary to confirm free space."
-  echo "          Expected: vgs $VG"
   read -p "  lab@lab215:~$ " cmd4
   [[ "$cmd4" != "vgs vgdata" ]] && { print_error "Use: vgs vgdata"; read -p "Press Enter to try again..." _; continue; }
+  echo
   echo "  VG     #PV #LV #SN Attr   VSize   VFree"
   echo "  vgdata   2   2   0 wz--n-  2.00g  1.20g"
   echo
 
   # Step 5: Extend the logical volume by +400M (SIMULATED)
   echo "  Step 5: Grow $LV_EXT_PATH by +400M (to ~700M)."
-  echo "          Expected: lvextend -L +400M $LV_EXT_PATH"
   read -p "  lab@lab215:~$ " cmd5
   [[ "$cmd5" != "lvextend -L +400M /dev/vgdata/lvext4" ]] && { print_error "Use: lvextend -L +400M /dev/vgdata/lvext4"; read -p "Press Enter to try again..." _; continue; }
+  echo
   echo "  Size of logical volume vgdata/lvext4 changed from 300.00 MiB (75 extents) to 700.00 MiB (175 extents)."
   echo "  Logical volume vgdata/lvext4 successfully resized."
   echo
 
   # Step 6: Grow the ext4 filesystem online (SIMULATED)
   echo "  Step 6: Resize the ext4 filesystem while mounted."
-  echo "          Expected: resize2fs $LV_EXT_PATH"
   read -p "  lab@lab215:~$ " cmd6
   [[ "$cmd6" != "resize2fs /dev/vgdata/lvext4" ]] && { print_error "Use: resize2fs /dev/vgdata/lvext4"; read -p "Press Enter to try again..." _; continue; }
+  echo
   echo "resize2fs 1.46.5 (30-Dec-2021)"
   echo "Filesystem at /dev/vgdata/lvext4 is mounted on /mnt/data_ext4; on-line resizing required"
   echo "old_desc_blocks = 2, new_desc_blocks = 9"
@@ -114,27 +114,27 @@ while true; do
 
   # Step 7: Verify LV size (SIMULATED)
   echo "  Step 7: Verify the new LV size."
-  echo "          Expected: lvs $LV_EXT_PATH"
   read -p "  lab@lab215:~$ " cmd7
   [[ "$cmd7" != "lvs /dev/vgdata/lvext4" ]] && { print_error "Use: lvs /dev/vgdata/lvext4"; read -p "Press Enter to try again..." _; continue; }
+  echo
   echo "  LV     VG     Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert"
   echo "  lvext4 vgdata -wi-ao---- 700.00m"
   echo
 
   # Step 8: Verify filesystem has grown (SIMULATED)
   echo "  Step 8: Confirm the mounted filesystem reflects the new size."
-  echo "          Expected: df -hT $MNT_EXT"
   read -p "  lab@lab215:~$ " cmd8
   [[ "$cmd8" != "df -hT /mnt/data_ext4" ]] && { print_error "Use: df -hT /mnt/data_ext4"; read -p "Press Enter to try again..." _; continue; }
+  echo
   echo "Filesystem            Type  Size  Used Avail Use% Mounted on"
   echo "/dev/vgdata/lvext4    ext4  700M  6.5M  694M   1% /mnt/data_ext4"
   echo
 
   # Step 9: (Bonus) Visualize the block device layout (SIMULATED)
-  echo "  Step 9 (bonus): View device mapping."
-  echo "          Expected: lsblk"
+  echo "  Step 9: View device mapping."
   read -p "  lab@lab215:~$ " cmd9
   [[ "$cmd9" != "lsblk" ]] && { print_error "Use: lsblk"; read -p "Press Enter to try again..." _; continue; }
+  echo
   echo "NAME                MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS"
   echo "sde                   8:64   0    10G  0 disk"
   echo "└─vgdata-lvext4     253:0    0   700M  0 lvm  /mnt/data_ext4"

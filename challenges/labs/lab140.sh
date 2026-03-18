@@ -219,15 +219,7 @@ while true; do
   echo
 
   print_success "Excellent work."
-  print_info "You practiced core RHCSA user administration tasks:"
-  print_info "- useradd provisioning"
-  print_info "- passwd password management"
-  print_info "- group membership verification"
-  print_info "- password aging policy (chage)"
-  print_info "- account locking and unlocking"
-  print_info "- NSS verification with getent"
-  print_info "- home directory validation"
-  print_info "- cleanup with userdel -r"
+  print_info "You completed  core RHCSA user administration tasks"
   print_info "You earned $LAB_XP XP."
   award_xp $LAB_XP
 

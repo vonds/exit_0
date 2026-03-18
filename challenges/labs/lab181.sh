@@ -17,33 +17,33 @@ record_lab_completion() {
     tmpfile=$(mktemp)
     jq --arg lab "$LAB_ID" '.[$lab] += 1 // 1' "$LAB_TRACK_FILE" > "$tmpfile" && mv "$tmpfile" "$LAB_TRACK_FILE"
 }
+
 get_lab_completion_count() {
     jq -r --arg lab "$LAB_ID" '.[$lab] // 0' "$LAB_TRACK_FILE"
 }
+
 draw_lab_ui() {
     clear
     center_draw_stats_panel "$LEVEL" "$XP" "$(calculate_xp_to_next_level)"
     center_draw_progress_bar "$XP" "$(calculate_xp_to_next_level)"
-    echo; echo; echo
+    echo
+    echo
+    echo
 }
 
 while true; do
     draw_lab_ui
     center_title "$LAB_NAME"
     echo
-    center_text "Scenario: The system dropped to the dracut emergency shell."
-    center_text "Goal: Inspect logs, activate storage (LVM), mount the real root at /sysroot, and continue boot."
+    center_text "Scenario: The system dropped into the dracut emergency shell during boot."
+    center_text "Goal: Review boot diagnostics, activate LVM, mount the real root at /sysroot,"
+    center_text "and continue the boot process successfully."
     echo
     center_text "Press Enter to begin the lab..."
     read _
 
-    # --- You are at the dracut emergency shell ---
     draw_lab_ui
-    echo "  The system is in the initramfs emergency environment (simulated)."
-    echo "  dracut:/#"
-    echo
-
-    echo "  Step 1: Show the current kernel command line."
+    echo "  Step 1: Show the current kernel command line so you can verify boot parameters."
     read -p "  dracut:/# " cmd1
     echo
     if [[ "$cmd1" != "cat /proc/cmdline" ]]; then
@@ -51,10 +51,10 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  BOOT_IMAGE=/vmlinuz-<KERNEL> root=UUID=<ROOT-UUID> ro rd.lvm.lv=rhel/root rhgb quiet"
+    echo "  BOOT_IMAGE=(hd0,gpt2)/vmlinuz-5.14.0-503.35.1.el9_5.x86_64 root=/dev/mapper/rhel-root ro rd.lvm.lv=rhel/root rd.lvm.lv=rhel/swap rhgb quiet"
     echo
 
-    echo "  Step 2: Review boot diagnostics from the current boot."
+    echo "  Step 2: Review detailed diagnostics from the current failed boot."
     read -p "  dracut:/# " cmd2
     echo
     if [[ "$cmd2" != "journalctl -xb" ]]; then
@@ -62,13 +62,22 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  dracut: Timed out waiting for device /dev/mapper/rhel-root"
-    echo "  systemd: Failed to mount /sysroot."
-    echo "  dracut: Entering emergency mode."
-    echo "  Hint: A detailed report is saved at /run/initramfs/rdsosreport.txt"
+    echo "  Mar 12 08:14:21 localhost kernel: XFS (dm-0): Mounting V5 Filesystem"
+    echo "  Mar 12 08:14:21 localhost systemd[1]: Starting Dracut Emergency Shell..."
+    echo "  Mar 12 08:14:21 localhost dracut-initqueue[643]: Warning: dracut-initqueue timeout - starting timeout scripts"
+    echo "  Mar 12 08:14:21 localhost dracut-initqueue[643]: Warning: Could not boot."
+    echo "  Mar 12 08:14:21 localhost dracut-initqueue[643]: Warning: /dev/mapper/rhel-root does not exist"
+    echo "  Mar 12 08:14:21 localhost systemd[1]: sysroot.mount: Mount process exited, code=exited, status=32"
+    echo "  Mar 12 08:14:21 localhost systemd[1]: sysroot.mount: Failed with result 'exit-code'."
+    echo "  Mar 12 08:14:21 localhost systemd[1]: Failed to mount /sysroot."
+    echo "  Mar 12 08:14:21 localhost dracut[842]: Warning: /dev/rhel/root does not exist"
+    echo "  Mar 12 08:14:21 localhost dracut[842]: Warning: /dev/mapper/rhel-root does not exist"
+    echo "  Mar 12 08:14:21 localhost dracut[842]: Refusing to continue"
+    echo "  Mar 12 08:14:21 localhost systemd[1]: Started Dracut Emergency Shell."
+    echo "  Hint: a full report is available at /run/initramfs/rdsosreport.txt"
     echo
 
-    echo "  Step 3: Inspect the dracut SOS report (first lines)."
+    echo "  Step 3: Inspect the dracut SOS report for a more focused summary."
     read -p "  dracut:/# " cmd3
     echo
     if [[ "$cmd3" != "head -n 15 /run/initramfs/rdsosreport.txt" ]]; then
@@ -76,13 +85,22 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  ==== rdsosreport: collected diagnostics (truncated) ===="
-    echo "  cmdline: ... rd.lvm.lv=rhel/root ..."
-    echo "  lvm: PV(s) not yet active"
-    echo "  mount: /sysroot: special device /dev/mapper/rhel-root does not exist"
+    echo "  ============================================================"
+    echo "  dracut-055-12.git20240104.el9"
+    echo "  dracut module 'systemd'"
+    echo "  kernel command line:"
+    echo "    BOOT_IMAGE=(hd0,gpt2)/vmlinuz-5.14.0-503.35.1.el9_5.x86_64 root=/dev/mapper/rhel-root ro rd.lvm.lv=rhel/root rd.lvm.lv=rhel/swap rhgb quiet"
+    echo "  devices scanned:"
+    echo "    /dev/sda1"
+    echo "    /dev/sda2"
+    echo "  lvm:"
+    echo "    volume group \"rhel\" present but not activated"
+    echo "  mount:"
+    echo "    mount: /sysroot: special device /dev/mapper/rhel-root does not exist"
+    echo "  ============================================================"
     echo
 
-    echo "  Step 4: List available disks and partitions."
+    echo "  Step 4: List block devices so you can see the underlying disk layout."
     read -p "  dracut:/# " cmd4
     echo
     if [[ "$cmd4" != "lsblk" ]]; then
@@ -90,13 +108,14 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  NAME        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT"
-    echo "  sda           8:0    0   40G  0 disk"
-    echo "  ├─sda1        8:1    0  512M  0 part"
-    echo "  └─sda2        8:2    0 39.5G  0 part"
+    echo "  NAME          MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS"
+    echo "  sda             8:0    0   40G  0 disk"
+    echo "  ├─sda1          8:1    0    1G  0 part"
+    echo "  └─sda2          8:2    0   39G  0 part"
+    echo "  No mapper devices are currently active."
     echo
 
-    echo "  Step 5: Scan for LVM volume groups."
+    echo "  Step 5: Scan for available LVM volume groups."
     read -p "  dracut:/# " cmd5
     echo
     if [[ "$cmd5" != "vgscan" ]]; then
@@ -104,11 +123,12 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
+    echo "  WARNING: Running as a single process."
     echo "  Reading volume groups from cache."
     echo "  Found volume group \"rhel\" using metadata type lvm2"
     echo
 
-    echo "  Step 6: Activate LVM volumes so the root LV appears."
+    echo "  Step 6: Activate all logical volumes in the detected volume groups."
     read -p "  dracut:/# " cmd6
     echo
     if [[ "$cmd6" != "vgchange -ay" ]]; then
@@ -119,7 +139,7 @@ while true; do
     echo "  2 logical volume(s) in volume group \"rhel\" now active"
     echo
 
-    echo "  Step 7: List logical volumes to confirm the root LV name."
+    echo "  Step 7: List logical volumes to confirm the expected root LV exists."
     read -p "  dracut:/# " cmd7
     echo
     if [[ "$cmd7" != "lvs" ]]; then
@@ -127,12 +147,12 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  LV    VG   Attr       LSize  Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert"
-    echo "  root  rhel -wi-ao----  20.0g"
-    echo "  swap  rhel -wi-ao----   2.0g"
+    echo "  LV   VG   Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert"
+    echo "  root rhel -wi-ao---- 34.00g"
+    echo "  swap rhel -wi-ao----  4.00g"
     echo
 
-    echo "  Step 8: (Optional) Identify filesystem type of the root LV."
+    echo "  Step 8: Identify the filesystem type on /dev/mapper/rhel-root before mounting it."
     read -p "  dracut:/# " cmd8
     echo
     if [[ "$cmd8" != "blkid /dev/mapper/rhel-root" ]]; then
@@ -140,7 +160,7 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  /dev/mapper/rhel-root: UUID=\"<UUID>\" TYPE=\"xfs\""
+    echo "  /dev/mapper/rhel-root: UUID=\"6f7d7d4d-9d95-47df-a7e2-4a3d58fd97b1\" BLOCK_SIZE=\"512\" TYPE=\"xfs\""
     echo
 
     echo "  Step 9: Mount the real root filesystem read-only at /sysroot."
@@ -153,7 +173,7 @@ while true; do
     fi
     echo
 
-    echo "  Step 10: Verify that the OS tree is visible under /sysroot."
+    echo "  Step 10: Verify that the operating system tree is present under /sysroot."
     read -p "  dracut:/# " cmd10
     echo
     if [[ "$cmd10" != "ls /sysroot" ]]; then
@@ -161,11 +181,10 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  bin  boot  etc  home  lib  lib64  root  sbin  usr  var"
+    echo "  afs  bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var"
     echo
 
-    echo "  Step 11: Continue the boot process now that /sysroot is mounted."
-    echo "           (Exit the emergency shell to let dracut proceed.)"
+    echo "  Step 11: Exit the dracut shell so the boot process can continue."
     read -p "  dracut:/# " cmd11
     echo
     if [[ "$cmd11" != "exit" ]]; then
@@ -173,11 +192,15 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  dracut: Switching root to /sysroot"
-    echo "  systemd: Continuing boot (simulated)..."
+    echo "  exit"
+    echo "  Warning: /sysroot is mounted read-only."
+    echo "  Switching root."
+    echo "  [  OK  ] Started NetworkManager-wait-online.service."
+    echo "  [  OK  ] Reached target Multi-User System."
+    echo "  [  OK  ] Started GNOME Display Manager."
     echo
 
-    echo "  Step 12: After boot, confirm the system is up to the default target."
+    echo "  Step 12: After boot completes, confirm the system is fully operational."
     read -p "  lab@lab181:~$ " cmd12
     echo
     if [[ "$cmd12" != "systemctl is-system-running" ]]; then
@@ -188,7 +211,7 @@ while true; do
     echo "  running"
     echo
 
-    echo "  Step 13: Verify that the root filesystem is mounted and active."
+    echo "  Step 13: Verify that the root filesystem is mounted from the expected device."
     read -p "  lab@lab181:~$ " cmd13
     echo
     if [[ "$cmd13" != "findmnt /" ]]; then
@@ -196,11 +219,11 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  TARGET SOURCE                   FSTYPE OPTIONS"
-    echo "  /      /dev/mapper/rhel-root    xfs    rw,relatime,attr2,inode64"
+    echo "  TARGET SOURCE                    FSTYPE OPTIONS"
+    echo "  /      /dev/mapper/rhel-root     xfs    rw,relatime,seclabel,attr2,inode64,logbufs=8,logbsize=32k,prjquota"
     echo
 
-    echo "  Step 14: (Optional) Show that LVM volumes are still active post-boot."
+    echo "  Step 14: Confirm the LVM volumes remain active after the system comes up."
     read -p "  lab@lab181:~$ " cmd14
     echo
     if [[ "$cmd14" != "lvs rhel" && "$cmd14" != "lvs" ]]; then
@@ -208,15 +231,18 @@ while true; do
         read -p "Press Enter to try again..." _
         continue
     fi
-    echo "  LV    VG   Attr       LSize"
-    echo "  root  rhel -wi-ao----  20.0g"
-    echo "  swap  rhel -wi-ao----   2.0g"
+    echo "  LV   VG   Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert"
+    echo "  root rhel -wi-ao---- 34.00g"
+    echo "  swap rhel -wi-ao----  4.00g"
     echo
 
     print_success "Nice work!"
     print_info "You earned $LAB_XP XP for completing this lab."
     award_xp $LAB_XP
-    XP=$(jq '.XP' "$SAVE_JSON"); LEVEL=$(jq '.LEVEL' "$SAVE_JSON"); export XP; export LEVEL
+    XP=$(jq '.XP' "$SAVE_JSON")
+    LEVEL=$(jq '.LEVEL' "$SAVE_JSON")
+    export XP
+    export LEVEL
     record_lab_completion
 
     completion_count=$(get_lab_completion_count)
