@@ -55,7 +55,6 @@ while true; do
     center_title "$LAB_NAME"
     echo
     center_text "Goal: Practice changing file permissions with chmod."
-    center_text "Focus: symbolic mode, numeric mode, and verification."
     echo
     center_text "Press Enter to begin the lab..."
     read _

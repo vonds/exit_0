@@ -59,12 +59,14 @@ while true; do
   echo "  LV     VG     Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert"
   echo "  lvext4 vgdata -wi-ao---- 300.00m"
   echo
-  echo "          Now confirm the mounted filesystem size."
-  echo "          Expected: df -hT $MNT_EXT"
+  echo "  Now confirm the mounted filesystem size."
+  echo
+
   read -p "  lab@lab215:~$ " cmd1b
   [[ "$cmd1b" != "df -hT /mnt/data_ext4" ]] && { print_error "Use: df -hT /mnt/data_ext4"; read -p "Press Enter to try again..." _; continue; }
-  echo "Filesystem            Type  Size  Used Avail Use% Mounted on"
-  echo "/dev/vgdata/lvext4    ext4  300M  6.0M  294M   2% /mnt/data_ext4"
+  echo
+  echo "  Filesystem            Type  Size  Used Avail Use% Mounted on"
+  echo "  /dev/vgdata/lvext4    ext4  300M  6.0M  294M   2% /mnt/data_ext4"
   echo
 
   # Step 2: Prepare the new PV (SIMULATED)
@@ -106,10 +108,10 @@ while true; do
   read -p "  lab@lab215:~$ " cmd6
   [[ "$cmd6" != "resize2fs /dev/vgdata/lvext4" ]] && { print_error "Use: resize2fs /dev/vgdata/lvext4"; read -p "Press Enter to try again..." _; continue; }
   echo
-  echo "resize2fs 1.46.5 (30-Dec-2021)"
-  echo "Filesystem at /dev/vgdata/lvext4 is mounted on /mnt/data_ext4; on-line resizing required"
-  echo "old_desc_blocks = 2, new_desc_blocks = 9"
-  echo "The filesystem on /dev/vgdata/lvext4 is now 716800 (4k) blocks long."
+  echo "  resize2fs 1.46.5 (30-Dec-2021)"
+  echo "  Filesystem at /dev/vgdata/lvext4 is mounted on /mnt/data_ext4; on-line resizing required"
+  echo "  old_desc_blocks = 2, new_desc_blocks = 9"
+  echo "  The filesystem on /dev/vgdata/lvext4 is now 716800 (4k) blocks long."
   echo
 
   # Step 7: Verify LV size (SIMULATED)
@@ -126,8 +128,8 @@ while true; do
   read -p "  lab@lab215:~$ " cmd8
   [[ "$cmd8" != "df -hT /mnt/data_ext4" ]] && { print_error "Use: df -hT /mnt/data_ext4"; read -p "Press Enter to try again..." _; continue; }
   echo
-  echo "Filesystem            Type  Size  Used Avail Use% Mounted on"
-  echo "/dev/vgdata/lvext4    ext4  700M  6.5M  694M   1% /mnt/data_ext4"
+  echo "  Filesystem            Type  Size  Used Avail Use% Mounted on"
+  echo "  /dev/vgdata/lvext4    ext4  700M  6.5M  694M   1% /mnt/data_ext4"
   echo
 
   # Step 9: (Bonus) Visualize the block device layout (SIMULATED)
@@ -135,11 +137,11 @@ while true; do
   read -p "  lab@lab215:~$ " cmd9
   [[ "$cmd9" != "lsblk" ]] && { print_error "Use: lsblk"; read -p "Press Enter to try again..." _; continue; }
   echo
-  echo "NAME                MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS"
-  echo "sde                   8:64   0    10G  0 disk"
-  echo "└─vgdata-lvext4     253:0    0   700M  0 lvm  /mnt/data_ext4"
-  echo "  └─vgdata-lvxfs    253:1    0   500M  0 lvm"
-  echo "sdf                   8:80   0    10G  0 disk"
+  echo "  NAME                MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS"
+  echo "  sde                   8:64   0    10G  0 disk"
+  echo "  └─vgdata-lvext4     253:0    0   700M  0 lvm  /mnt/data_ext4"
+  echo "    └─vgdata-lvxfs    253:1    0   500M  0 lvm"
+  echo "  sdf                   8:80   0    10G  0 disk"
   echo
 
   print_success "Nice work! You extended the LV and the ext4 filesystem online."
