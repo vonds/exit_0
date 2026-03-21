@@ -43,7 +43,7 @@ while true; do
 
   # STEP 1: Import signing key (real: trust chain step)
   echo "  Step 1: Import the vendor public key."
-  echo "  (Assume vendor-pubkey.asc is in the current directory.)"
+  echo "  Assume vendor-pubkey.asc is in the current directory."
   read -p "$PROMPT" cmd1
   echo
   if [[ "$cmd1" != "gpg --import vendor-pubkey.asc" ]]; then
@@ -58,7 +58,7 @@ while true; do
 
   # STEP 2: Verify detached signature
   echo "  Step 2: Verify the detached signature for app.tar.gz."
-  echo "  (Assume app.tar.gz and app.tar.gz.sig are present.)"
+  echo "  Assume app.tar.gz and app.tar.gz.sig are present."
   read -p "$PROMPT" cmd2
   echo
   if [[ "$cmd2" != "gpg --verify app.tar.gz.sig app.tar.gz" ]]; then
@@ -90,7 +90,16 @@ while true; do
     read -p "Press Enter to try again..." _
     continue
   fi
-  echo "  (Editor opened. You made your change.)"
+  echo "  [sudo] password for examuser:"
+  echo "  sudoedit: editing /etc/ssh/sshd_config"
+  echo
+  echo "  # You are now in your editor."
+  echo "  # Make a small, safe change such as:"
+  echo "  #   PermitRootLogin no"
+  echo "  #   PasswordAuthentication no"
+  echo "  # Save and quit (for vim: :wq)."
+  echo
+  echo "  Wrote /etc/ssh/sshd_config"
   echo
 
   # STEP 5: Validate config and restart sshd (real: don't lock yourself out)
